@@ -1,0 +1,58 @@
+{
+    "item" : {
+        "GlassMagnifier" : {
+            "name" : "Glass Magnifier",
+            "pickup" : "Increase base <y>damage.</c>",
+            "description" : "Increase <y>base damge</c> by <y>2 <c_stack>(+1,5 per stack)</c>.",
+            "destination" : "1",
+            "date" : "1",
+            "story" : "1",
+            "priority" : "1"
+        },
+        "ThinWings" : {
+            "name" : "Thin Wings",
+            "pickup" : "Falling to low <r>health</c> increases the <b> move speed.</c>",
+            "description" : "Falling below <r>25% health</c>, increases <b>move speed</c> by <b>25%<c_stack>(+20% per stack.)</c> for 10 seconds.",
+            "destination" : "1",
+            "date" : "1",
+            "story" : "1",
+            "priority" : "1"
+        },
+        "MassacreCurse" : {
+            "name" : "Massacre Curse",
+            "pickup" : "Killing enemies increases <y>damage</c> and <g>armor</c>",
+            "description" : "Killing <y>3 enemies</c> grants <y>1 buff stack</c> of <r>'Massacre'</c> for <y>5</c> seconds <c_stack>(+2.5 seconds)</c>. Increases <y>damage</c> and <g>armor</c> by <y>3%</c>.",
+            "destination" : "1",
+            "date" : "1",
+            "story" : "1",
+            "priority" : "1"
+        },
+        "MagmaFragment" : {
+            "name" : "Magma Fragment",
+            "pickup" : "Chance to <r>burn</c> enemies",
+            "description" : "<y>10%</c> <c_stack>(+10% per item stack)</c> <y>chance</c> sets enemies on <r>fire</c>. <r>Fire</c> deals <y>30%</c> <c_stack>(+20% per buff stack)</c> for <y>5 seconds</c>.",
+            "destination" : "1",
+            "date" : "1",
+            "story" : "1",
+            "priority" : "1"
+        },
+        "IceMixture" : {
+            "name" : "Ice Mixture",
+            "pickup" : "Chance to <b>freeze</c> enemies",
+            "description" : "<y>7%</c> <c_stack>(+5% per stack)</c> <y>chance</c> slow enemies <y>move speed</c> and <y>attack speed</c> by 40% for <y>4 seconds.</c>",
+            "destination" : "1",
+            "date" : "1",
+            "story" : "1",
+            "priority" : "1"
+        },
+        "GearFeather" : {
+            "name" : "Gear Feather",
+            "pickup" : "Increase jump height ",
+            "description" : "Increase jump height by 7% <c_stack>(+7% per stack.)</c>",
+            "destination" : "1",
+            "date" : "1",
+            "story" : "1",
+            "priority" : "1"
+        }
+    }
+}

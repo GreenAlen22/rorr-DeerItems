@@ -1,0 +1,12 @@
+﻿{
+	"name": "DeerItems",
+	"version_number": "1.1.0",
+	"website_url": "https://github.com/GreenAlen22/rorr-DeerItems.git",
+	"description": "items mod, add 5 white items. Second beta",
+	"dependencies": [
+		"ReturnOfModding-ReturnOfModding-1.0.55",
+		"RoRRModdingToolkit-RoRR_Modding_Toolkit-1.2.0",
+		"MGReturns-ENVY-1.1.1",
+		"Klehrik-CooldownHelper-1.0.1"
+	]
+}
