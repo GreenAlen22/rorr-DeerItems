@@ -14,10 +14,10 @@ An item mod that adds all sorts of unique (and not so unique) items. Work is sti
 
 ## Misc
 ### Ru
-Вы можете ознакомиться со списком контента [тута](https://github.com/Klehrik/RoRR-Aphelion/wiki/Content)  
+Вы можете ознакомиться со списком контента [тута](https://github.com/GreenAlen22/rorr-DeerItems/wiki/Ru)  
 Онлайн режим провервен на совместимость. Но если будут какие либо ошибки сообщите в дискорд.
 ### En
-You can see the list of content [here](https://github.com/Klehrik/RoRR-Aphelion/wiki/Content )
+You can see the list of content [here](https://github.com/GreenAlen22/rorr-DeerItems/wiki/En)
 The online mode is checked for compatibility. But if there are any errors, please report them to discord.
 
 ---
