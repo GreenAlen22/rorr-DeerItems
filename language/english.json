@@ -37,7 +37,7 @@
             "priority": "Fragile"
         },
         "MassacreCurse": {
-            "name": "Curse of Massacre",
+            "name": "Massacre Curse",
             "pickup": "Killing enemies increases <y>damage</c> and <g>armor</c>.",
             "description": "Killing an <y>enemy</c> grants <y>1 stack</c><r> of 'Massacre'</c> for <y>2.5</c> seconds <c_stack>(+2.5 seconds)</c>. Increases <y>damage</c> and <g>armor</c> by <y>3%</c>.",
             "destination": "Jungles VII,\nMuseum of 2019,\nEarth",
@@ -73,7 +73,7 @@
             "priority": "Standard"
         },
         "FearEyes": {
-            "name": "Eyes of Fear",
+            "name": "Fear Eyes",
             "pickup": "Eyes are afraid, but hands still do the work.",
             "description": "Increases <y>damage by 15</c><c_stack>(+10 per stack)</c>. Breaks when <r>health drops</c> below <b>15%</c>.",
             "destination": "Kitchen 4-B,\nSupply Station,\nUES PRIME",
@@ -190,7 +190,7 @@
             "priority": "<r>High Priority/Fragile</c>"
         },
         "AtGMissileMk0": {
-            "name": "Air-to-Ground Missile Mk.0",
+            "name": "AtG Missile Mk. 0",
             "pickup": "Chance to fire a missile",
             "description": "On hit, you have a <y>7% chance</c> <c_stack>(+7% per stack)</c> to launch a missile dealing <y>75% TOTAL damage</c>.",
             "destination": "Fort Joseph,\nBelt No.1053,\n[REDACTED],\nBoron System",
@@ -199,7 +199,7 @@
             "priority": "MILITARY"
         },
         "SporeOBloom": {
-            "name": "Sporebloom",
+            "name": "Spore O bloom",
             "pickup": "Chance to release <p>poison</c> on kill.",
             "description": "On killing an enemy, has a <y>44%</c> chance to release a <p>poison cloud</c> dealing <y>60%</c> <c_stack>(+60% per stack)</c> <y>damage</c> over <b>5 seconds</c>.",
             "destination": "Hidden Nook,\nMountain of Creation,\nVenus",
