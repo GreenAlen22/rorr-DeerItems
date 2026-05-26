@@ -1,0 +1,11 @@
+﻿{
+	"name": "DeerItems",
+	"version_number": "2.0.0",
+	"website_url": "https://github.com/GreenAlen22/rorr-DeerItems.git",
+	"description": "A mod with additional items. It currently contains 18 white items, 9 green items, and 4 items.",
+	"dependencies": [
+		"ReturnOfModding-ReturnOfModding-1.0.74",
+		"RoRRModdingToolkit-RoRR_Modding_Toolkit-1.2.19",
+		"LuaENVY-ENVY-1.2.0"
+	]
+}
