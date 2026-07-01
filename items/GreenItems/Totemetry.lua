@@ -15,7 +15,7 @@ local sound = Resources.sfx_load("DeerItems", "sound/Totemetry", PATH.."assets/s
 local item = Item.new("DeerItems", "Totemetry")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_survive)
+item:set_loot_tags(Item.LOOT_TAG.category_healing)
 
 -- Константы поведения тотема
 local RADIUS_BASE   = 7.5 * 32 * 2      -- Базовый радиус (480 px)
@@ -24,6 +24,9 @@ local HEAL_TICK     = 180               -- Период лечения: раз �
 local TOTEM_LIFE    = 60 * 45           -- Время жизни тотема: 45 сек
 local COOLDOWN      = 60 * 120          -- Время кулдауна: 2 минуты
 local AS_BUFF_TIME  = TOTEM_LIFE        -- Длительность бонуса к атак-спиду: 45 сек
+
+-- Цвет отрисовки радиуса тотема — создаётся один раз, а не каждый кадр в onDraw
+local TOTEM_COLOR   = Color(0x63494f)
 
 -- Объект тотема
 local objTotem = Object.new("DeerItems", "EfHealingTotem")
@@ -58,13 +61,13 @@ end)
 
 -- Визуализация радиуса тотема
 objTotem:onDraw(function(self)
-    gm.draw_set_colour(Color(0x63494f))
-    gm.draw_circle(self.x, self.y - 40, self.radius, true)
-    gm.draw_circle(self.x, self.y - 40, self.radius / 3, true)
-    gm.draw_rectangle(self.x - self.radius / 1.2, self.y - self.radius / 1.2 - 40,
-                      self.x + self.radius / 1.2, self.y + self.radius / 1.2 - 40, true)
-    gm.draw_roundrect(self.x - self.radius / 1.4, self.y - self.radius / 1.4 - 40,
-                      self.x + self.radius / 1.4, self.y + self.radius / 1.4 - 40, true)
+    -- Координаты и радиус читаем из инстанса один раз за кадр
+    local x, y, r = self.x, self.y - 40, self.radius
+    gm.draw_set_colour(TOTEM_COLOR)
+    gm.draw_circle(x, y, r, true)
+    gm.draw_circle(x, y, r / 3, true)
+    gm.draw_rectangle(x - r / 1.2, y - r / 1.2, x + r / 1.2, y + r / 1.2, true)
+    gm.draw_roundrect(x - r / 1.4, y - r / 1.4, x + r / 1.4, y + r / 1.4, true)
 end)
 
 -- Синхронизация при удалении

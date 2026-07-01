@@ -1,5 +1,5 @@
 -- DeerItems-FearEyes
--- Увеличевает урон игрока за стак. При достижении 15% HP превращается в сломанные стаки.
+-- Увеличевает урон игрока за стак. При достижении 40% HP превращается в сломанные стаки.
 
 -- Загружаем спрайт предмета
 -- Загружаем звуковой эффект
@@ -7,6 +7,9 @@
 local sprite = Resources.sprite_load("DeerItems", "item/FearEyes", PATH.."assets/sprites/items/sWhiteItems/FearEyes.png", 1, 16, 16)
 local sound = Resources.sfx_load("DeerItems", "sound/FearEyes", PATH.."assets/sounds/FearEyes.ogg")
 local spike = Resources.sprite_load("DeerItems", "particle/Spike", PATH.."assets/sprites/particle/Spike.png", 1, 20, 15)
+
+-- ленивый кэш ссылки на сломанную версию (на загрузке может быть ещё не зарегистрирована)
+local deactivate
 
 -- Создание нового предмета с названием "FearEyes" в категории "DeerItems"
 -- Привязка спрайта к предмету
@@ -29,10 +32,11 @@ if item.onStatRecalc then
     end)
 end
 
--- При получении урона и снижении HP до 15%: преобразует стаки в сломанные
+-- При получении урона и снижении HP до 40%: преобразует стаки в сломанные
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
-    if actor.hp <= actor.maxhp * 0.15 then
-        local item_used = Item.find("DeerItems-FearEyesDeactivate")
+    if actor.hp <= actor.maxhp * 0.40 then
+        deactivate = deactivate or Item.find("DeerItems-FearEyesDeactivate")
+        local item_used = deactivate
 
         -- Переносим обычные стаки
         local normal = actor:item_stack_count(item, Item.STACK_KIND.normal)

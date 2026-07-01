@@ -11,7 +11,7 @@ local sprite = Resources.sprite_load("DeerItems", "item/RadialAlloy", PATH.."ass
 local item = Item.new("DeerItems", "RadialAlloy")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_survive)
+item:set_loot_tags(Item.LOOT_TAG.category_healing)
 
 -- При получении урона: лечим часть обратно
 item:onDamagedProc(function(actor, attacker, stack, hit_info)

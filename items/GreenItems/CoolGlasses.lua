@@ -21,7 +21,7 @@ item:set_loot_tags(Item.LOOT_TAG.category_damage)
 item:onAttackHit(function(actor, victim, stack, attack_info)
     if attack_info.critical then
         -- Получаем базовый урон до модификаторов
-        local base_damage = attack_info:get_damage_nocrit(attack_info.damage)
+        local base_damage = attack_info:get_damage_nocrit()
         -- Создание взрыва на месте жертвы
         local inst = actor:fire_explosion(
             victim.x,
@@ -36,7 +36,7 @@ item:onAttackHit(function(actor, victim, stack, attack_info)
         local sunDMG = inst.attack_info
         sunDMG:set_critical(false)            -- убираем возможность крита
         sunDMG.proc = false                   -- отключаем проки
-        sunDMG:use_raw_damage(true)          -- игнорируем модификаторы
+        sunDMG:use_raw_damage()              -- игнорируем модификаторы
         sunDMG:set_damage(base_damage * 0.2 * stack) -- наносим "сырой" урон
     end
 end)

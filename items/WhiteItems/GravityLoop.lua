@@ -8,6 +8,9 @@ local sprite = Resources.sprite_load("DeerItems", "item/GravityLoop", PATH.."ass
 local sound = Resources.sfx_load("DeerItems", "sound/GravityLoop", PATH.."assets/sounds/GravityLoop.ogg")
 local GravityLoopBreack = Resources.sprite_load("DeerItems", "particle/GravityLoopBreack", PATH.."assets/sprites/particle/GravityLoopBreack.png", 9, 32, 32)
 
+-- ленивый кэш ссылки на сломанную версию (на загрузке может быть ещё не зарегистрирована)
+local deactivate
+
 -- Создание нового предмета с названием "GravityLoop" в категории "DeerItems"
 -- Привязка спрайта к предмету
 -- Установка тира предмета: белый (обычный)
@@ -32,7 +35,8 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
         ef.sprite_index = GravityLoopBreack
 
         -- Получаем ссылку на предмет, заменяющий использованный стак
-        local item_used = Item.find("DeerItems-GravityLoopDeactivate")
+        deactivate = deactivate or Item.find("DeerItems-GravityLoopDeactivate")
+        local item_used = deactivate
 
         -- Удаляем 1 обычный стак и добавляем 1 сломанный
         local normal = actor:item_stack_count(item, Item.STACK_KIND.normal)

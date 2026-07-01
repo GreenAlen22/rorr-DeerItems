@@ -20,7 +20,14 @@ item:onStatRecalc(function(actor, stack)
 	local utility = actor:get_active_skill(Skill.SLOT.utility)
 	utility.cooldown = math.ceil(utility.cooldown * (0.95 ^ stack))
 end)
--- При использовании утилитарного скилла: добавление барьера
+-- При использовании утилитарного скилла: барьер, зависящий от базового кулдауна навыка.
+-- Чем длиннее кулдаун (т.е. чем реже доступен барьер), тем он больше — это уравнивает
+-- ценность предмета у персонажей с коротким и длинным КД третьего навыка.
 item:onUtilityUse(function(actor, stack)
-	actor:add_barrier(15 + 10 * stack)
+	local utility = actor:get_active_skill(Skill.SLOT.utility)
+	-- cooldown хранится в кадрах (60 к/с) → переводим в секунды
+	local cd_seconds = (utility.cooldown or 0) / 60
+	-- 1.5% от макс. HP за каждую секунду кулдауна (+0.5% за стак сверх первого)
+	local pct = 0.015 + 0.005 * (stack - 1)
+	actor:add_barrier(actor.maxhp * pct * cd_seconds)
 end)

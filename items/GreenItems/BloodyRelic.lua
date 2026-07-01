@@ -2,7 +2,7 @@
 -- 10% шанс при ударе дать бафф на 8 сек, увеличивающий скорость атаки. Макс. баффов: 5 + количество предметов.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/BloodyRelic", PATH.."assets/sprites/items/sGreenItems/BloodyRelic.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/BloodyRelic", PATH.."assets/sprites/items/sGreenItems/BloodyRelic.png", 1, 16, 17)
 
 -- Создание предмета BloodyRelic
 -- Привязка спрайта к предмету
@@ -12,6 +12,9 @@ local item = Item.new("DeerItems", "BloodyRelic")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.uncommon)
 item:set_loot_tags(Item.LOOT_TAG.category_damage)
+
+-- guid мода: ускоряет get_data (без обхода debug-стека на каждом кадре)
+local GUID = _ENV["!guid"]
 
 -- Загружаем спрайт баффа
 local buff_sprite = Resources.sprite_load("DeerItems", "buff/BloodyRelic", PATH.."assets/sprites/buffs/BloodyRelic.png", 1, 7, 10)
@@ -27,7 +30,7 @@ buff.max_stack = 999
 
 -- При применении баффа — создаём таймер его действия (8 секунд)
 buff:onApply(function(actor, stack)
-    local data = actor:get_data("BloodyRelic")
+    local data = actor:get_data("BloodyRelic", GUID)
     if not data.timers then
         data.timers = {}
     end
@@ -36,8 +39,7 @@ end)
 
 -- Каждый кадр: уменьшаем таймеры, удаляем истёкшие, ограничиваем стаки
 buff:onPostStep(function(actor, stack)
-    local data = actor:get_data("BloodyRelic")
-    local item = Item.find("DeerItems-BloodyRelic")
+    local data = actor:get_data("BloodyRelic", GUID)
     local maxAllowed = 5 + actor:item_stack_count(item)
     if data.timers then
         -- Обновление и удаление истекших таймеров

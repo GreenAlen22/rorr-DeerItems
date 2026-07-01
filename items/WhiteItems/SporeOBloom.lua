@@ -2,7 +2,7 @@
 -- При убийстве с шансом 44% создаёт ядовитое облако, наносящее урон от силы убийцы.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/SporeOBloom", PATH.."assets/sprites/items/sWhiteItems/SporeOBloom.png", 1, 16, 18)
+local sprite = Resources.sprite_load("DeerItems", "item/SporeOBloom", PATH.."assets/sprites/items/sWhiteItems/SporeOBloom.png", 1, 16.5, 18)
 
 -- Создание предмета SporeOBloom
 -- Привязка спрайта к предмету

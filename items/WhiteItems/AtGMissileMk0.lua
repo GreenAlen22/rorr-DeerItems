@@ -64,8 +64,10 @@ oMissile:onStep(function(self)
             -- Проверка столкновения с целью
             if self:is_colliding(t) then
                 if self:attack_collision_canhit(t) then
-                    -- Нанесение урона цели
-                    self.parent:fire_direct(t, 0.75, self.direction, self.x, self.y)
+                    -- Нанесение урона цели. proc=false обязательно: иначе попадание ракеты
+                    -- само сработает в onAttackHit → запустит новую ракету → бесконечный самопрок.
+                    local hit = self.parent:fire_direct(t, 0.75, self.direction, self.x, self.y)
+                    if hit and hit.attack_info then hit.attack_info.proc = false end
                 end
                 self:destroy()
             end
@@ -119,8 +121,10 @@ item:set_loot_tags(Item.LOOT_TAG.category_damage)
 -- Очистка всех коллбеков перед переопределением
 item:clear_callbacks()
 -- При попадании атакой: шанс запустить ракету
-item:onAttackHit(function(actor, victim, stack, hit_info)
-    hit_info.proc = false
+-- onHitProc (а не onAttackHit!) срабатывает ТОЛЬКО на атаках с включённым proc.
+-- Попадание самой ракеты помечено proc=false (см. oMissile:onStep), поэтому её урон сюда
+-- не попадает и цепочка «ракета → ракета → …» больше не зацикливается.
+item:onHitProc(function(actor, victim, stack, hit_info)
     if not gm._mod_net_isHost() then return end
     -- Шанс 7% за стак
     if math.random() <= (0.07 * stack) then

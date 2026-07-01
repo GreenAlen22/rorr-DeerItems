@@ -15,16 +15,21 @@ item:set_sprite(sprite)
 item:set_tier(Item.TIER.common)
 item:set_loot_tags(Item.LOOT_TAG.category_damage)
 
+-- guid мода (ускоряет get_data) и ленивый кэш ссылки на дебафф
+local GUID = _ENV["!guid"]
+local iceBuff
+
 -- Очистка старых коллбеков
 item:clear_callbacks()
 -- При попадании атакой срабатывает шанс наложить замедляющий дебафф
 item:onHitProc(function(actor, victim, stack, hit_info)
     -- Шанс 7% (2+5) и + 5% за стак
 	if math.random() <= 0.02 + (0.05 * stack) then
-        -- Звук на цели при наложении
-        victim:sound_play(sound, 1.0, 0.9 + math.random() * 0.2)
+        -- Звук на цели при наложении: всегда случайные громкость и интонация
+        victim:sound_play(sound, 0.8 + math.random() * 0.6, 0.7 + math.random() * 0.6)
         -- Применение дебаффа
-        victim:buff_apply(Buff.find("DeerItems-IceMixture"), 1)
+        iceBuff = iceBuff or Buff.find("DeerItems-IceMixture")
+        victim:buff_apply(iceBuff, 1)
     end
 end)
 
@@ -41,7 +46,7 @@ buff.is_debuff = true
 
 -- При применении — запускаем таймер и меняем визуал
 buff:onApply(function(actor, stack)
-    local actorData = actor:get_data("IceMixture")
+    local actorData = actor:get_data("IceMixture", GUID)
     if not actorData.timers then
         actorData.timers = {}
     end
@@ -53,7 +58,7 @@ end)
 
 -- Обновление таймеров каждого стека
 buff:onPostStep(function(actor, stack)
-    local actorData = actor:get_data("IceMixture") or {}
+    local actorData = actor:get_data("IceMixture", GUID) or {}
     -- Обновляем таймеры и удаляем истекшие
     if actorData.timers then
         for i = #actorData.timers, 1, -1 do

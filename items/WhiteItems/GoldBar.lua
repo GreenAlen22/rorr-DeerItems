@@ -28,7 +28,7 @@ item:onStageStart(function(actor, stack)
     Alarm.create(function()
         local hud = GM._mod_game_getHUD()
         if hud ~= -4 then
-            hud:add_gold_gml_Object_oHUD_Create_0(money)
+            hud.gold = hud.gold + money
         end
     end, 1)
 end)

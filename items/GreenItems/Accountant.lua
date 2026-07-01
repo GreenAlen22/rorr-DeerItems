@@ -24,8 +24,8 @@ item:onEquipmentUse(function(actor, stack)
     -- Длительность: 3 + 3 сек за стак
     actor:buff_apply(buff, 60 * (3 + 3 * stack), 1)
 
-    -- Воспроизведение звука активации
-    actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
+    -- Воспроизведение звука активации: всегда случайные громкость и интонация
+    actor:sound_play(sound, 1.6 + math.random() * 0.8, 0.7 + math.random() * 0.6)
 end)
 
 -- Настройки баффа: скрыт, не дебафф, максимум 1 стак

@@ -2,7 +2,7 @@
 -- После 3 убийств подряд даёт бафф, усиливающий урон и броню. Длительность стаков зависит от количества предметов.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/MassacreCurse", PATH.."assets/sprites/items/sWhiteItems/MassacreCurse.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/MassacreCurse", PATH.."assets/sprites/items/sWhiteItems/MassacreCurse.png", 1, 16, 17)
 
 -- Создание предмета MassacreCurse
 -- Привязка спрайта к предмету
@@ -13,9 +13,13 @@ item:set_sprite(sprite)
 item:set_tier(Item.TIER.common)
 item:set_loot_tags(Item.LOOT_TAG.category_damage)
 
+-- guid мода (ускоряет get_data) и ленивый кэш ссылки на бафф
+local GUID = _ENV["!guid"]
+local massacreBuff
+
 -- При получении предмета инициализируем счётчик убийств
 item:onAcquire(function(actor, stack)
-    local actorData = actor:get_data("MassacreCurse")
+    local actorData = actor:get_data("MassacreCurse", GUID)
     if not actorData.count then
         actorData.count = 0
     end
@@ -23,8 +27,9 @@ end)
 
 -- При убийстве увеличиваем счётчик и выдаём бафф при достижении 3
 item:onKillProc(function(actor, victim, stack)
-    local buff = Buff.find("DeerItems-MassacreCurse")
-    local actorData = actor:get_data("MassacreCurse")
+    massacreBuff = massacreBuff or Buff.find("DeerItems-MassacreCurse")
+    local buff = massacreBuff
+    local actorData = actor:get_data("MassacreCurse", GUID)
 
     actorData.count = actorData.count + 1
 
@@ -56,7 +61,7 @@ buff.is_timed = false
 
 -- При добавлении стака — добавляем таймер его действия
 buff:onApply(function(actor, stack)
-    local actorData = actor:get_data("MassacreCurse")
+    local actorData = actor:get_data("MassacreCurse", GUID)
     if not actorData.timers then actorData.timers = {} end
     -- Каждому стаку даётся время действия: 2.5 сек * количество предметов
     table.insert(actorData.timers, (2.5 * actor:item_stack_count(item)) * 60.0)
@@ -64,7 +69,7 @@ end)
 
 -- Постобновление: уменьшаем таймеры, удаляем стеки, если истекли
 buff:onPostStep(function(actor, stack)
-    local actorData = actor:get_data("MassacreCurse")
+    local actorData = actor:get_data("MassacreCurse", GUID)
     -- Обновляем каждый таймер
     for i, time in ipairs(actorData.timers) do
         actorData.timers[i] = time - 1

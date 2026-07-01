@@ -1,13 +1,295 @@
 {
     "item": {
+        "RiftBeacon": {
+            "name": "Rift Beacon",
+            "pickup": "<g>Survive a deadly hit</c> by tearing open a <p>rift</c>.",
+            "description": "Dropping below <b>25%</c> health grants a <g>barrier</c> for <g>25%</c> of max health and opens a <p>rift</c> for <b>8s</c>: enemies within <b>~250</c> take <r>50% damage</c> <c_stack>(+10% per stack)</c> every <b>0.5s</c> and are periodically <b>flung away</c>. <b>Kills</c> during the rift extend it by <b>1s</c>. Recharges each stage.",
+            "priority": "<r>High Priority</c>"
+        },
+        "IngrownIdol": {
+            "name": "Ingrown Idol",
+            "pickup": "Feeds on <r>kills</c> and, when sated, looses a <r>beast</c> to hunt for you.",
+            "description": "Each <b>kill</c> feeds the idol: <y>1</c> normal, <y>2</c> elite, <y>3</c> boss. Every <b>30 offerings</c> the idol calls a <r>powerful beast</c> that hunts your enemies for <b>45s</c>, striking for <y>200% damage</c> <c_stack>(+50% per stack)</c>. After <b>20 minutes</c> offerings are halved (<y>0.5</c> / <y>1</c> / <y>2</c>).",
+            "destination": "Reliquary Vault,\nDig Site 13,\nTitan",
+            "date": "27.02.2057",
+            "story": "It starts as a cold lump you can close a hand around. Feed it - it does not care whose blood, only how much - and it warms, settles in under the skin, and waits. When it has eaten its fill the carving splits and something steps out: not the idol, not you, but the thing the two of you make together, and it hunts the way the idol hungers. It runs itself down to nothing and folds back into the bone. The medics stopped asking what it is; they just tally what it leaves behind.",
+            "priority": "<r>High Priority</c>"
+        },
+        "ContagionBarb": {
+            "name": "Contagion Barb",
+            "pickup": "Hits cause <r>bleeding</c> that <r>spreads</c> on kill.",
+            "description": "<b>15%</c> <c_stack>(+5% per stack)</c> chance on hit to cause <r>bleeding</c> for <r>40% damage per second</c> over <b>4s</c>. Killing a bleeding enemy <r>spreads</c> the bleed to <b>1</c> <c_stack>(+1 per stack)</c> nearby enemy.",
+            "priority": "<g>Priority</c>"
+        },
+        "CharlatansDie": {
+            "name": "Charlatan's Die",
+            "pickup": "The first chest each stage may drop a <b>better item</c>.",
+            "description": "The <b>first chest</c> opened each stage has a <b>35%</c> <c_stack>(+10% per stack)</c> chance to also drop a higher-rarity item (<g>uncommon</c>, or <r>rare</c>).",
+            "priority": "<g>Priority</c>"
+        },
+        "StandingRequisition": {
+            "name": "Standing Requisition",
+            "pickup": "Each stage delivers a <b>choice</c> of items.",
+            "description": "At the start of each stage, a <b>delivery crate</c> appears nearby offering a <b>choice of 2</c> items - take one, the other is lost. Higher stacks improve the <b>rarity</c> odds.",
+            "priority": "<g>Priority</c>"
+        },
+        "LootFever": {
+            "name": "Loot Fever",
+            "pickup": "Picking up items <g>boosts your stats</c> for a while.",
+            "description": "Picking up any <b>item</c> grants a stack of <r>Fever</c>: <y>+3%</c> to <y>damage</c>, <y>attack speed</c>, <b>movement speed</c> and <g>regeneration</c> for <b>20s</c>. Stacks up to <b>4</c> <c_stack>(+2 per stack)</c> times.",
+            "priority": "<g>Priority</c>"
+        },
+        "MagicMissile": {
+            "name": "Magic Missile",
+            "pickup": "Your attacks <y>loose darts that never miss</c>.",
+            "description": "Each attack spends a charge to fire a <y>dart</c> at the nearest enemy for <y>120% damage</c> <c_stack>(+60% per stack)</c>. Holds <b>4</c> <c_stack>(+2 per stack)</c> charges, restoring <b>1</c> every <b>2.5s</c>.",
+            "destination": "Hobby Deck 4,\nQuartermaster Stores,\nUES Safe Travels",
+            "date": "11.07.2056",
+            "story": "Recovered from a hobbyist's footlocker, wedged between a bag of dice and a worn rulebook. It is a wrist emitter that throws thin darts - no fins, no charge we can measure - and yet every dart finds the target, even when the shooter does not. Two words are scratched into the casing: MAGIC MISSILE. The one tech who pried a unit open reports it stopped curving its shots afterward, so we stopped prying them open. Issue as-is.",
+            "priority": "<g>Priority</c>"
+        },
+        "BountyContract": {
+            "name": "Bounty Contract",
+            "pickup": "<r>Execute</c> weakened elites and earn <b>gold</c> for every elite slain.",
+            "description": "Instantly <r>kills</c> <r>elites</c> (not bosses) below <b>15%</c> <c_stack>(+5% per stack, max 50%)</c> health. Every <b>elite kill</c> grants <b>$40</c> <c_stack>(+$20 per stack)</c>. Ordinary kills grant no gold. Gold scales with time.",
+            "priority": "<g>Priority</c>"
+        },
+        "Golemshot": {
+            "name": "Golemshot",
+            "pickup": "Using interactables <b>wakes a golem sentry</c>.",
+            "description": "Activating any <b>interactable</c> deploys a <y>golem turret</c> for <b>30s</c> that fires at the nearest enemy within <b>~250</c> every <b>0.75s</c> for <y>100% damage</c> <c_stack>(+50% per stack)</c>. Up to <b>1</c> <c_stack>(+1 per stack)</c> golem at once.",
+            "destination": "Claim 0451,\nAbandoned Dig,\nHoxxes Annex",
+            "date": "19.11.2056",
+            "story": "The mining crews left them in the tunnels - squat ceramic constructs, knee-high, meant to guard a claim while the shift slept. They wake when someone works a mechanism nearby: a lever, a lock, a drill. Then the golem plants its feet, opens a port in its chest, and fires on anything not listed on the payroll. It cannot walk and it will not follow. Stand it beside the thing you are opening and it earns its keep for half a minute, then folds back into a rock you would step over without a second look.",
+            "priority": "<g>Priority</c>"
+        },
+        "BombardierSwarm": {
+            "name": "Bombardier Swarm",
+            "pickup": "Summons a <y>bombardier drone</c> that drops <r>dynamite</c> on enemies.",
+            "description": "Summons a <y>bombardier drone</c> that flies to the nearest enemy and every <b>10s</c> drops a <r>stick of dynamite</c>; each of your nearby <b>drones</c> drops one too. The dynamite falls under gravity and explodes for <r>250% damage</c> <c_stack>(+125% per stack)</c> within <b>~150</c>, <b>stunning</c> for <b>1s</c>.",
+            "priority": "<g>Priority</c>"
+        },
+        "RustMite": {
+            "name": "Rust Mite",
+            "pickup": "Hits make enemies <r>take more damage</c>.",
+            "description": "<y>100% chance</c> on hit to stack <r>Rust</c> on the target - each stack makes it take <r>+4%</c> more damage from <b>any source</c>, <r>permanently</c>.",
+            "priority": "<r>High Priority</c>"
+        },
+        "MosquitoNet": {
+            "name": "Mosquito Net",
+            "pickup": "<b>Shoot down</c> projectiles and periodically <b>block a hit</c>.",
+            "description": "Every <b>0.5s</c>, shoot down <b>2</c> <c_stack>(+2 per stack)</c> <r>enemy projectiles</c> within <b>~12m</c> (recharge <b>scales with attack speed</c>). Every <b>10s</c> <c_stack>(-1s per stack)</c>, fully <b>block</c> one incoming hit.",
+            "priority": "<r>High Priority</c>"
+        },
+        "OrbitalLens": {
+            "name": "Orbital Lens",
+            "pickup": "Chance to call a <r>meteor</c> on hit.",
+            "description": "<y>3%</c> <c_stack>(+2% per stack)</c> chance on hit to call a <r>meteor</c> for <y>800%</c> <c_stack>(+250% per stack)</c> base damage. The more <y>damage you deal</c>, the <y>higher the chance and meteor damage</c> (decays over time).",
+            "priority": "<r>High Priority</c>"
+        },
+        "FaultyConductor": {
+            "name": "Faulty Conductor",
+            "pickup": "Periodic <b>wave</c> that <y>energizes allies</c> and empowers <b>drones</c>.",
+            "description": "Every <b>15s</c> <c_stack>(-20% per stack)</c>, release a wave that <y>energizes allies</c> for <b>7s</c>: <y>+30% attack and movement speed</c>. <b>Drones</c> permanently deal <y>+15%</c> <c_stack>(+15% per stack)</c> more damage.",
+            "priority": "<r>High Priority</c>"
+        },
+        "RavenousVine": {
+            "name": "Ravenous Vine",
+            "pickup": "Nearby enemies <g>feed the vine</c>; when ripe it <y>blooms</c>: area damage and <y>healing</c>.",
+            "description": "Enemies within <b>5 tiles</c> <c_stack>(+1.5 per stack)</c>, up to <b>6</c> <c_stack>(+4 per stack)</c>, <g>feed the vine</c>: the more of them, the faster it ripens. When ripe, the vine deals <y>600%</c> <c_stack>(+300% per stack)</c> damage to all nearby enemies and heals <y>9% max HP</c> <c_stack>(+4.5% per stack)</c>.",
+            "priority": "<r>High Priority</c>"
+        },
+        "CascadeFailure": {
+            "name": "Cascade Failure",
+            "pickup": "<r>Infect</c> enemies and <r>detonate</c> shared damage.",
+            "description": "<r>Infect</c> up to <b>4</c> <c_stack>(+2 per stack)</c> enemies. <y>50%</c> of damage you deal to infected is <b>pooled</c>. Every <b>3s</c>, all infected take <y>100% of the pool</c>.",
+            "priority": "<r>High Priority</c>"
+        },
+        "ArmySurplus": {
+            "name": "Army Surplus",
+            "pickup": "Gain a <b>combat drone</c> and reinforce your <b>drones</c>.",
+            "description": "Deploy a <b>combat drone</c> that fights on its own. All <b>drones</c> gain <y>+25%</c> <c_stack>(+25% per stack)</c> damage and <y>+15%</c> <c_stack>(+15% per stack)</c> max health.",
+            "priority": "<r>High Priority</c>"
+        },
+        "CashbackChip": {
+            "name": "Cashback Chip",
+            "pickup": "Get <y>gold</c> back on <y>every purchase</c>.",
+            "description": "Refunds <y>10%</c> <c_stack>(+10% per stack)</c> of the <y>gold</c> spent on <b>any purchase</c>. Additionally, the <g>first chest</c> <c_stack>(+1 per stack)</c> you buy each stage is <g>free</c>.",
+            "destination": "Clearing House,\nOuter Ring Exchange,\n[REDACTED]",
+            "date": "21.04.2057",
+            "story": "A slim card of brushed alloy, warm to the touch, with a single contact that never tarnishes. The traders on the outer ring passed it hand to hand without quite trusting it: every time coin left your account, a fraction crept quietly back, as if the chip skimmed the seller instead of you.\n\nNo one could say where the returned money came from. The ledgers always balanced - to the buyer's favor. The cashiers stopped checking and started smiling.\n\nWe filed it as 'loyalty instrument, anomalous yield.' To myself I noted: the house always wins, unless the house is in your pocket.",
+            "priority": "<g>Priority</c>"
+        },
+        "Nightshade": {
+            "name": "Nightshade",
+            "pickup": "Summon a <r>shadow assassin</c> that blinks between enemies.",
+            "description": "On use, summon a <r>shade</c> that <b>blinks</c> onto the nearest enemy, strikes for <r>133% damage</c>, then vanishes - repeating for <b>13 seconds</c>. It cannot be killed.",
+            "destination": "Containment Vat 7,\nSymbiotics Lab,\nUES PRIME",
+            "date": "30.06.2057",
+            "story": "It came in a sealed vat, a slick black mass that mirrored whatever stood before it. Set a fighter beside it and it learned his shape - then learned to step out of sight between one breath and the next.\n\nWe never saw it cross the room. It was here, then it was on the enemy, then it was nowhere, and the enemy was down.\n\nWe logged it as 'autonomous infiltration surrogate.' The crew named it for the quiet little flower that kills without a sound.",
+            "priority": "<y>Equipment</c>"
+        },
+        "TacticalVisor": {
+            "name": "Tactical Visor",
+            "pickup": "Briefly gain <y>guaranteed crits</c>.",
+            "description": "On use, gain <y>+100% Critical Chance</c> for <b>8 seconds</c>.",
+            "destination": "Optics Bay,\nMarksman Range 3,\nUES SAFE TRAVELS",
+            "date": "08.05.2057",
+            "story": "A targeting visor that paints the world in weak points. For a few seconds after you key it, every shot finds the seam, the joint, the soft place behind the plate.\n\nThe gunners said it didn't aim for you - it just stopped letting you miss the part that matters.\n\nWe wrote 'fire-control overlay, transient.' They wrote nothing; they were too busy hitting everything.",
+            "priority": "<y>Equipment</c>"
+        },
+        "Hunger": {
+            "name": "Hunger",
+            "pickup": "Open a <p>black hole</c> that pulls enemies in.",
+            "description": "On use, launch a <p>black hole</c> that <b>drifts forward</c> and <b>pulls enemies</c> toward its center for <b>10 seconds</c>. Deals <b>no damage</c>; <r>bosses</c> are immune.",
+            "destination": "Singularity Cradle,\nGravimetrics Wing,\n[REDACTED]",
+            "date": "17.09.2057",
+            "story": "A palm-sized cube that weighs nothing until you press it - then the air folds inward and everything not bolted down begins to lean toward a point that should not exist.\n\nIt takes no life of its own. It only gathers. Whatever it cannot move, it ignores; whatever it can, it brings together, patiently, into one helpless knot.\n\nWe filed it as 'localized gravity well.' The crew named it for the look it gave the horde: a quiet, bottomless appetite.",
+            "priority": "<y>Equipment</c>"
+        },
+        "Annihilator": {
+            "name": "Annihilator",
+            "pickup": "Fire a <r>charge</c> that zaps, then <r>detonates</c>.",
+            "description": "On use, fire a slow <b>charge</c> that zaps nearby enemies for up to <r>600% damage/second</c>. On contact it <r>detonates</c> in a massive <b>20m</c> blast for <r>4000% damage</c>.",
+            "destination": "Reactor Spine,\nWeapons Test Annex,\nUES PRIME",
+            "date": "02.11.2057",
+            "story": "A reactor's heart in a launch tube. The charge drifts forward slow enough to watch, and that is the cruel part - you see the tendrils reach out and start unmaking whatever they touch long before the end.\n\nThen it meets something solid, and there is a light, and where the light was there is nothing.\n\nWe logged it as 'preon discharge unit, single use per cycle.' Everyone who saw it fire logged it as the last thing the target ever did.",
+            "priority": "<y>Equipment</c>"
+        },
+        "FacetedJade": {
+            "name": "Faceted Jade",
+            "pickup": "<y>Armor</c> while <g>out of danger</c>.",
+            "description": "After taking <r>no damage for 5s</c>, gain <y>+45 armor</c> <c_stack>(+45 per stack)</c>. The next hit you take consumes it until you stay safe again.",
+            "destination": "Lapidary Vault,\nAppraisal Wing,\n[REDACTED]",
+            "date": "03.07.2057",
+            "story": "A cut of green jade with far too many faces for any jeweller's wheel to manage. Leave it on the bench and a glassy skin grows over it, slow, like frost on a window. Knock it - even lightly - and the skin goes all at once, with the sound of a dropped plate. Wait, and it starts over.\n\nThe appraiser sent it back with a note: «Can't price it. It's only ever armored when nobody's looking at it.»",
+            "priority": "Standard"
+        },
+        "ElephantGun": {
+            "name": "Elephant Gun",
+            "pickup": "Deal <y>extra damage</c> to <r>bosses</c>.",
+            "description": "Deal <y>+20%</c> <c_stack>(+20% per stack)</c> more damage to <r>bosses</c>.",
+            "destination": "Big-Game Reserve,\nTrophy Hold,\nSavannah Belt, Earth",
+            "date": "16.10.2056",
+            "story": "A rifle too heavy for any sane shoulder, bored wide enough to swallow a fist. It was never meant for small things - fire it at a scurrying target and you'll only deafen yourself. But aim it at something vast, something that thinks its size makes it safe, and the round goes in like a verdict.\n\nThe big-game hunter who carried it kept one rule in his log: «Never waste it on what you could simply outrun. Save it for what you cannot.»",
+            "priority": "Standard"
+        },
+        "PainTax": {
+            "name": "Pain Tax",
+            "pickup": "Gain <y>gold</c> when you are <r>hurt</c>.",
+            "description": "On taking <r>damage</c> from an enemy, gain <y>$8</c> <c_stack>(+8 per stack)</c>. <y>Increases over time</c>.",
+            "destination": "Collections Floor,\nDebt Office,\nTitan",
+            "date": "01.04.2057",
+            "story": "A black ledger-coin, warm to the touch, with a slot worn smooth on one face. Every time its bearer is wounded, the coin grows heavier by a few grams of gold - as if someone, somewhere, were settling an account in pain.\n\nWe never found the other party. The clerk who studied it longest began flinching at his own paperwork: «It pays well, but it only pays when it hurts - and the longer you carry it, the more it decides your suffering is worth.»",
+            "priority": "Standard"
+        },
+        "CheatDeath": {
+            "name": "Cheat Death",
+            "pickup": "Spread <r>damage</c> out over time as <r>bleed</c>.",
+            "description": "<b>10%</c> <c_stack>(+5% per stack)</c> of <r>damage taken</c> is delayed as <r>bleed</c> over <b>5s</c> (capped at <b>100%</c>) - giving you time to <g>heal it off</c>.",
+            "destination": "Reliquary 9,\nHospice Vault,\n[REDACTED]",
+            "date": "09.09.2057",
+            "story": "A pair of skeletal hands, cupped like they're catching rain. There's always blood in them, welling up between the finger bones and running over, no matter how often you wipe them dry.\n\nThe man we took them from should have died on the table. Took a wound that empties a body in seconds - and just didn't. Bled slow instead. Slow enough to walk to the medbay on his own. He swore the hands held the worst of it back, doling it out a drop at a time so he'd have time to patch the rest.\n\nHe cheated death twice more before it stopped taking the joke.",
+            "priority": "Standard"
+        },
+        "Concentration": {
+            "name": "Concentration",
+            "pickup": "Being <g>out of danger</c> empowers your <y>next hit</c>.",
+            "description": "After taking <r>no damage for 5s</c>, your <y>next attack</c> deals <y>+60%</c> <c_stack>(+60% per stack)</c> bonus damage. Consumed on hit.",
+            "destination": "Duelling Hall,\nSilence Range,\nNeo-Olympia",
+            "date": "28.05.2057",
+            "story": "A plain metal cuff with a single green eye set into it. The eye sits half-shut. Stand still, stay out of trouble, and it opens - wider the longer you hold - until it's staring dead ahead at whatever you are. Move too soon and it droops closed again, bored.\n\nWhatever it's looking at when it's fully open gets hit a lot harder than it should. The scouts who wore it stopped spraying and started waiting. «One good shot,» they'd say, «is the one the cuff was awake for.»",
+            "priority": "Standard"
+        },
+        "Tankbuster": {
+            "name": "Tankbuster",
+            "pickup": "Periodic <y>heavy hit</c> that scales with <r>enemy HP</c>.",
+            "description": "Every <b>7s</c>, your next hit deals an extra <y>+40%</c> <c_stack>(+20% per stack)</c> of your damage plus <y>2%</c> <c_stack>(+1% per stack)</c> of the target's <r>max HP</c>.",
+            "destination": "Demolition Bay,\nSapper's Depot,\nUES PRIME",
+            "date": "21.06.2057",
+            "story": "A squat iron bomb with a single lidded eye bolted to the casing. It doesn't tick. It watches. Set it loose in a crowd and it ignores the small fry entirely - the eye rolls past them, hunting, and locks onto the biggest, fattest thing in the room.\n\nThen it goes off against that one, and only that one. The engineers never got it to care about anything it judged beneath it. «It's not a bomb,» one wrote in the test log. «It's a grudge with a fuse.»",
+            "priority": "Standard"
+        },
+        "BountyTag": {
+            "name": "Bounty Tag",
+            "pickup": "<y>Gold</c> per <r>kill</c>, more on a clean streak.",
+            "description": "Gain <y>$2</c> <c_stack>(+2 per stack)</c> per <r>kill</c>, plus <y>$1</c> for each kill in a row <b>without taking damage</c> (up to <b>+$10</c>). Taking damage resets the streak. <y>Increases over time</c>.",
+            "destination": "Contracts Desk,\nBounty Office,\nEdge Frontiers",
+            "date": "15.08.2058",
+            "story": "A demon's head, mounted and lacquered, the kind a certain sort of officer likes to hang over the desk. The tongue lolls. The eyes have been swapped for two little counters that tick over every time something dies nearby.\n\nIt pays out in hard coin - more for a clean run, less the moment you take a hit yourself. The collector who hung it swore it kept honest books. «It doesn't care who you kill,» he told us. «Only that nothing touched you while you did it.»",
+            "priority": "Standard"
+        },
+        "OneArmyMan": {
+            "name": "One Army Man",
+            "pickup": "When it's you against the horde - <r>bring more horde</c>.",
+            "description": "On use, <b>BFG starts playing</c> for <b>30s</c>. For the first <b>22s</c> gain <y>+50% attack speed</c> and <y>+50% damage</c>, and <g>heal 1.5% of max HP per kill</c>. For the <b>whole track</c> the <r>director floods the stage with enemies</c>, including <r>elites</c> - so the assault outlives your buffs. Enemies spawned during the song drop <r>no experience</c> and only <y>20% gold</c>.",
+            "destination": "The Fortress of Doom,\nHell",
+            "date": "10.12.1993",
+            "story": "They are rage, brutal, without mercy. But you. You will be worse.\n\nRip and tear, until it is done.\n\nThe Slayer came not for glory, nor for gold, nor for any reward the realms could offer. He came because the legions of Hell were loosed, and someone had to meet them. Where he walks, the horde rises against him - and finds only its end. He does not count the dead. He does not mourn them. He moves to the next, and the next, and the killing does not stop while the war-hymn still plays.\n\nHell feared him. Hell named him the Doom Slayer. And against the dark he stands alone, and that is enough.",
+            "priority": "<y>Equipment</c>"
+        },
+        "HeavyLungs": {
+            "name": "Heavy Lungs",
+            "pickup": "Grants a <g>shield</c> per <b>drone</c> and reinforces <b>drones</c>.",
+            "description": "Grants a <g>shield</c> equal to <g>5%</c> of your <g>maximum HP</c> for each <b>drone</c>. Increases <b>drone</c> <g>HP</c> and <g>regeneration</c> by <g>10%</c> <c_stack>(+5% per stack)</c>.",
+            "destination": "Pulmonary Complex,\nLife-Support Bay,\nUES PRIME",
+            "date": "02.09.2057",
+            "story": "A pair of heavy breathing bellows, cast as if from lead - a chore to lift, yet almost silent at work. The engineers on the lower decks fitted them to old repair drones: a machine wearing them lasted longer and shrugged off overloads, as though it had learned to breathe deep and slow.\n\nWe tested them on our own tin cans. A drone with these lungs held under fire far more stubbornly, and around its owner a thin protective film seemed to settle - thicker the more machines circled nearby, as if they shared their own reserve of air with their master.\n\nIn the report I wrote 'pressurization circuit, improves bearer survivability'. To myself I thought otherwise: the one who breathes heavy is the one who is not alone.",
+            "priority": "<g>Priority</c>"
+        },
+        "LaughingFungus": {
+            "name": "Laughing Fungus",
+            "pickup": "<g>Standing still</c> creates a <g>healing zone</c>.",
+            "description": "After <b>standing still for 1 second</c>, you create a zone that every second <g>heals</c> all <g>allies</c> within <b>3 meters</c> <c_stack>(+1.5m per stack)</c> for <g>6%</c> <c_stack>(+3% per stack)</c> of <g>your maximum health</c>.",
+            "destination": "Spore Sanctuary,\nFungal Gorge,\n[REDACTED]",
+            "date": "30.08.2057",
+            "story": "We brought back another curiosity from the gorge: a squat green mushroom that quivers when no one moves near it. Stand still beside it and it swells, releasing a fine, warm haze that settles into the lungs like a quiet chuckle. Cuts knit, fatigue lifts, and for some reason everyone in the haze starts to smile.\n\nThe lynx, it seems, gathered around such caps to rest between hunts - never while running, only while still. The moment you stir, the mushroom shrinks back into the soil, sulking, and the haze is gone.\n\nIn the report I wrote 'restorative spore emitter, requires immobility'. In my notes I added: it heals best those who finally learn to stop and breathe.",
+            "priority": "<g>Priority</c>"
+        },
+        "AssemblyBlueprint": {
+            "name": "Assembly Blueprint",
+            "pickup": "Chance to <b>duplicate purchased drones</c> and <g>rebuild dead ones</c>.",
+            "description": "<y>20%</c> chance <c_stack>(+20% per stack, hyperbolic, up to 80%)</c> to <b>duplicate a drone or turret on purchase</c>. Additionally, <g>10%</c> chance <c_stack>(+10% per stack, hyperbolic, up to 80%)</c> to <g>rebuild a drone or turret when it dies</c>, returning it at <g>50% HP</c>.",
+            "destination": "Fabrication Line 7,\nDrydock Assembly,\nUES PRIME",
+            "date": "17.09.2057",
+            "story": "A folded sheet of dark drafting film, edges worn soft from handling. Hold it to the light and the schematic on it seems to redraw itself - never quite the same machine twice, as if it were sketching whatever drone happened to be nearest.\n\nThe deck crews swore by it. Pay to raise one repair drone off the husk, and now and then a second would whir to life beside it, identical down to the dents, with no one having paid the difference. And when a machine was finally shot to scrap, the film would dim, and from the wreck the crews would haul a half-charged twin - battered, half-fueled, but flying.\n\nI wrote it up as a 'self-replicating fabrication template'. Privately I thought the old shipwright's line: a good drawing never dies with the thing it built - it simply waits to be read again.",
+            "priority": "<g>Priority</c>"
+        },
+        "GoldenSneakers": {
+            "name": "Golden Sneakers",
+            "pickup": "Grants <b>movement speed</c> based on your current <y>gold</c>.",
+            "description": "Grants up to <b>+50% movement speed</c> based on your current <y>gold</c>. Reaches the cap at <y>700 gold</c> <c_stack>(-50% gold per stack)</c>. <y>Scales over time</c>.",
+            "destination": "Sprint Foundry,\nCourier Outfitters,\nNeo-Olympia",
+            "date": "11.05.2057",
+            "story": "A pair of sneakers plated in soft gold, light despite the metal. The courier who wore them swore he ran faster on payday than on any other morning - and slower the instant his pockets ran dry.\n\nWe laughed at first. Then we measured. The richer the wearer, the lighter his stride, as if the gold itself wanted to be carried somewhere, anywhere, fast. Spend it, and the shoes go heavy again, like ordinary leather.\n\nWe wrote it up as a 'motivational prototype'. Privately I think they simply love money more than their owner does - and they hurry to spend it on his behalf.",
+            "priority": "<g>Priority</c>"
+        },
+        "UnfocusPrisma": {
+            "name": "Unfocus Prism",
+            "pickup": "Increases <y>damage</c> to <b>distant</c> enemies.",
+            "description": "Increases <y>damage</c> to enemies <b>more than 13 meters</c> away by <y>25%</c> <c_stack>(+25% per stack)</c>.",
+            "destination": "Gravenkamp,\n5th Houston Street,\nPrism Tower,\nEarth",
+            "date": "27.03.2056",
+            "story": "Your first order is complete. A strange request - a lens that pulls focus off whatever is near and throws it into the distance. \"Focus distortion,\" as you called it.\n\nI ground the prism so that everything at arm's length blurs into a rainbow haze, while the far-off snaps sharp, as if dragged right up close. Looking down at your own feet through it is agony - but a target across the hall stands out to the last detail, and the hand strikes it dead-on, harder than it has any right to.\n\nI don't understand why anyone would go blind up close for the sake of what lies far away. But you pay, and I don't ask needless questions. Still, I admit - I'm curious what you'll build from this, and from the lenses you'll order next.",
+            "priority": "<g>Priority/Fragile</c>"
+        },
+        "ReserveCapacitor": {
+            "name": "Reserve Capacitor",
+            "pickup": "Grants an <b>extra equipment charge</c>.",
+            "description": "Holds an <b>additional equipment charge</c> <c_stack>(+1 per stack)</c>. Each reserve charge recharges over <y>2x</c> the <b>equipment's cooldown</c>.",
+            "destination": "Reserve Armory,\nPower-Cell Depot,\nUES PRIME",
+            "date": "22.04.2057",
+            "story": "A small block with a matte casing and a single glowing contact. To the eye, just a spare power element, the kind we keep by the hundred in the hold.\n\nBut set it beside a piece of equipment and the gear seems to stop cooling down. We spent a charge, waited for the cooldown - and the device was ready again, as if a second mouthful of power had been tucked away for a rainy day. The engineers argued over where the extra surge came from; the instruments read exactly as much energy as we put in, not a joule more.\n\nI wrote it up briefly: 'buffer cell, reduces downtime.' To myself I noted something else - it's reassuring to know you always have one more shot held in reserve.",
+            "priority": "<g>Priority</c>"
+        },
         "SeaFossil": {
             "name": "Sea Fossil",
             "pickup": "A pitiful semblance of strength.",
-            "description": "Using equipment <g>Restores 200%</c> <c_stack>(+100% per stack)</c> <g>health</c> from cooldown time. <b>Reduces equipment cooldown</c> by <b>10%</c> <c_stack>(+10% per stack)</c>.",
+            "description": "Using equipment <g>Restores 120%</c> <c_stack>(+50% per stack)</c> <g>health</c> from cooldown time.",
             "destination": "Lunar Shore,\nMirror Bay,\nJupiter",
             "date": "01.06.2057",
-            "story": "We found it at the edge of the shore, where sand no longer holds the step and the water drags you down. On the outside-an ordinary shell.\n\nPut it to your ear and you won’t hear the sea. Instead-a measured <b>hammer’s beat</c>, as hollow as in the temple beneath the throne hall. Sometimes, slow, heavy steps too, as if someone still walks in circles, unaware all are gone. I recalled tales of the <r>‘King without a kingdom’</c> and shuddered: can even stone and shell carry his echoes?\n\nIt grants <g>a drop of strength</c>, but seems to demand part of the will in return. The hand reaches for tools on its own, as in that cursed ‘gesture’, when the tool controls you more than you control it.\n\nWe didn’t take it on the march. We placed it in a chest marked ‘pseudo-strength’. Such things are easier left behind. Too often what looks like support is only a reminder that there are forces not to be envied-and they do not forgive curiosity.",
-            "priority": "<y>fragile/museum</c>"
+            "story": "We found it at the edge of the shore, where sand no longer holds the step and the water drags you down. On the outside-an ordinary shell.\n\nPut it to your ear and you won't hear the sea. Instead-a measured <b>hammer's beat</c>, as hollow as in the temple beneath the throne hall. Sometimes, slow, heavy steps too, as if someone still walks in circles, unaware all are gone. I recalled tales of the <r>'King without a kingdom'</c> and shuddered: can even stone and shell carry his echoes?\n\nIt grants <g>a drop of strength</c>, but seems to demand part of the will in return. The hand reaches for tools on its own, as in that cursed 'gesture', when the tool controls you more than you control it.\n\nWe didn't take it on the march. We placed it in a chest marked 'pseudo-strength'. Such things are easier left behind. Too often what looks like support is only a reminder that there are forces not to be envied-and they do not forgive curiosity.",
+            "priority": "<g>Priority/Fragile/Museum</c>"
         },
         "Community": {
             "name": "Community",
@@ -16,7 +298,7 @@
             "destination": "Litovigla Cluster,\nMulticut Mine,\nEdge Frontiers",
             "date": "15.08.2058",
             "story": "They say every world has its king.\nWe had a <r>TYRANT</c>, they had a <r>BULWARK</c>. Both held swords wider than a man, both believed they protected the weak from the strong.\n\nBut a throne is no fortress. A crown cannot save from the one who comes nameless and merciless. He comes to every world, tears each from the pedestal, and swords are equally dull before the one called hero.\n\nWe applaud when he topples the throne, and fall silent when he destroy the world.\n\nMaybe heroes are not protectors, but simply <y>executioners</c> who recognize neither <r>throne</c> nor <g>gods</c>, trading a crown for the next victim. And if so-should one envy those called <g>king</c>?",
-            "priority": "<g>priority/mineral</c>"
+            "priority": "<r>High Priority</c>"
         },
         "GlassMagnifier": {
             "name": "Glass Magnifier",
@@ -24,17 +306,17 @@
             "description": "Increases <y>base damage</c> by <y>5 <c_stack>(+2 per stack)</c>.",
             "destination": "Archive 7,\nDepartment of Optical Research,\nUES PRIME",
             "date": "14.04.2057",
-            "story": "An old magnifier, the brass has darkened, but the glass is clean, as if polished just yesterday.\n\nThrough it, everything looks different: cracks, scratches, all become sharper. We ran the sample through a spectrograph — nothing unusual, just glass. Yet the effect is real, and hard to deny.\n\nThe report states dryly: “enhances attentiveness.” Perhaps in the future, more properties will be discovered.",
+            "story": "An old magnifier. The brass has darkened, but the glass is clean - as if polished only yesterday.\n\nLook through it and you don't see farther, or larger. You see where it will break. The hairline crack beneath a rivet, the tired grain in a steel beam, the very spot where a thing is already ready to split at a touch. One of our men, studying a lathe through it, muttered: \"It doesn't magnify. It passes sentence.\"\n\nLater he stopped looking at machines. His last notes are about people: whose armor ran thin, whose hand wavered, whose - as he put it - \"smile is hanging by a single thread.\" We put the magnifier away for good - after we found it aimed at a mirror, with him beside it.",
             "priority": "Standard"
         },
         "ThinWings": {
             "name": "Thin Wings",
             "pickup": "Reloads a <y>skill</c> and increases <b>movement speed</c> when interacting with an object.",
-            "description": "When interacting with an object, increases <y>movement speed</c> by <b>15%</b><c_stack> (+8% per stack)</c>, and <b>reduces cooldown</c> of a random skill by <b>10%</c> for <b>10 seconds</c>.",
+            "description": "When interacting with an object, increases <y>movement speed</c> by <b>15%</c><c_stack> (+8% per stack)</c>, and <b>reduces cooldown</c> of a random skill by <b>10%</c> for <b>10 seconds</c>.",
             "destination": "Entomology Pavilion,\nAster Greenhouse,\nEarth",
             "date": "19.04.2058",
-            "story": "We found a strange thing. Looks like large, frozen dragonfly wings. Semi-transparent, bluish, seemingly fragile, but to the touch they hold firm, as if made not of chitin, but something else.\n\nFasten them to your back and touch any mechanism — and you feel as though you yourself are faster. Devices respond more eagerly, tools are lighter, and thoughts, thoughts seem to soar.\n\nIn the lab they called it a “reaction accelerator,” or more simply: with these, work gets done faster.",
-            "priority": "Fragile"
+            "story": "Large dragonfly wings, frozen in ice. Fragile to the eye, harder than bone to the touch, and plainly not made of chitin.\n\nFasten them to your back, and your hands reach for any mechanism on their own: for a lever, a latch, a humming box. They reach before you've decided to. By the end of the second week the testers no longer said \"I opened it.\" They said \"it opened.\"",
+            "priority": "Standard/Fragile"
         },
         "MassacreCurse": {
             "name": "Massacre Curse",
@@ -42,16 +324,16 @@
             "description": "Killing an <y>enemy</c> grants <y>1 stack</c><r> of 'Massacre'</c> for <y>2.5</c> seconds <c_stack>(+2.5 seconds)</c>. Increases <y>damage</c> and <g>armor</c> by <y>3%</c>.",
             "destination": "Jungles VII,\nMuseum of 2019,\nEarth",
             "date": "04.05.2057",
-            "story": "Another find from the same site. A small skull with a spine attached. Its color is strange: the bone seems to have absorbed <r>blood</c>. We even tried to wash it clean, but the color remained. At times, a white glow flickers in the sockets.\n\nThe soldiers say the artifact responds to killing. The more corpses around, the heavier it feels in hand, yet the stronger its bearer becomes. Sounds like nonsense, but we counted far too many bones near its previous owner.\n\nIn the report I noted: “induces <r>battle frenzy</c>.” In my private notes, I put it more simply: best kept in a locked container.",
+            "story": "Another find from the same site. A small skull with a spine attached. Its color is strange: the bone seems to have absorbed <r>blood</c>. We even tried to wash it clean, but the color remained. At times, a white glow flickers in the sockets.\n\nThe soldiers say the artifact responds to killing. The more corpses around, the heavier it feels in hand, yet the stronger its bearer becomes. Sounds like nonsense, but we counted far too many bones near its previous owner.\n\nIn the report I noted: \"induces <r>battle frenzy</c>.\" In my private notes, I put it more simply: best kept in a locked container.",
             "priority": "Standard/Unstable"
         },
         "MagmaFragment": {
             "name": "Magma Fragment",
             "pickup": "Chance to <r>ignite</c> an enemy.",
-            "description": "<y>10%</c> <c_stack>(+10% per stack)</c> <y>chance</c> to <r>ignite</c> <y>enemies</c>, dealing <y>30% TOTAL damage</c> over <b>5 seconds</c>.",
+            "description": "<y>5%</c> <c_stack>(+5% per stack)</c> <y>chance</c> to <r>ignite</c> <y>enemies</c>, dealing <y>30% TOTAL damage</c> over <b>5 seconds</c>. Only <b>one burn</c> can be active on an enemy at a time.",
             "destination": "0909,\nK&K Union,\nEarth",
             "date": "14.05.2056",
-            "story": "This time, she definitely won’t find out.",
+            "story": "Found it in the ashes of the east wing, still warm three days after the fire. Doesn't cool. Doesn't go out. You can hold it for about a second before it bites.\n\nThe investigators ruled the blaze an accident. They didn't find the letters, or what was left of them. Good.\n\nThis time, she definitely won't find out.",
             "priority": "Standard"
         },
         "IceMixture": {
@@ -60,7 +342,7 @@
             "description": "<y>7%</c> <c_stack>(+5% per stack)</c> <y>chance</c> to <b>slow movement speed</c> and <y>attack speed</c> of enemies by 30% for <b>3 seconds</c>.",
             "destination": "10681,\nFrozen Valley,\nPluto",
             "date": "22.01.2054",
-            "story": "The first sample of a cryo experiment. We compressed dozens of different materials, cooled them to the limit, and let them merge into a single crystal. It turned out beautiful: blue and sparkling.\n\nBut the temperature never reached what we wanted. It’s incredibly cold, but not “perfect” — not absolute zero. The material is unstable; upon contact with organisms it causes a sharp <b>slowdown</c> of metabolism, as if tissue were freezing from within.\n\nMy colleagues have already begun new attempts to create absolute zero — the result is strange, but useful. We will go further. Perhaps the next version will be more refined. Maybe it will open the path to <g>superconductors</c> and rewrite our textbooks.",
+            "story": "The first sample from the cryo program. We compressed dozens of substances, chilled them to the limit and let them fuse into a single crystal. It came out beautiful - blue, full of sparks.\n\nThe cold off it leaves a burn on the skin, and the living near it seem to forget how to hurry: blood thickens, breath draws out. But the limit we were after we never reached - fell the smallest bit short of true zero. The sample is unstable, and that \"smallest bit\" gave us pause: on the last test the crystal fell wholly silent, and with it the clock on the wall.\n\nThis batch we write off as scrap. But the direction is right - the boys are already preparing the next crystal, and it will come far nearer to absolute zero than ours. If it works, it will overturn everything we knew about superconductors. A pity only that the one who began it won't be the one to test the perfected thing.",
             "priority": "Standard"
         },
         "GearFeather": {
@@ -69,16 +351,16 @@
             "description": "Increases <b>jump height</c> by <b>7%</c> <c_stack>(7% per stack)</c>.",
             "destination": "2341,\nRKR Center,\nIo",
             "date": "07.03.2056",
-            "story": "First there was the <g>Hopoo Feather</c> — light, rare, almost mythical. Selling it was our first mistake: we lost more than we gained.\n\nNow another feather is in our hands — <g>Gear</c>. Larger, heavier, yet it still pulls you upward when you leap. Outwardly similar, but inside it feels alien. Not a gift, but a bargain.\n\nI wrote in the report: perhaps the first sale was a mistake. I don’t want the second mistake to be <y>a dead end at the steam valve</c>.\n\nArtifacts change owners, change worlds. Sometimes they don’t break immediately — but they do break nonetheless.",
+            "story": "First there was the <g>Hopoo Feather</c> - light, rare, almost mythical. Selling it was our first mistake: we lost more than we gained.\n\nNow another feather is in our hands - <g>Gear</c>. Larger, heavier, yet it still pulls you upward when you leap. Outwardly similar, but inside it feels alien. Not a gift, but a bargain.\n\nI wrote in the report: perhaps the first sale was a mistake. I don't want the second mistake to be <y>a dead end at the steam valve</c>.\n\nArtifacts change owners, change worlds. Sometimes they don't break immediately - but they do break nonetheless.",
             "priority": "Standard"
         },
         "FearEyes": {
             "name": "Fear Eyes",
             "pickup": "Eyes are afraid, but hands still do the work.",
-            "description": "Increases <y>damage by 15</c><c_stack>(+10 per stack)</c>. Breaks when <r>health drops</c> below <b>15%</c>.",
+            "description": "Increases <y>damage by 15</c><c_stack>(+10 per stack)</c>. Breaks when <r>health drops</c> below <b>40%</c>.",
             "destination": "Kitchen 4-B,\nSupply Station,\nUES PRIME",
             "date": "14.05.2057",
-            "story": "At first, I thought it was just a fish. Yes, fugu — I’d heard of those. But the eyes… they seemed to bulge out and freeze, as if it had seen something better left unseen. I placed it on the table — and it felt like its gaze was still drilling into me.\n\nI don’t know if it can be cooked, it’s too strange.\n\nI couldn’t throw it away. Now it just lies in a container. Staring...",
+            "story": "At first, I thought it was just a fish. Yes, fugu - I'd heard of those. But the eyes... they seemed to bulge out and freeze, as if it had seen something better left unseen. I placed it on the table - and it felt like its gaze was still drilling into me.\n\nI don't know if it can be cooked, it's too strange.\n\nI couldn't throw it away. Now it just lies in a container. Staring...",
             "priority": "Standard"
         },
         "ShadowShield": {
@@ -94,19 +376,19 @@
             "name": "Rhinoplasty",
             "pickup": "What does a surgeon do with the leftover <g>skin</c>?",
             "description": "Killing every 4 enemies grants 1 stack of <g>'skin'</c>. After <b>10</c> seconds all <g>'skin pieces'</c> will be absorbed, giving you <g>40</c> <c_stack>(+20 per stack)</c> <g>health</c> for each <g>'skin'</c> stack.",
-            "destination": "Medblock 2,\nSurgical Ward,\nOrbital Station “Seraphim”",
+            "destination": "Medblock 2,\nSurgical Ward,\nOrbital Station \"Seraphim\"",
             "date": "28.02.2057",
-            "story": "Attention everyone!\nDue to the development of new tools, we need to replace the surgical kits!\nEach kit must now include the following: scalpels, clamps, sutures, sterile masks, anesthesia capsules, blood reserves, tissue implant cards, and an auto-injector for coagulation.\n\nAnd also — a new prototype knife. The blade is made of green medical metal, with a twisted vessel running along it. Upon contact, it takes part of the skin from the wound and returns it to the body. I don’t know whether to call this progress, but the scientists insist these tools be kept locked away. Just in case they decide to work without a patient.",
+            "story": "Attention everyone!\nDue to the development of new tools, we need to replace the surgical kits!\nEach kit must now include the following: scalpels, clamps, sutures, sterile masks, anesthesia capsules, blood reserves, tissue implant cards, and an auto-injector for coagulation.\n\nAnd also - a new prototype knife. The blade is made of green medical metal, with a twisted vessel running along it. Upon contact, it takes part of the skin from the wound and returns it to the body. I don't know whether to call this progress, but the scientists insist these tools be kept locked away. Just in case they decide to work without a patient.",
             "priority": "Standard"
         },
         "GreenTea": {
             "name": "Green Tea",
             "pickup": "Slightly increases <g>regeneration</c> and <g>maximum health</c>.",
-            "description": "Increases <g>health regeneration</c> by <g>0.42</c> <c_stack>(+0.42 per stack)</c> <g>units</c>. Increases <g>maximum health pool</c> by <g>4%</c> <c_stack>(+4% per stack)</c>.",
+            "description": "Increases <g>health regeneration</c> by <g>0.546</c> <c_stack>(+0.546 per stack)</c> <g>units</c>. Increases <g>maximum health pool</c> by <g>6.8%</c> <c_stack>(+6.8% per stack)</c>.",
             "destination": "Sheridan S.\nNorthlake,\nUNITED STATES OF AMERICA,\nMars",
             "date": "02.06.2057",
-            "story": "I decided to experiment: mixed an extract from that huge <g>ginseng</c> you sent me with the formula from that vial they kept advertising on TV. For taste, I added a little brewing — just regular green tea. The result turned out… curious.\n\nSmall cuts heal faster, breathing steadies, and strength seems to increase as well. But without extremes — no miraculous healing like from the original samples. It feels like I took <y>half the benefit</c> from each.\n\nSide effects are still unclear. Honestly, the worst part is that it actually tastes quite pleasant. I fear we’ve just invented a medicine people will drink for pleasure.",
-            "priority": "Standard"
+            "story": "Mixed up a trial batch: an extract from that giant ginseng you sent for your cancer research, plus a drop of that healing gel from the vial - you know the one, with the whole laundry list of side effects down the label. Brewed some ordinary green tea over the top, for taste. Came out interesting.\n\nApart, one's a dubious little root and the other's poison with healing thrown in. Together, and watered down at that, they behave themselves: cuts close faster, breathing steadies, strength picks up. No rash, no itch - as if I took half of each and left the worse half in the glass. Worst of all, it tastes good.\n\nThat was two weeks ago. I've kept brewing it since. I tell myself it's for the notes. I drink it when there's nothing left to heal. Try it and tell me straight whether it's time to quit - because asking myself no longer works.",
+            "priority": "<g>Priority</c>"
         },
         "Accountant": {
             "name": "Accountant",
@@ -114,7 +396,7 @@
             "description": "Activating equipment grants you <y>+50% attack speed</c> for <y>6 seconds</c> <c_stack>(+3 seconds per stack)</c>.",
             "destination": "Expense Archive,\nGrand Warehouse,\nTitan",
             "date": "01.04.2057",
-            "story": "A transparent vessel, inside — a brain suspended in viscous fluid. Cables run into the wall, carrying a continuous stream of data. We use it for resource accounting, tax calculations, and supply forecasts.\n\nOnce, this was someone’s brain. The name erased, the past erased — only the function remains: to calculate, store, and process. And it does so flawlessly, more precise than any machine. But sometimes, in rare glitches, words appear on the screen that shouldn’t exist: “I’m cold” or “Where are my hands.”\n\nOfficially, it is an accounting supercomputer. Unofficially, it is a reminder that for every perfect calculation, someone has already paid the price.",
+            "story": "A transparent vessel, inside - a brain suspended in viscous fluid. Cables run into the wall, carrying a continuous stream of data. We use it for resource accounting, tax calculations, and supply forecasts.\n\nOnce, this was someone's brain. The name erased, the past erased - only the function remains: to calculate, store, and process. And it does so flawlessly, more precise than any machine. But sometimes, in rare glitches, words appear on the screen that shouldn't exist: \"I'm cold\" or \"Where are my hands.\"\n\nOfficially, it is an accounting supercomputer. Unofficially, it is a reminder that for every perfect calculation, someone has already paid the price.",
             "priority": "<g>Priority</c>"
         },
         "BloodyRelic": {
@@ -123,7 +405,7 @@
             "description": "Dealing damage has a <y>10%</c> <c_stack>(+10% per stack)</c> chance to grant <r>bloodlust</c>, which increases <y>attack speed</c> by <y>5%</c> for <y>8 seconds</c>. Effect can stack up to <b>5</c> <c_stack>(+1 per stack)</c> <b>times</c>.",
             "destination": "Jungles VII,\nMuseum of 2019,\nEarth",
             "date": "04.05.2058",
-            "story": "We thought the pauldron and the skull were the limit of what twisted rebel minds could create. But under a pile of rusted blades, we found a necklace. The stone in the center looks like an eye, and it’s <r>red</c>, as if filled with fresh blood. It stares straight at you, even when you look away.\n\nRumors spread quickly among the workers: the relic gives “thirst” — the more blood you spill, the faster you move, the more eagerly your hands raise weapons. One guard held it, and now he utters no sound, his gaze darting as though he hears the heartbeat of those who can still be killed. They shackled him and took him to the med bay.\n\nIn short — don’t remove it from the container, don’t let anyone touch it without proper gear, etc., etc., standard safety. I don’t need to explain that to you.",
+            "story": "We thought the pauldron and the skull were the limit of what twisted rebel minds could create. But under a pile of rusted blades, we found a necklace. The stone in the center looks like an eye, and it's <r>red</c>, as if filled with fresh blood. It stares straight at you, even when you look away.\n\nRumors spread quickly among the workers: the relic gives \"thirst\" - the more blood you spill, the faster you move, the more eagerly your hands raise weapons. One guard held it, and now he utters no sound, his gaze darting as though he hears the heartbeat of those who can still be killed. They shackled him and took him to the med bay.\n\nIn short - don't remove it from the container, don't let anyone touch it without proper gear, etc., etc., standard safety. I don't need to explain that to you.",
             "priority": "<g>Priority/Unstable</c>"
         },
         "GoldBar": {
@@ -132,7 +414,7 @@
             "description": "Upon entering a stage grants <y>$33</c> <c_stack>(+22 per stack)</c>. <y>Increases over time</c>.",
             "destination": "Mint 'Orbita',\nSmelting Section,\nEarth",
             "date": "05.03.2057",
-            "story": "Found in an old safe during palace excavations of some long-gone tycoons. At first glance, just an ordinary <y>gold bar</c>. But strange marks are etched on its surface — resembling numbers, or perhaps an alien script. Jewelers said these weren’t stamps or hallmarks. The metal itself seemed to have always been this way, with those symbols.\n\nOne cashier swore he saw the inscriptions shift, rearranging into numbers. Another insisted he heard coins clinking in an empty hall.\n\nI want to hand it over to you for safekeeping. Paper money burns, digital funds vanish. But ingots, bars — they always hold value.",
+            "story": "Pulled from an old safe during the dig at the estate of some long-vanished rich men. To look at it, an ordinary gold bar. But marks are etched along its edge, like figures. The jewelers agreed to a man: it's no stamp and no hallmark - the metal seems to have always borne them.\n\nThe figures won't hold still. The cashier who held the bar swore the number crept slowly upward, right there in his hand, and the longer you held it the heavier it pressed on your palm. He set it down when he understood - that isn't a price climbing. That's a debt.\n\nTake it into safekeeping. Paper burns, accounts reset to zero, but gold stays gold. I only rest easier when this bar is lying in someone else's hands.",
             "priority": "Standard"
         },
         "FearEyesDeactivate": {
@@ -147,19 +429,19 @@
         "GiftPurity": {
             "name": "Gift of Purity",
             "pickup": "<b>The third skill recharges faster</c> and <g>grants barrier</c>",
-            "description": "<b>Reduces cooldown</c> of the third skill by <b>15%</c><c_stack>(+10% per stack)</c>. Using the <b>third skill</c> grants <g>25</c><c_stack>(+10 per stack)</c> <g>barrier points</c>.",
+            "description": "<b>Reduces cooldown</c> of the third skill by <b>15%</c><c_stack>(+10% per stack)</c>. Using the <b>third skill</c> grants a temporary <g>barrier</c> for <g>1.5%</c><c_stack>(+0.5% per stack)</c> of your <g>maximum health</c> per second of the skill's base cooldown.",
             "destination": "Sanctuary of the Seer,\nHall Beneath the Moonlit Dome,\n[REDACTED]",
             "date": "Indeterminable",
-            "story": "The Gift of Purity is the rarest sign of mercy. Those who receive it find in their hands a pair of smooth, <y>violet</c> berries, exuding a faint scent of the night air. They are not harvested, not cultivated, not passed from hand to hand. It is believed they can only be received by the will of the Seer — and only by those who have proven their devotion.\n\nUnlike the beads that bring anxiety and death, the Gift of Purity brings silence and confidence. Those fortunate enough to carry it said that enemies seemed to hesitate, blows lost their sharpness, and the heart grew calm. No voices, no whispers, no laughter. Only the sense that an unseen hand stands nearby, and your life — is no longer your own.\n\nYet this is no simple gift. The berries are a symbol. While they are fresh, you are under protection, but betrayal turns them into poison. Stories tell of deserters who found only shriveled fruits in their palms, bitter and deadly to the taste. The Seer, it is said, does not forgive those who break their oath.\n\nStill, for communities that endured trials, the appearance of the Gift is a blessing. It reminds: the Seer not only punishes, but also protects. Where beads carry terror and dread, the berries of purity bring hope and peace. Their rarity makes them elusive, but all who have heard of them know: it is a promise. A promise that loyalty will be noticed, and the faithful — never forgotten.",
-            "priority": "Indeterminable"
+            "story": "The Gift of Purity is the rarest sign of mercy. Those who receive it find in their hands a pair of smooth, <y>violet</c> berries, exuding a faint scent of the night air. They are not harvested, not cultivated, not passed from hand to hand. It is believed they can only be received by the will of the Seer - and only by those who have proven their devotion.\n\nUnlike the beads that bring anxiety and death, the Gift of Purity brings silence and confidence. Those fortunate enough to carry it said that enemies seemed to hesitate, blows lost their sharpness, and the heart grew calm. No voices, no whispers, no laughter. Only the sense that an unseen hand stands nearby, and your life - is no longer your own.\n\nYet this is no simple gift. The berries are a symbol. While they are fresh, you are under protection, but betrayal turns them into poison. Stories tell of deserters who found only shriveled fruits in their palms, bitter and deadly to the taste. The Seer, it is said, does not forgive those who break their oath.\n\nStill, for communities that endured trials, the appearance of the Gift is a blessing. It reminds: the Seer not only punishes, but also protects. Where beads carry terror and dread, the berries of purity bring hope and peace. Their rarity makes them elusive, but all who have heard of them know: it is a promise. A promise that loyalty will be noticed, and the faithful - never forgotten.",
+            "priority": "Standard/Indeterminable"
         },
         "GravityLoop": {
             "name": "Gravity Loop",
-            "pickup": "<g>Heals</c> when you are at <r>death’s door</c>",
+            "pickup": "<g>Heals</c> when you are at <r>death's door</c>",
             "description": "When <r>health drops</c> below <b>35%</c>, <g>restores 50% health</c>. Breaks after use.",
             "destination": "Biocollection No.3,\nGreenhouse and Aquarium,\nNew-Gravenkamp, Earth",
             "date": "23.07.2057",
-            "story": "Greetings.\nI found this artifact during excavations in a mountain region — it lay beside a skeleton, apparently buried by a collapse. Surprisingly, the skeleton itself was intact, unlike the trinket: the casing (?) was covered in cracks, and it seemed like a single careless move would turn it to dust. That’s what I thought — until I accidentally dropped it, tripping over a rock. To my surprise, I suffered no injury, and the artifact remained untouched — as if it had absorbed the blow itself. Sending it to you in hopes of a decent profit — this thing, beyond its archaeological value, could revolutionize the personal shielding market.",
+            "story": "Good day.\nI dug this trinket up at a mountain excavation. It lay beside a skeleton that a collapse like that should have ground to dust - yet the bones were whole, not a crack on them. The device, by contrast, is all cracks, fit to crumble at a breath.\n\nThrough my own carelessness I tripped and dropped it onto the rocks. I thought the find was done for. But neither it nor I took any harm: it was as though it drank the whole blow itself. Once.\n\nLater I looked up the histories of its former owners. Every one was found like that first skeleton: not a scratch on the body, beside them the same dead box, burned out from within. Each survived the thing that should have killed him - and soon died of another: one finished off by hunger, one by the cold. I'm sending it all the same: beyond its age, the personal-protection market will pay well for this. Only warn the buyer honestly - it will save you once, and no more.",
             "priority": "Standard"
         },
         "Obereg": {
@@ -168,17 +450,17 @@
             "description": "When <r>health</c> falls below <r>50%</c>, increases <y>armor</c> by <b>30</c> <c_stack>(+30 per stack)</c>.",
             "destination": "Old mound near the Black Forest,\nA village erased from the map,\n[REDACTED]",
             "date": "02.03.2057",
-            "story": "When the enemy warbands came, the people had neither walls nor an army. An old woman brought forth a green star, forged from strange metal, from her oven and placed it on the threshold. “Let the house at least stand, while we yet live,” she said.\n\nThe warriors fell one by one, and only when the snow was soaked with blood did the amulet begin to glow. It held their souls to their bodies, forcing them to rise so long as hands could still grasp an axe. But its light was cold and cruel: the brighter it burned, the faster life slipped away. Since then, it was said — this metal does not forgive the weak, it only delays death.\n\nWhen the mound was covered in grass, only the star remained. Heavy, cold, with a rusty glint of alien blood.",
+            "story": "When the enemy warbands came, the people had neither walls nor an army. An old woman brought forth a green star, forged from strange metal, from her oven and placed it on the threshold. \"Let the house at least stand, while we yet live,\" she said.\n\nThe warriors fell one by one, and only when the snow was soaked with blood did the amulet begin to glow. It held their souls to their bodies, forcing them to rise so long as hands could still grasp an axe. But its light was cold and cruel: the brighter it burned, the faster life slipped away. Since then, it was said - this metal does not forgive the weak, it only delays death.\n\nWhen the mound was covered in grass, only the star remained. Heavy, cold, with a rusty glint of alien blood.",
             "priority": "Standard"
         },
         "ShieldGenerator": {
             "name": "Shield Generator",
             "pickup": "Grants a <b>shield</c>",
             "description": "<b>Grants a shield equal to 10%</c> <c_stack>(+5% per stack)</c> of <b>maximum health</c>.",
-            "destination": "Energy Bay,\nField Testing Department,\nStation “Asterion”",
+            "destination": "Energy Bay,\nField Testing Department,\nStation \"Asterion\"",
             "date": "04.11.2057",
-            "story": "A mechanical block with a core emitting <b>blue</c> flashes. In normal mode they hiss quietly, but bring a sensor close — and the readings spike, as if a small thunderstorm were nearby. It’s attached to armor. The device creates a layer of blue glow around it, which holds a blow quite well. Inside the shield you hear the echo of your own steps, as if you were in an empty room. The senior engineer said: “This isn’t just protection — use it carefully. Otherwise, instead of defense, you’ll just get a delay in dying.” But even a delay can sometimes be useful.",
-            "priority": "<g>Priority/Energetic</c>"
+            "story": "Item: wearable shield-field generator. Housing - a cast block, an active core.\n\nAt rest - a steady blue glow, a faint hiss. Under load the sensors register a sharp spike in the field. Mounting is standard, onto armor.\n\nThe field absorbs an incoming blow in part; the remainder falls on the wearer. Beneath the field one hears one's own sounds returned - an incidental acoustic effect, no bearing on function.\n\nNoted over the trial period: wearers under the field more often take unjustified risks. No restrictions on issue.",
+            "priority": "Standard/Energetic"
         },
         "EyeDiamond": {
             "name": "Diamond Eye",
@@ -186,7 +468,7 @@
             "description": "Increases <y>critical hit chance</c> by <y>10%</c> and <r>critical hit damage</c> by <r>150%</c> <c_stack>(+100% per stack)</c>.",
             "destination": "Gravenkamp,\n5th Houston Street,\nPrism Tower,\nEarth",
             "date": "13.06.2056",
-            "story": "Your order has been processed. The frame is made of synthetic diamond, the lenses tinted <r>red</c>. The right lens has an integrated targeting module — it activates automatically, creating a glow visible even through fog.\n\nI must warn you: these materials are far too expensive for a mere accessory. Considering your past orders, one gets the impression you’re not looking for optics, but for a weapon. Please — if you are working for [REDACTED], be cautious. These glasses were made to <r>cut</c> more precisely, not to see further.",
+            "story": "Your order has been processed. The frame is made of synthetic diamond, the lenses tinted <r>red</c>. The right lens has an integrated targeting module - it activates automatically, creating a glow visible even through fog.\n\nI must warn you: these materials are far too expensive for a mere accessory. Considering your past orders, one gets the impression you're not looking for optics, but for a weapon. Please - if you are working for [REDACTED], be cautious. These glasses were made to <r>cut</c> more precisely, not to see further.",
             "priority": "<r>High Priority/Fragile</c>"
         },
         "AtGMissileMk0": {
@@ -196,7 +478,7 @@
             "destination": "Fort Joseph,\nBelt No.1053,\n[REDACTED],\nBoron System",
             "date": "[REDACTED]",
             "story": "Delivery of the prototype Viper Missile System.\n\nSingle-barrel configuration, extremely unreliable ignition system. Missiles often misfire or trigger prematurely, yet command insisted on field testing. Ammunition limited to a single launch, recommended for training purposes only.\n\nDo not issue to regular units. According to engineers, the launcher poses a greater threat to the operator than to the target.",
-            "priority": "MILITARY"
+            "priority": "Standard/MILITARY"
         },
         "SporeOBloom": {
             "name": "Spore O bloom",
@@ -204,16 +486,16 @@
             "description": "On killing an enemy, has a <y>44%</c> chance to release a <p>poison cloud</c> dealing <y>60%</c> <c_stack>(+60% per stack)</c> <y>damage</c> over <b>5 seconds</c>.",
             "destination": "Hidden Nook,\nMountain of Creation,\nVenus",
             "date": "21.12.2056",
-            "story": "A funny thing happened once — in a rush I forgot a piece of bread inside my bag. Later, when I noticed a strange smell and opened it, the bread was already covered in moss, with a tiny purple mushroom growing nearby.\nI carefully placed it in a jar with moist moss. Mushrooms, as I know, feed on moisture and decaying matter. So I spray it with water and give it small pieces of bread. It doesn’t need green light or fertilizer, it just draws in dampness and absorbs the bread, releasing spores in the process. It even reacts to words — if you whisper something, it slightly raises its cap, as if listening. The main thing is not to let the jar dry out, and make sure the moss stays damp.\nI’m sending it to you — best not to unscrew the lid indoors or place it near a fan. Once, after a draft, spores swirled everywhere inside and it hid in the moss for half a day. It seems to prefer twilight and being spoken to in a soft voice.",
+            "story": "A funny thing happened once - in a rush I forgot a piece of bread inside my bag. Later, when I noticed a strange smell and opened it, the bread was already covered in moss, with a tiny purple mushroom growing nearby.\nI carefully placed it in a jar with moist moss. Mushrooms, as I know, feed on moisture and decaying matter. So I spray it with water and give it small pieces of bread. It doesn't need green light or fertilizer, it just draws in dampness and absorbs the bread, releasing spores in the process. It even reacts to words - if you whisper something, it slightly raises its cap, as if listening. The main thing is not to let the jar dry out, and make sure the moss stays damp.\nI'm sending it to you - best not to unscrew the lid indoors or place it near a fan. Once, after a draft, spores swirled everywhere inside and it hid in the moss for half a day. It seems to prefer twilight and being spoken to in a soft voice.",
             "priority": "Standard"
         },
         "NewtonsMechanism": {
-            "name": "Newton’s Mechanism",
+            "name": "Newton's Mechanism",
             "pickup": "<b>Electricity</c> is not a toy for children.",
-            "description": "When the player <r>takes damage</c>, enemies within <y>2.5m</c> <c_stack>(+2.5m per stack)</c> receive reflected <y>300%</c> <c_stack>(+100% per stack)</c> <y>damage</c>. Up to <b>15</c> <c_stack>(+10 per stack)</c> enemies take damage.",
+            "description": "Grants a <g>shield</c> for <g>4%</c> of your <g>max health</c>. While you have a shield, increases <g>armor by 30</c> <c_stack>(+30 per stack)</c>. When your <b>shield breaks</c>, release a <y>stunning pulse</c> for <y>150% damage</c> plus <y>130%</c> <c_stack>(+10% per stack)</c> of your <g>max shield</c>.",
             "destination": "2013,\nInfinite Drive,\nEarth",
             "date": "28.06.2056",
-            "story": "Hey, sending you this exhibit for your Newton memorial museum. I think it would fit Mr. Newton himself perfectly, heh! Just make sure when unpacking it you handle it with the utmost care, and once you place it in the museum, keep it in an impact-resistant container filled with that cushioning fluid we talked about earlier. Still, I advise keeping it at least 2 meters away — you wouldn’t want your visitors turning into toasted pancakes, right?",
+            "story": "Hey, sending you this exhibit for your Newton memorial museum. I think it would fit Mr. Newton himself perfectly, heh! Just make sure when unpacking it you handle it with the utmost care, and once you place it in the museum, keep it in an impact-resistant container filled with that cushioning fluid we talked about earlier. Still, I advise keeping it at least 2 meters away - you wouldn't want your visitors turning into toasted pancakes, right?",
             "priority": "<g>Priority</c>"
         },
         "CoolGlasses": {
@@ -222,16 +504,16 @@
             "description": "Increases <y>critical hit chance by 5%</c>. On a <y>critical hit</c> creates a <r>solar strike</c>, dealing <y>20%</c> <c_stack>(+20% per stack)</c> <y>TOTAL damage</c> in a <b>2m</c> radius.",
             "destination": "Gravenkamp,\n5th Houston Street,\nPrism Tower,\nEarth",
             "date": "21.08.2056",
-            "story": "A simple frame, dark lenses, nothing remarkable at first glance. But under stress they overheat and emit a glow like a small <y>sun</c>. With your hands, the effect becomes even more dangerous.\n\nI don’t understand why you need three different sets at once. First you asked for focus distortion, then diamond lenses, now a black sun. If these are all parts of one project, you’re playing with something that could easily spiral out of control.\n\nRemember: even the ‘coolest’ glasses still break if you throw them.",
+            "story": "A simple frame, dark lenses, nothing remarkable at first glance. But under stress they overheat and emit a glow like a small <y>sun</c>. With your hands, the effect becomes even more dangerous.\n\nI don't understand why you need three different sets at once. First you asked for focus distortion, then diamond lenses, now a black sun. If these are all parts of one project, you're playing with something that could easily spiral out of control.\n\nRemember: even the 'coolest' glasses still break if you throw them.",
             "priority": "<g>Priority/Fragile</c>"
         },
         "DeepcoreGK2": {
             "name": "Deepcore GK2",
             "pickup": "ROCK AND STONE!",
-            "description": "Gives <y>‘Bosco’</c>, which periodically fires at enemies, dealing <y>10% damage</c>. Each hit increases <b>movement speed</c> by <b>0.5%</c>. Number of targets: <y>2</c> <c_stack>(+1 per stack)</c>, target range: <b>10m</c> <c_stack>(+1m per stack)</c>. Bosco’s fire rate depends on <y>attack speed</c>.",
+            "description": "Gives <y>'Bosco'</c>, which periodically fires at enemies, dealing <y>3% damage</c> and <b>slowing</c> them. Each <b>new enemy</c> hit increases <b>movement speed</c> by <b>0.7%</c> until the end of the stage. Number of targets: <y>2</c> <c_stack>(+2 per stack)</c>, target range: <b>10m</c> <c_stack>(+1m per stack)</c>. Bosco's fire rate depends on <y>attack speed</c>.",
             "destination": "9834,\nCortical Fund,\nMars",
             "date": "08.03.2057",
-            "story": "Yo, thanks for the drone parts — they fit my boys like a glove. In return I’m sending you a pretty rare piece — not exactly contraband, but getting it was a real pain. A GK-series assault rifle and a (slightly worn) Autonomous Support Drone (A.S.D.) — exclusive gear from the military-mining company in the Hoxxes system! You’ll figure out the rifle yourself, you’re no fool, but about the drone — damn, even worn-out, I’d have kept it for myself. Most of its functions are gone, but it still has its laser! Can’t say for sure, but it’s a patented technology that allows it to remain functional almost indefinitely without losing combat potential. Just make sure no one finds out you’ve got it — the dwarf who sold it to me went through hell to get it.",
+            "story": "Yo, thanks for the drone parts - they fit my boys like a glove. In return I'm sending you a pretty rare piece - not exactly contraband, but getting it was a real pain. A GK-series assault rifle and a (slightly worn) Autonomous Support Drone (A.S.D.) - exclusive gear from the military-mining company in the Hoxxes system! You'll figure out the rifle yourself, you're no fool, but about the drone - damn, even worn-out, I'd have kept it for myself. Most of its functions are gone, but it still has its laser! Can't say for sure, but it's a patented technology that allows it to remain functional almost indefinitely without losing combat potential. Just make sure no one finds out you've got it - the dwarf who sold it to me went through hell to get it.",
             "priority": "<g>Priority</c>"
         },
         "Totemetry": {
@@ -240,7 +522,7 @@
             "description": "Every <b>2 minutes</c> creates a totem lasting <b>45 seconds</c>, which <g>heals allies</c> in a <y>7.5m</c> radius <c_stack>(+2m per stack)</c> for <g>2%</c> <c_stack>(+2% per stack)</c> of their <g>maximum health</c> every <b>3 seconds</c>. The appearance of the totem increases <y>attack speed</c> by <y>10%</c>.",
             "destination": "Excavations in the Fungal Gorge,\nObservation Sector,\n[REDACTED]",
             "date": "19.08.2057",
-            "story": "We found it among the debris — a green rectangular stone, as if carved by hands that never existed here. At the first touch it trembled, and nearby a <g>totem</c> appeared, resembling the structures raised by lynxes. It glowed with a soft light, and everyone within range felt lighter, their breathing steadier.\n\nIt seems this artifact is not merely an ornament, but a portable shrine. The lynx tribe uses it to gather together: it quickens their rhythm, lifts their spirit, heals their wounds. Stranger still — the stone activates on its own, as though deciding itself when its bearer needs to recover.\n\nIn it echo the songs of the lynx, their laughter and their dances. As if each activation brings back a piece of the tribe, even if they have long since returned to the earth. I do not know whose voice will answer the next time it shines.",
+            "story": "We found it among the debris - a green rectangular stone, as if carved by hands that never existed here. At the first touch it trembled, and nearby a <g>totem</c> appeared, resembling the structures raised by lynxes. It glowed with a soft light, and everyone within range felt lighter, their breathing steadier.\n\nIt seems this artifact is not merely an ornament, but a portable shrine. The lynx tribe uses it to gather together: it quickens their rhythm, lifts their spirit, heals their wounds. Stranger still - the stone activates on its own, as though deciding itself when its bearer needs to recover.\n\nIn it echo the songs of the lynx, their laughter and their dances. As if each activation brings back a piece of the tribe, even if they have long since returned to the earth. I do not know whose voice will answer the next time it shines.",
             "priority": "<g>Priority</c>"
         },
         "RadialAlloy": {
@@ -249,25 +531,52 @@
             "description": "After <r>taking damage</c>, <g>heals</c> for <g>10</c> <c_stack>(+5 per stack)</c> <g>HP</c>. <g>Healing</c> can offset incoming <r>damage</c> no lower than <b>5 HP</c>.",
             "destination": "Materials Science Laboratory,\nResearch Sector No.12,\nMars",
             "date": "06.11.2057",
-            "story": "Shards of green metal, cut as though sliced by angled rays. At contact they vibrate slightly. It was noted: when the material vibrates in the hands of someone with a wound, the healing process accelerates, as if the metal shares its own energy with the body. Scientists debate: is it an alloy or a living substance? Analyses show a crystalline lattice, but its reaction to damage feels like something more. As though it doesn’t simply heal, but ‘takes part of the pain upon itself.’ In reports to command we wrote: ‘material with regenerative effect.’ But we continue to study it.",
+            "story": "Shards of metal, cut as if at a slant - faceted, as though by a beam. They tremble faintly in the hand.\n\nNoted: if a wounded man holds them, the wound closes noticeably faster, as though the metal shares its strength with the body. By structure - an ordinary crystalline lattice, nothing special. By behavior - something else.\n\nIt doesn't take the pain away. It takes the pain for itself. Whoever carried a handful of the shards too long began complaining of wounds not his own: an aching break he never suffered, a burn from a fire long gone cold. In the report we put it briefly - \"material with a healing effect.\" Among ourselves we argue about something else: where does all it has gathered go, once there is no room left inside it?",
             "priority": "<g>Priority/Unstable</c>"
         },
         "Maslenitsa": {
             "name": "Maslenitsa",
             "pickup": "Increases <g>armor</c>. Grants <g>armor</c> for items that provide <g>armor</c>.",
-            "description": "Increases <g>armor by 25</c> <c_stack>(+25 per stack)</c>. Additionally grants <g>2</c> <c_stack>(+2 per stack)</c> <g>armor</c> for each of: ‘Hard Times’, ‘Reflective Armor’, ‘Huge Cone’, ‘Amulet’, ‘Shadow Shield’.",
+            "description": "Increases <g>armor by 25</c> <c_stack>(+25 per stack)</c>. Additionally grants <g>2</c> <c_stack>(+2 per stack)</c> <g>armor</c> for each of: 'Hard Times', 'Reflective Armor', 'Huge Cone', 'Amulet', 'Shadow Shield'.",
             "destination": "Hill with a burned village,\nAbandoned shrine,\n[REDACTED]",
             "date": "09.03.2057",
-            "story": "When winter dragged on for a third year, people gathered on the hill and lit a great fire. Not for celebration — but for the final rite. They placed a green helmet, hammered with the sun itself, upon the head of the strongest warrior.\n\nHe stood, heavy as the earth itself, and the enemies could not break his armor. But each strike tore breath from his chest, and the helmet pressed him ever closer to the ground. People cried, sang, and threw pancakes into the fire, hoping to appease the sun. But spring never came.\n\nThe helmet was returned to the shrine after the warrior fell and never rose again. Now it lies in silence, the metal still bearing the gleam of those fires that warmed no one.",
+            "story": "When winter dragged on for a third year, people gathered on the hill and lit a great fire. Not for celebration - but for the final rite. They placed a green helmet, hammered with the sun itself, upon the head of the strongest warrior.\n\nHe stood, heavy as the earth itself, and the enemies could not break his armor. But each strike tore breath from his chest, and the helmet pressed him ever closer to the ground. People cried, sang, and threw pancakes into the fire, hoping to appease the sun. But spring never came.\n\nThe helmet was returned to the shrine after the warrior fell and never rose again. Now it lies in silence, the metal still bearing the gleam of those fires that warmed no one.",
             "priority": "<r>High Priority</c>"
         },
         "ShineOSun": {
             "name": "Shine, O Sun",
             "pickup": "Chance to create a <y>sun</c> when killing enemies.",
-            "description": "On killing an enemy, has a <y>22%</c> chance to create a <y>scorching sun</c>, dealing <r>5% of the enemy’s maximum health</c> within a <b>12m</c> radius <c_stack>(+2.5m per stack)</c> for 5 seconds.",
+            "description": "On killing an enemy, has a <y>22%</c> chance to create a <y>scorching sun</c>, dealing <r>5% of the enemy's maximum health</c> within a <b>12m</c> radius <c_stack>(+2.5m per stack)</c> for 5 seconds.",
             "destination": "Hidden Nook,\nMountain of Creation,\nVenus",
             "date": "22.12.2056",
-            "story": "Guys, remember the little mushroom I sent yesterday? Today he has a new neighbor in the jar.\nA tiny sun with little hands. I’m not joking — it’s warm, like a cup of tea. When I made it laugh, its temperature rose and it melted the label on the jar. It doesn’t ask for food either — it feeds on sunlight (though it is itself like a little sun). Caution: don’t place near heaters or shake it — the glass already cracked a couple of times from the heat.\nIf it’s awake, at night its glow can light the whole apartment, so keep it under a blanket or in a darkened box. In the evening I had to wrap the jar in a towel. Sometimes when I tapped the glass, it would peek out, like from behind a curtain. I’m sending it to you — I hope you have a night lamp companion, so it won’t feel lonely.",
+            "story": "Guys, remember the little mushroom I sent yesterday? Today he has a new neighbor in the jar.\nA tiny sun with little hands. I'm not joking - it's warm, like a cup of tea. When I made it laugh, its temperature rose and it melted the label on the jar. It doesn't ask for food either - it feeds on sunlight (though it is itself like a little sun). Caution: don't place near heaters or shake it - the glass already cracked a couple of times from the heat.\nIf it's awake, at night its glow can light the whole apartment, so keep it under a blanket or in a darkened box. In the evening I had to wrap the jar in a towel. Sometimes when I tapped the glass, it would peek out, like from behind a curtain. I'm sending it to you - I hope you have a night lamp companion, so it won't feel lonely.",
+            "priority": "<r>High Priority</c>"
+        },
+        "Dombra": {
+            "name": "Dombra",
+            "pickup": "Chance to summon <r>berkut wings</c> on hit.",
+            "description": "On hit, you have a <y>20% chance</c> to summon <r>berkut wings</c> to your <b>left and right</c>, together dealing <y>122% TOTAL damage</c> <c_stack>(+122% per stack)</c>.",
+            "destination": "Great Steppe,\nSaryarka,\nEarth",
+            "date": "[REDACTED]",
+            "story": "An old dombra, the wood darkened with age, two strings still taut. When its owner struck a kuy, those nearby swore they heard the beat of great wings overhead.\n\nWe set it down and plucked a string ourselves. Nothing - until a blow was struck in anger. Then the air to either side folded, and for an instant a pair of vast berkut wings unfurled, sweeping all before them, before melting into the wind.\n\nThe nomads say the steppe gives its strength to those who keep its songs. We wrote 'resonant melee amplifier' in the report. The herdsman who handed it over only smiled: play it well, and you never ride alone.",
+            "priority": "<r>High Priority</c>"
+        },
+        "VioletFrenzy": {
+            "name": "Violet Frenzy",
+            "pickup": "Killing an <r>elite</c> sends you into a <p>frenzy</c> with near-instant cooldowns.",
+            "description": "After killing an <r>elite monster</c>, enter a <p>frenzy</c> for <b>4s</c> <c_stack>(+4s per stack)</c>, during which all <y>skill cooldowns are 0.5s</c>.",
+            "destination": "[REDACTED]",
+            "date": "[REDACTED]",
+            "story": "Recovered from a containment cell, sealed in a violet resin block. The handlers' log is mostly redacted; what remains describes a parasitic growth that fused to the host's spine and 'rewarded' kills with a flood of clarity - the world slowing, every motion arriving early. Test subjects reported the colour first: a faint lilac at the edges of sight that bloomed brighter the longer the hunt lasted. The final entry is a single line, underlined twice: it only quiets down while something is still dying.",
+            "priority": "<r>High Priority</c>"
+        },
+        "DeadWater": {
+            "name": "Dead Water",
+            "pickup": "<g>Healing</c> is amplified and stored as <p>soul energy</c> that strikes with <r>skulls</c>.",
+            "description": "<g>Healing</c> is increased by <g>75%</c> <c_stack>(+50% per stack)</c>. <g>100%</c> <c_stack>(+75% per stack)</c> of healing is stored as <p>soul energy</c>. When <p>soul energy</c> reaches <b>10%</c> of your <g>maximum health</c>, a <r>skull</c> is released, dealing <r>150%</c> of the stored <p>soul energy</c>.",
+            "destination": "Abandoned graveyard,\nThe well by the three aspens,\n[REDACTED]",
+            "date": "31.10.2057",
+            "story": "From the well by the three aspens we drew a flask of murky, heavy water. The old folk called such water 'dead' - not for drinking, but for wounds. Splash it on a gash and the edges draw together on their own, the bleeding stills, the flesh knits, as though no blow had ever landed.\n\nBut the water takes its due. What it has healed does not vanish without trace - the pain it took gathers somewhere within it as a cold, dull glow. And when the vessel brims, that glow tears free in a grinning skull and seeks out whoever stands nearest. In the old tales dead water was always kept paired with living water: one mended the body, the other called back the spirit. We have no living water. Only the kind that mends the dead - and remembers every wound it ever closed.\n\nIn the report I wrote 'regenerative reagent with delayed discharge.' To myself I put it shorter: it heals you gladly, then collects the price from whomever it points to.",
             "priority": "<r>High Priority</c>"
         }
     }

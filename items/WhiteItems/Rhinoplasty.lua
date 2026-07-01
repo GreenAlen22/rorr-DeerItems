@@ -6,6 +6,9 @@
 local sprite = Resources.sprite_load("DeerItems", "item/Rhinoplasty", PATH.."assets/sprites/items/sWhiteItems/Rhinoplasty.png", 1, 16, 16)
 local spriteBuff = Resources.sprite_load("DeerItems", "buff/Rhinoplasty", PATH.."assets/sprites/buffs/Rhinoplasty.png", 1, 6, 8)
 
+-- guid мода: ускоряет get_data (без обхода debug-стека на каждом кадре)
+local GUID = _ENV["!guid"]
+
 -- Создание предмета Rhinoplasty
 -- Привязка спрайта к предмету
 -- Установка тира предмета: белый (обычный)
@@ -25,11 +28,7 @@ buff.is_timed = true
 
 -- При убийстве увеличиваем счётчик убийств
 item:onKillProc(function(actor, victim, stack)
-    local data = actor:get_data("Rhinoplasty")
-    if not data or type(data) ~= "table" then
-        data = { kills = 0, cooldown = 0 }
-        actor:set_data("Rhinoplasty", data)
-    end
+    local data = actor:get_data("Rhinoplasty", GUID)
     -- Безопасная инициализация значений
     if data.cooldown == nil then data.cooldown = 0 end
     if data.kills == nil then data.kills = 0 end
@@ -39,11 +38,7 @@ end)
 
 -- Проверка условий применения баффа каждый кадр
 item:onPostStep(function(actor, stack)
-    local data = actor:get_data("Rhinoplasty")
-    if not data or type(data) ~= "table" then
-        data = { kills = 0, cooldown = 0 }
-        actor:set_data("Rhinoplasty", data)
-    end
+    local data = actor:get_data("Rhinoplasty", GUID)
 
     if data.cooldown == nil then data.cooldown = 0 end
     if data.kills == nil then data.kills = 0 end

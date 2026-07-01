@@ -15,14 +15,22 @@ item:set_loot_tags(Item.LOOT_TAG.category_utility)
 
 -- Очистка старых коллбеков
 item:clear_callbacks()
+
+-- Список всех предметов игры фиксирован после загрузки модов — ищем его один раз и кэшируем.
+-- У игрока меняется лишь количество, поэтому item_stack_count пересчитываем при каждом вызове.
+local all_items
+local function count_total_items(actor)
+    all_items = all_items or Item.find_all()
+    local total = 0
+    for _, it in ipairs(all_items) do
+        total = total + actor:item_stack_count(it, Item.STACK_KIND.any)
+    end
+    return total
+end
 -- Перерасчёт основных характеристик
 item:onStatRecalc(function(actor, stack)
-    -- Подсчёт всех предметов
-    local total_items = 0
-    local all_items = Item.find_all()
-    for _, it in ipairs(all_items) do
-        total_items = total_items + actor:item_stack_count(it, Item.STACK_KIND.any)
-    end
+    -- Подсчёт предметов у игрока (список реестра кэшируется)
+    local total_items = count_total_items(actor)
 
     -- Множитель: +1% за каждый предмет * количество стаков
     local mult = 1.0 + (0.01 * total_items * (stack or 1))
@@ -46,11 +54,7 @@ end)
 
 -- После пересчёта: компенсируем изменение maxhp, чтобы не потерять здоровье
 item:onPostStatRecalc(function(actor, stack)
-	local total_items = 0
-    local all_items = Item.find_all()
-    for _, it in ipairs(all_items) do
-        total_items = total_items + actor:item_stack_count(it, Item.STACK_KIND.any)
-    end
+	local total_items = count_total_items(actor)
 
     local mult = 1.0 + (0.01 * total_items * (stack or 1))
 
