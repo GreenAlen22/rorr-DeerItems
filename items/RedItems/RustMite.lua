@@ -9,7 +9,7 @@
 -- эффект гарантирован и работает от ЛЮБОГО источника урона.
 
 -- Спрайт предмета и иконка дебаффа (болванки из template — замени текстуры по этим путям).
-local sprite     = Resources.sprite_load("DeerItems", "item/RustMite", PATH.."assets/sprites/items/sRedItems/RustMite.png", 1, 16, 16)
+local sprite     = Resources.sprite_load("DeerItems", "item/RustMite", PATH.."assets/sprites/items/sRedItems/RustMite.png", 1, 18, 18)
 local buffSprite = Resources.sprite_load("DeerItems", "buff/RustMite", PATH.."assets/sprites/buffs/RustMite.png", 1, 7, 7)
 
 -- guid мода: ускоряет get_data

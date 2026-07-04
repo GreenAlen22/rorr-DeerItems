@@ -2,8 +2,8 @@
 -- Активация любого интерактива (сундук, магазин, алтарь, бочка) разворачивает турель на 30с,
 -- которая бьёт ближайших врагов в радиусе ~250. Одновременно не больше stack турелей.
 
-local sprite       = Resources.sprite_load("DeerItems", "item/Golemshot", PATH.."assets/sprites/items/sGreenItems/Golemshot.png", 1, 16, 16)
-local turretSprite = Resources.sprite_load("DeerItems", "object/Golemshot", PATH.."assets/sprites/particle/Golemshot.png", 1, 16, 16)
+local sprite       = Resources.sprite_load("DeerItems", "item/Golemshot", PATH.."assets/sprites/items/sGreenItems/Golemshot.png", 1, 18, 18)
+local turretSprite = Resources.sprite_load("DeerItems", "object/Golemshot", PATH.."assets/sprites/particle/Golemshot.png", 1, 15, 18)
 
 local GUID  = _ENV["!guid"]
 local BLEND = Color(0x7fd5a0)

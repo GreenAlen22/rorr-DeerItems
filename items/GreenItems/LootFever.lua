@@ -3,7 +3,7 @@
 -- Стаки тикают по отдельности (как BloodyRelic); кап растёт с числом предметов.
 
 -- Иконка предмета и иконка баффа (заглушки-шаблоны — замени текстуры по этим путям).
-local sprite      = Resources.sprite_load("DeerItems", "item/LootFever", PATH.."assets/sprites/items/sGreenItems/LootFever.png", 1, 16, 16)
+local sprite      = Resources.sprite_load("DeerItems", "item/LootFever", PATH.."assets/sprites/items/sGreenItems/LootFever.png", 1, 18, 18)
 local buff_sprite = Resources.sprite_load("DeerItems", "buff/LootFever", PATH.."assets/sprites/buffs/LootFever.png", 1, 7, 10)
 
 -- guid мода: ускоряет get_data

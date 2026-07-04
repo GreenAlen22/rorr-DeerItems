@@ -8,7 +8,7 @@
 -- радиус И потолок учитываемых врагов (=> заряд быстрее) и усиливают всплеск.
 
 -- Спрайт предмета (болванка из template). Нова переиспользует готовый Explosive.png. Звук не нужен.
-local sprite      = Resources.sprite_load("DeerItems", "item/RavenousVine", PATH.."assets/sprites/items/sRedItems/RavenousVine.png", 1, 16, 16)
+local sprite      = Resources.sprite_load("DeerItems", "item/RavenousVine", PATH.."assets/sprites/items/sRedItems/RavenousVine.png", 1, 18, 18)
 local bloomSprite = Resources.sprite_load("DeerItems", "particle/RavenousVineBloom", PATH.."assets/sprites/particle/Explosive.png", 5, 32, 32)
 
 local GUID = _ENV["!guid"]

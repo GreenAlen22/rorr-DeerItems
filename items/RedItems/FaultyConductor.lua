@@ -4,9 +4,9 @@
 -- Дроны постоянно получают +15% (+15% за стак) к урону.
 
 -- Спрайт предмета, иконка баффа «заряжен», частица-вспышка пульса и звук — болванки из template (заменишь сам).
-local sprite      = Resources.sprite_load("DeerItems", "item/FaultyConductor", PATH.."assets/sprites/items/sRedItems/FaultyConductor.png", 1, 16, 16)
-local buffSprite  = Resources.sprite_load("DeerItems", "buff/FaultyConductor", PATH.."assets/sprites/buffs/FaultyConductor.png", 1, 7, 7)
-local pulseSprite = Resources.sprite_load("DeerItems", "particle/FaultyConductor", PATH.."assets/sprites/particle/FaultyConductor.png", 1, 16, 16)
+local sprite      = Resources.sprite_load("DeerItems", "item/FaultyConductor", PATH.."assets/sprites/items/sRedItems/FaultyConductor.png", 1, 18, 18)
+local buffSprite  = Resources.sprite_load("DeerItems", "buff/FaultyConductor", PATH.."assets/sprites/buffs/FaultyConductor.png", 1, 4, 8)
+local pulseSprite = Resources.sprite_load("DeerItems", "particle/FaultyConductor", PATH.."assets/sprites/particle/FaultyConductor.png", 5, 10, 10)
 local sound       = Resources.sfx_load("DeerItems", "FaultyConductor/pulse", PATH.."assets/sounds/FaultyConductor.ogg")
 
 local GUID = _ENV["!guid"]

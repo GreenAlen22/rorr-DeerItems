@@ -1,13 +1,17 @@
 -- DeerItems-CashbackChip / «Кэшбэк-Чип» / "Cashback Chip"
 -- Пассивка (адаптация Executive Card из RoR2). Два независимых эффекта:
---   (a) С ЛЮБОЙ покупки за золото возвращается 10% потраченного (×стак).
---   (b) Раз за этап (по одному на стак) ПЕРВАЯ покупка СУНДУКА бесплатна — возврат 100%.
+--   (a) С ЛЮБОЙ покупки за золото возвращается 10% потраченного +3% за доп. стак.
+--   (b) Раз за этап первый сундук бесплатный, доп. стаки дают +10% к следующему бесплатному сундуку.
 
 -- Иконка предмета (заглушка-шаблон — замени текстуру по этому пути)
-local sprite = Resources.sprite_load("DeerItems", "item/CashbackChip", PATH.."assets/sprites/items/sGreenItems/CashbackChip.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/CashbackChip", PATH.."assets/sprites/items/sGreenItems/CashbackChip.png", 1, 18, 18)
+local sound = Resources.sfx_load("DeerItems", "sound/GoldBar", PATH.."assets/sounds/GoldBar.ogg")
 
 -- ── Настройки баланса ──
-local CASHBACK_FRAC = 0.10   -- доля возврата с покупки за стак (10%/стак)
+local CASHBACK_BASE = 0.10
+local CASHBACK_STACK = 0.03
+local FREE_CHEST_BASE = 1
+local FREE_CHEST_STACK_CHANCE = 0.10
 
 -- Сколько бесплатных сундуков уже использовано в этом этапе у каждого игрока: [actor.id] → число
 local free_used = {}
@@ -41,6 +45,23 @@ local function is_chest(interactable)
     return ok and truthy(res)
 end
 
+local function cashback_fraction(stack)
+    return CASHBACK_BASE + CASHBACK_STACK * math.max(0, stack - 1)
+end
+
+local function should_refund_chest(actor_id, stack)
+    local used = free_used[actor_id] or 0
+    local budget = FREE_CHEST_BASE + FREE_CHEST_STACK_CHANCE * math.max(0, stack - 1)
+    local guaranteed = math.floor(budget)
+
+    if used < guaranteed or (used == guaranteed and math.random() < (budget - guaranteed)) then
+        free_used[actor_id] = used + 1
+        return true
+    end
+
+    return false
+end
+
 -- Возврат денег при покупке. onInteractableActivate (тип 37) срабатывает ТОЛЬКО у держателей
 -- предмета и передаёт (actor, stack, interactable). Деньги пишем только локальному игроку.
 item:onInteractableActivate(function(actor, stack, interactable)
@@ -55,16 +76,15 @@ item:onInteractableActivate(function(actor, stack, interactable)
     local cost = interactable.cost or 0
     if cost <= 0 then return end
 
-    -- (b) Бесплатный сундук: первые `stack` сундуков за этап возвращают 100% стоимости
-    local used = free_used[actor.id] or 0
-    if used < stack and is_chest(interactable) then
-        free_used[actor.id] = used + 1
+    -- (b) Бесплатный сундук: 1 гарантированно, затем +10% к следующему за каждый доп. стак.
+    if is_chest(interactable) and should_refund_chest(actor.id, stack) then
         give_gold(cost)
+        actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
         return   -- бесплатный сундук не комбинируем с 10%-возвратом (и так вернули всё)
     end
 
-    -- (a) 10% кэшбэк с любой покупки за золото (×стак)
-    give_gold(math.floor(cost * CASHBACK_FRAC * stack))
+    -- (a) 10% кэшбэк с любой покупки за золото +3% за доп. стак.
+    give_gold(math.floor(cost * cashback_fraction(stack)))
 end)
 
 -- Сброс счётчика бесплатных сундуков на новом этапе

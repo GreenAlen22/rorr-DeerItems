@@ -4,8 +4,8 @@
 -- (Урон кровотечения ведём списком у игрока, как «солнца» ShineOSun: так он скейлится и
 --  засчитывается игроку; сам бафф — лишь визуальная метка-дебафф.)
 
-local sprite      = Resources.sprite_load("DeerItems", "item/ContagionBarb", PATH.."assets/sprites/items/sGreenItems/ContagionBarb.png", 1, 16, 16)
-local buff_sprite = Resources.sprite_load("DeerItems", "buff/ContagionBleed", PATH.."assets/sprites/buffs/ContagionBleed.png", 1, 7, 7)
+local sprite      = Resources.sprite_load("DeerItems", "item/ContagionBarb", PATH.."assets/sprites/items/sGreenItems/ContagionBarb.png", 1, 18, 18)
+local buff_sprite = Resources.sprite_load("DeerItems", "buff/ContagionBleed", PATH.."assets/sprites/buffs/ContagionBarb.png", 1, 7.5, 7.5)
 
 local GUID = _ENV["!guid"]
 

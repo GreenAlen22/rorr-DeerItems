@@ -324,7 +324,7 @@
             "description": "Killing an <y>enemy</c> grants <y>1 stack</c><r> of 'Massacre'</c> for <y>2.5</c> seconds <c_stack>(+2.5 seconds)</c>. Increases <y>damage</c> and <g>armor</c> by <y>3%</c>.",
             "destination": "Jungles VII,\nMuseum of 2019,\nEarth",
             "date": "04.05.2057",
-            "story": "Another find from the same site. A small skull with a spine attached. Its color is strange: the bone seems to have absorbed <r>blood</c>. We even tried to wash it clean, but the color remained. At times, a white glow flickers in the sockets.\n\nThe soldiers say the artifact responds to killing. The more corpses around, the heavier it feels in hand, yet the stronger its bearer becomes. Sounds like nonsense, but we counted far too many bones near its previous owner.\n\nIn the report I noted: \"induces <r>battle frenzy</c>.\" In my private notes, I put it more simply: best kept in a locked container.",
+            "story": "Another find from the same site. A small skull with a spine attached. Its color is strange: the bone seems to have absorbed <r>blood</c>. We even tried to wash it clean, but the color remained. At times, a white glow flickers in the sockets.\n\nThe soldiers say the artifact responds to killing. The more corpses around, the heavier it feels in hand, yet the stronger its bearer becomes. Sounds like nonsense, but we counted far too many bones near its previous owner.",
             "priority": "Standard/Unstable"
         },
         "MagmaFragment": {
@@ -424,6 +424,7 @@
         },
         "GravityLoopDeactivate": {
             "name": "Empty Container",
+            "pickup": "whiiiistliiiing.....",
             "description": ""
         },
         "GiftPurity": {

@@ -2,7 +2,7 @@
 -- Увеличивает макс. HP на 6.8% за стак, восстанавливает разницу HP при перерасчёте и даёт регенерацию.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/GreenTea", PATH.."assets/sprites/items/sGreenItems/GreenTea.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/GreenTea", PATH.."assets/sprites/items/sGreenItems/GreenTea.png", 1, 18, 18)
 
 -- Создание предмета GreenTea
 -- Привязка спрайта к предмету

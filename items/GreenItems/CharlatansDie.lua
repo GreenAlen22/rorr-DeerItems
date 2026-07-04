@@ -3,7 +3,7 @@
 -- (Объединение Chance Doll + Sale Star: исход Алтаря Шанса в RMT прочитать нельзя, поэтому
 --  «удачу» перенесли на сундук — доспавниваем ящик более высокого тира.)
 
-local sprite = Resources.sprite_load("DeerItems", "item/CharlatansDie", PATH.."assets/sprites/items/sGreenItems/CharlatansDie.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/CharlatansDie", PATH.."assets/sprites/items/sGreenItems/CharlatansDie.png", 1, 18, 18)
 
 local GUID = _ENV["!guid"]
 

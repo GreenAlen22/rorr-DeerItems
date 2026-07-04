@@ -4,9 +4,9 @@
 -- Каждые 100% нанесённого урона повышают шанс и урон метеора (с капом и затуханием).
 
 -- Спрайт метеора (его даёшь ты), импакт-эффект из готового Explosive.png, звук удара (его даёшь ты).
-local sprite      = Resources.sprite_load("DeerItems", "item/OrbitalLens", PATH.."assets/sprites/items/sRedItems/OrbitalLens.png", 1, 16, 16)
-local meteorSprite= Resources.sprite_load("DeerItems", "particle/OrbitalLens", PATH.."assets/sprites/particle/OrbitalLens.png", 1, 16, 16)
-local explosive   = Resources.sprite_load("DeerItems", "particle/OrbitalLensBurst", PATH.."assets/sprites/particle/Explosive.png", 5, 32, 32)
+local sprite      = Resources.sprite_load("DeerItems", "item/OrbitalLens", PATH.."assets/sprites/items/sRedItems/OrbitalLens.png", 1, 18, 18)
+local OrbitalLensMeteor = Resources.sprite_load("DeerItems", "particle/OrbitalLens", PATH.."assets/sprites/particle/OrbitalLensMeteor.png", 5, 75, 75)
+local OrbitalLensExplosive   = Resources.sprite_load("DeerItems", "particle/OrbitalLensBurst", PATH.."assets/sprites/particle/OrbitalLensExplosive.png", 14, 125, 235)
 local sound       = Resources.sfx_load("DeerItems", "OrbitalLens/impact", PATH.."assets/sounds/OrbitalLens.ogg")
 
 local GUID = _ENV["!guid"]
@@ -109,7 +109,7 @@ item:onPostStep(function(actor, stack)
                 atk.attack_info.proc = false
                 atk.attack_info:set_critical(false)
             end
-            gm.instance_create(m.x, m.ty, gm.constants.oEfExplosion).sprite_index = explosive
+            gm.instance_create(m.x, m.ty, gm.constants.oEfExplosion).sprite_index = OrbitalLensExplosive
             actor:sound_play(sound, 1.0, 0.9 + math.random() * 0.4)
             table.remove(data.meteors, i)
         end
@@ -123,9 +123,8 @@ item:onPostDraw(function(actor, stack)
     for _, m in ipairs(data.meteors) do
         local p  = 1 - (m.t / FALL_FRAMES)             -- прогресс падения 0..1
         local cy = m.sy + (m.ty - m.sy) * p
-        gm.draw_sprite(meteorSprite, 0, m.x, cy)
+        gm.draw_sprite(OrbitalLensMeteor, 0, m.x, cy)
         gm.draw_set_colour(Color(0xff7733))
-        gm.draw_ellipse(m.x - m.w, m.ty - m.h * 0.4, m.x + m.w, m.ty + m.h * 0.4, true)
         gm.draw_set_colour(Color.WHITE)
     end
 end)

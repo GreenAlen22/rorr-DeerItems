@@ -7,7 +7,7 @@
 --   gm.instance_create_depth(x, y, depth, gm.constants.oDrone1)  → готовый дрон-союзник.
 -- Все настоящие дроны/союзники владельца (включая этого) получают +25% урона и +15% макс. HP за стак.
 
-local sprite = Resources.sprite_load("DeerItems", "item/ArmySurplus", PATH.."assets/sprites/items/sRedItems/ArmySurplus.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/ArmySurplus", PATH.."assets/sprites/items/sRedItems/ArmySurplus.png", 1, 18, 18)
 
 local GUID = _ENV["!guid"]
 local oP   = gm.constants.oP

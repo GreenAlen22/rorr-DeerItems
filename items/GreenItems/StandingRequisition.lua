@@ -2,7 +2,7 @@
 -- В начале каждого этапа неподалёку появляется ящик-доставка с выбором 1 из 2 предметов.
 -- (Command-ящик из Item.spawn_crate с двумя вариантами = выбор одного; второй пропадает.)
 
-local sprite = Resources.sprite_load("DeerItems", "item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 18, 18)
 
 local GUID = _ENV["!guid"]
 

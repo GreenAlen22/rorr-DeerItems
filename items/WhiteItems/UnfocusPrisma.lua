@@ -10,7 +10,7 @@ local sprite = Resources.sprite_load("DeerItems", "item/UnfocusPrisma", PATH.."a
 -- Назначение тега лута: предмет, усиливающий урон
 local item = Item.new("DeerItems", "UnfocusPrisma")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
+item:set_tier(Item.TIER.common)
 item:set_loot_tags(Item.LOOT_TAG.category_damage)
 
 -- Порог дальности, с которого начинает действовать бонус: 13 метров (1 метр = 32 пикселя)

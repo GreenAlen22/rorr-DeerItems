@@ -5,7 +5,7 @@
 -- Скорость перехвата растёт со скоростью атаки.
 
 -- Спрайт предмета (болванка из template) и звук перехвата/блока (его делаешь ты).
-local sprite = Resources.sprite_load("DeerItems", "item/MosquitoNet", PATH.."assets/sprites/items/sRedItems/MosquitoNet.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/MosquitoNet", PATH.."assets/sprites/items/sRedItems/MosquitoNet.png", 1, 18, 18)
 local sound  = Resources.sfx_load("DeerItems", "MosquitoNet/zap", PATH.."assets/sounds/MosquitoNet.ogg")
 
 local GUID  = _ENV["!guid"]

@@ -7,8 +7,8 @@
 -- Боссов фильтруем (= иммунитет); урон нигде не наносится.
 
 -- Иконка снаряжения (заглушка-шаблон). Визуал дыры рисуем процедурно (onDraw).
-local sprite = Resources.sprite_load("DeerItems", "equipment/Hunger", PATH.."assets/sprites/items/sEquipments/Hunger.png", 1, 16, 16)
-local sndHum = Resources.sfx_load("DeerItems", "Hunger/hum", PATH.."assets/sounds/Hunger.ogg")
+local sprite = Resources.sprite_load("DeerItems", "equipment/Hunger", PATH.."assets/sprites/items/sEquipments/Hunger.png", 1, 18, 18)
+local HungerSpawn = Resources.sfx_load("DeerItems", "Hunger/hum", PATH.."assets/sounds/HungerSpawn.ogg")
 
 -- ── Настройки баланса ──
 local COOLDOWN    = 60          -- кулдаун, секунды
@@ -108,7 +108,7 @@ equip:set_loot_tags(Item.LOOT_TAG.category_utility)
 equip:set_cooldown(COOLDOWN)
 
 equip:onUse(function(actor)
-    actor:sound_play(sndHum, 1.0, 1.0)
+    actor:sound_play(HungerSpawn, 1.0, 1.0)
     -- Дыра появляется чуть впереди игрока и медленно летит вперёд по направлению запуска.
     local dir = (actor.image_xscale >= 0) and 0 or 180   -- по направлению взгляда игрока
     local hole = obj:create(actor.x + actor.image_xscale * 48, actor.y - 16)

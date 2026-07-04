@@ -3,7 +3,7 @@
 --   (a) Добивание: элита (не босс) с HP ниже порога мгновенно казнится.
 --   (b) Деньги дают ТОЛЬКО убийства элит. Обычные убийства золота НЕ приносят.
 
-local sprite = Resources.sprite_load("DeerItems", "item/BountyContract", PATH.."assets/sprites/items/sGreenItems/BountyContract.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/BountyContract", PATH.."assets/sprites/items/sGreenItems/BountyContract.png", 1, 18, 18)
 
 local GUID = _ENV["!guid"]
 

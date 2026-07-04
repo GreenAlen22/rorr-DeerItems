@@ -6,12 +6,12 @@
 -- Загружаем спрайт эффекта активации
 local sprite = Resources.sprite_load("DeerItems", "item/ThinWings", PATH.."assets/sprites/items/sWhiteItems/ThinWings.png", 1, 16, 16)
 local buffSprite = Resources.sprite_load("DeerItems", "buff/ThinWings", PATH.."assets/sprites/buffs/ThinWings.png", 1, 7, 7)
-local ActivateThinWings = Resources.sprite_load("DeerItems", "particle/ActivateThinWings", PATH.."assets/sprites/particle/ActivateThinWings.png", 7, 32, 32)
+local ThinWingsActivate = Resources.sprite_load("DeerItems", "particle/ThinWingsActivate", PATH.."assets/sprites/particle/ThinWingsActivate.png", 7, 32, 32)
+local ThinWingsSkillBorder = Resources.sprite_load("DeerItems", "particle/ThinWingsSkillBorder", PATH.."assets/sprites/particle/ThinWingsSkillBorder.png", 1, 15, 15.5)
 
 -- guid мода выносим один раз — чтобы get_data не искал его через debug-стек каждый кадр
 local GUID = _ENV["!guid"]
 -- Цвет рамки-индикатора выбранного навыка
-local FRAME_COLOR = Color(0xFFFFFF)
 
 -- Создание предмета и баффа
 local item = Item.new("DeerItems", "ThinWings")
@@ -38,7 +38,7 @@ item:onInteractableActivate(function(actor, stack, interactable)
     data.tw_slot = math.random(3)
     -- Визуальный эффект активации
     local ef = gm.instance_create(actor.x, actor.y - 40, gm.constants.oEfSparks)
-    ef.sprite_index = ActivateThinWings
+    ef.sprite_index = ThinWingsActivate
 end)
 
 --==================================================================================================
@@ -55,10 +55,9 @@ end)
 --   x(slot) = baseX + ICON_FIRST + slot*ICON_STEP   (slot: 0=осн, 1=втор, 2=утил, 3=спец)
 --   y       = baseY + ICON_DY
 --==================================================================================================
-local ICON_FIRST = 15.8    -- сдвиг от базы бара до ЦЕНТРА иконки слота 0 (после блока «LV»)
-local ICON_STEP  = 29    -- шаг между центрами соседних иконок навыков
+local ICON_FIRST = 15    -- сдвиг от базы бара до ЦЕНТРА иконки слота 0 (после блока «LV»)
+local ICON_STEP  = 30    -- шаг между центрами соседних иконок навыков
 local ICON_DY    = 12    -- вертикальная поправка от базы бара до центра иконок (+вниз / −вверх)
-local ICON_HALF  = 14    -- полусторона рамки (≈ половина иконки)
 
 -- База скилл-бара, пойманная в этом кадре (откуда игра рисует панель навыков)
 local g_bar = { x = 0, y = 0, frame = -1 }
@@ -92,15 +91,10 @@ gm.post_script_hook(gm.constants.draw_hud, function()
 
     -- Лёгкая пульсация рамки для заметности (Global._current_frame доступен в этом тулките)
     local a = 0.55 + 0.45 * (0.5 + 0.5 * math.sin(frame * 0.15))
-    local h = ICON_HALF
-
-    gm.draw_set_colour(FRAME_COLOR)
-    gm.draw_set_alpha(a * 0.22)
-    gm.draw_rectangle(cx - h, cy - h, cx + h, cy + h, false)  -- полупрозрачная заливка
-    gm.draw_set_alpha(a)
-    gm.draw_rectangle(cx - h, cy - h, cx + h, cy + h, true)   -- яркий контур
-    gm.draw_set_alpha(1)
     gm.draw_set_colour(Color.WHITE)
+    gm.draw_set_alpha(a)
+    gm.draw_sprite(ThinWingsSkillBorder, 0, cx, cy)
+    gm.draw_set_alpha(1)
 end)
 
 -- Настройки отображения баффа

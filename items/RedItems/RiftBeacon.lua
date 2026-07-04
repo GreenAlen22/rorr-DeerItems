@@ -3,7 +3,7 @@
 -- и периодически выбрасываются прочь. Любое убийство при активном разломе продлевает его на 1с.
 -- Срабатывает раз за этап (перезаряжается в начале нового этапа).
 
-local sprite = Resources.sprite_load("DeerItems", "item/RiftBeacon", PATH.."assets/sprites/items/sRedItems/RiftBeacon.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/RiftBeacon", PATH.."assets/sprites/items/sRedItems/RiftBeacon.png", 1, 18, 18)
 
 local GUID = _ENV["!guid"]
 local RIFT_COLOR = Color(0x9b4dff)

@@ -8,8 +8,8 @@
 -- в onAcquire, ведёт себя в onStep, держится в onPostStep). Динамит — снаряд по образцу
 -- AtGMissileMk0 (создаётся на хосте, projectile_sync для клиентов, взрыв и звук в onDestroy).
 
-local droneSprite = Resources.sprite_load("DeerItems", "object/BombardierDrone", PATH.."assets/sprites/particle/BombardierDrone.png", 1, 16, 16)
-local dynSprite   = Resources.sprite_load("DeerItems", "object/Dynamite",       PATH.."assets/sprites/particle/Dynamite.png", 1, 8, 8)
+local droneSprite = Resources.sprite_load("DeerItems", "object/BombardierDrone", PATH.."assets/sprites/particle/BombardierDrone.png", 1, 18, 18)
+local dynSprite   = Resources.sprite_load("DeerItems", "object/Dynamite",       PATH.."assets/sprites/particle/Dynamite.png", 6, 16, 16)
 local sprite      = Resources.sprite_load("DeerItems", "item/BombardierSwarm",   PATH.."assets/sprites/items/sGreenItems/BombardierSwarm.png", 1, 16, 16)
 local boom        = Resources.sfx_load("DeerItems", "sound/boom", PATH.."assets/sounds/boom.ogg")
 

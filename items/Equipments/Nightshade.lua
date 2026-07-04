@@ -5,7 +5,7 @@
 -- Так нет ни «странной ходьбы», ни прохода сквозь текстуры — клон только мигает (телепорт).
 
 -- Ассеты (заглушки-шаблоны — замени текстуры/звук по этим путям)
-local sprite      = Resources.sprite_load("DeerItems", "equipment/Nightshade", PATH.."assets/sprites/items/sEquipments/Nightshade.png", 1, 16, 16)
+local sprite      = Resources.sprite_load("DeerItems", "equipment/Nightshade", PATH.."assets/sprites/items/sEquipments/Nightshade.png", 1, 18, 18)
 local cloneSprite = Resources.sprite_load("DeerItems", "object/NightshadeClone", PATH.."assets/sprites/particle/NightshadeClone.png", 1, 8, 8)
 local sndSummon   = Resources.sfx_load("DeerItems", "Nightshade/summon", PATH.."assets/sounds/NightshadeSummon.ogg")
 local sndHit      = Resources.sfx_load("DeerItems", "Nightshade/hit", PATH.."assets/sounds/NightshadeHit.ogg")

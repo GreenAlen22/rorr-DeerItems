@@ -31,7 +31,6 @@
   header.top { margin-bottom: 20px; }
   header.top h1 { margin: 0 0 6px; font-size: 28px; letter-spacing: .3px; }
   header.top .sub { color: var(--muted); font-size: 14px; }
-
   .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 14px; }
   .filters button {
     cursor: pointer; font: inherit; font-size: 13px;
@@ -49,7 +48,6 @@
     color: #0f1115; background: var(--c, var(--text)); border-color: var(--c, var(--text)); font-weight: 600;
   }
   .filters button.active .cnt { color: #0f1115; background: rgba(15,17,21,.18); }
-
   .nav {
     display: flex; flex-wrap: wrap; gap: 6px;
     background: var(--panel); border: 1px solid var(--border);
@@ -62,7 +60,6 @@
   }
   .nav a:hover { color: var(--text); border-color: var(--border); background: var(--panel-2); }
   .nav a.hidden { display: none; }
-
   .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
   .card {
     background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent);
@@ -94,7 +91,6 @@
   .lore-story { margin: 0; font-size: 12.5px; color: #aab1bd; font-style: italic; }
   .key { margin-top: 10px; font-size: 10.5px; color: #5a6170; font-family: ui-monospace, Consolas, monospace; }
   .empty { color: var(--muted); padding: 40px 0; text-align: center; display: none; }
-
   .c-r { color: var(--r); }
   .c-g { color: var(--g); }
   .c-b { color: var(--b); }
@@ -109,10 +105,8 @@
       <h1>DeerItems - тексты предметов (RU)</h1>
       <div class="sub">Сгенерировано из <code>language/russian.json</code> &middot; всего: 70 &middot; показано: <span id="shown">70</span></div>
     </header>
-
-    <div class="filters"><button class="f active" data-f="all">Все <span class="cnt">70</span></button><button class="f" data-f="white" style="--c:#cdd2db">Обычные <span class="cnt">24</span></button><button class="f" data-f="green" style="--c:#6fd57f">Необычные <span class="cnt">25</span></button><button class="f" data-f="red" style="--c:#ff6b5e">Легендарные <span class="cnt">16</span></button><button class="f" data-f="equip" style="--c:#ffcf4a">Снаряжение <span class="cnt">5</span></button></div>
-    <nav class="nav"><a href="#RiftBeacon" data-type="red">Маяк разлома</a><a href="#CompoundingIdol" data-type="red">Вросший идол</a><a href="#ContagionBarb" data-type="green">Жало заразы</a><a href="#LoadedDice" data-type="green">Кость шарлатана</a><a href="#StandingRequisition" data-type="green">Постоянная заявка</a><a href="#LootFever" data-type="green">Лихорадка добычи</a><a href="#FlechetteModule" data-type="green">Волшебная стрела</a><a href="#BountyContract" data-type="green">Контракт на отстрел</a><a href="#BarnacleTurret" data-type="green">Големострел</a><a href="#BombardierSwarm" data-type="green">Рой бомбардиров</a><a href="#RustMite" data-type="red">Ржавый клещ</a><a href="#MosquitoNet" data-type="red">Москитная сеть</a><a href="#OrbitalLens" data-type="red">Орбитальная линза</a><a href="#FaultyConductor" data-type="red">Аварийный сверхпроводник</a><a href="#RavenousVine" data-type="red">Ненасытная лоза</a><a href="#CascadeFailure" data-type="red">Каскадный отказ</a><a href="#ArmySurplus" data-type="red">Армейские излишки</a><a href="#CashbackChip" data-type="green">Кэшбэк-Чип</a><a href="#Nightshade" data-type="equip">Паслён</a><a href="#TacticalVisor" data-type="equip">Тактический визор</a><a href="#Hunger" data-type="equip">Голод</a><a href="#Annihilator" data-type="equip">Аннигилятор</a><a href="#FacetedJade" data-type="white">Граненый нефрит</a><a href="#ElephantGun" data-type="white">Слонобой</a><a href="#PainTax" data-type="white">Болевой тариф</a><a href="#CheatDeath" data-type="white">Обман смерти</a><a href="#Concentration" data-type="white">Концентрация</a><a href="#Tankbuster" data-type="white">Танкобой</a><a href="#BountyTag" data-type="white">Премия за голову</a><a href="#OneArmyMan" data-type="equip">Один в поле воин</a><a href="#HeavyLungs" data-type="green">Тяжёлые лёгкие</a><a href="#LaughingFungus" data-type="green">Смехогриб</a><a href="#AssemblyBlueprint" data-type="green">Сборочный чертёж</a><a href="#GoldenSneakers" data-type="green">Золотые кроссовки</a><a href="#UnfocusPrisma" data-type="green">Расфокусированная призма</a><a href="#ReserveCapacitor" data-type="green">Резервный конденсатор</a><a href="#GlassMagnifier" data-type="white">Стеклянная лупа</a><a href="#ThinWings" data-type="white">Тонкие крылья</a><a href="#MassacreCurse" data-type="white">Проклятие резни</a><a href="#MagmaFragment" data-type="white">Осколок магмы</a><a href="#IceMixture" data-type="white">Смесь льдов</a><a href="#GearFeather" data-type="white">Перо Гира</a><a href="#FearEyes" data-type="white">Глаза страха</a><a href="#ShadowShield" data-type="green">Щит теней</a><a href="#Rhinoplasty" data-type="white">Ринопластика</a><a href="#GreenTea" data-type="green">Зеленый чай</a><a href="#Accountant" data-type="green">Бухгалтер</a><a href="#BloodyRelic" data-type="green">Кровавая реликвия</a><a href="#GoldBar" data-type="white">Золотой слиток</a><a href="#FearEyesDeactivate" data-type="white">Мертвые глаза</a><a href="#GravityLoopDeactivate" data-type="white">Пустой контейнер</a><a href="#GiftPurity" data-type="white">Дар чистоты</a><a href="#GravityLoop" data-type="white">Гравитационная петля</a><a href="#Obereg" data-type="white">Оберег</a><a href="#ShieldGenerator" data-type="white">Генератор щита</a><a href="#SeaFossil" data-type="green">Морское ископаемое</a><a href="#Community" data-type="red">Сообщество</a><a href="#EyeDiamond" data-type="red">Глаз алмаз</a><a href="#AtGMissileMk0" data-type="white">Ракета «воздух-земля» Mk.0</a><a href="#SporeOBloom" data-type="white">Спороцветущий</a><a href="#NewtonsMechanism" data-type="green">Механизм Ньютона</a><a href="#CoolGlasses" data-type="green">Крутые очки</a><a href="#DeepcoreGK2" data-type="green">Deepcore GK2</a><a href="#Totemetry" data-type="green">Тотеметрия</a><a href="#RadialAlloy" data-type="green">Радиальный сплав</a><a href="#Maslenitsa" data-type="red">Масленица</a><a href="#ShineOSun" data-type="red">Сияй, о Солнце</a><a href="#Dombra" data-type="red">Домбыра</a><a href="#VioletFrenzy" data-type="red">Лиловое неистовство</a><a href="#DeadWater" data-type="red">Мёртвая вода</a></nav>
-
+    <div class="filters"><button class="f active" data-f="all">Все <span class="cnt">70</span></button><button class="f" data-f="white" style="--c:#cdd2db">Обычные <span class="cnt">25</span></button><button class="f" data-f="green" style="--c:#6fd57f">Необычные <span class="cnt">24</span></button><button class="f" data-f="red" style="--c:#ff6b5e">Легендарные <span class="cnt">16</span></button><button class="f" data-f="equip" style="--c:#ffcf4a">Снаряжение <span class="cnt">5</span></button></div>
+    <nav class="nav"><a href="#RiftBeacon" data-type="red">Маяк разлома</a><a href="#IngrownIdol" data-type="red">Вросший идол</a><a href="#ContagionBarb" data-type="green">Жало заразы</a><a href="#CharlatansDie" data-type="green">Кость шарлатана</a><a href="#StandingRequisition" data-type="green">Постоянная заявка</a><a href="#LootFever" data-type="green">Лихорадка добычи</a><a href="#MagicMissile" data-type="green">Волшебная стрела</a><a href="#BountyContract" data-type="green">Контракт на отстрел</a><a href="#Golemshot" data-type="green">Големострел</a><a href="#BombardierSwarm" data-type="green">Рой бомбардиров</a><a href="#RustMite" data-type="red">Ржавый клещ</a><a href="#MosquitoNet" data-type="red">Москитная сеть</a><a href="#OrbitalLens" data-type="red">Орбитальная линза</a><a href="#FaultyConductor" data-type="red">Аварийный сверхпроводник</a><a href="#RavenousVine" data-type="red">Ненасытная лоза</a><a href="#CascadeFailure" data-type="red">Каскадный отказ</a><a href="#ArmySurplus" data-type="red">Армейские излишки</a><a href="#CashbackChip" data-type="green">Кэшбэк-Чип</a><a href="#Nightshade" data-type="equip">Паслён</a><a href="#TacticalVisor" data-type="equip">Тактический визор</a><a href="#Hunger" data-type="equip">Голод</a><a href="#Annihilator" data-type="equip">Аннигилятор</a><a href="#FacetedJade" data-type="white">Граненый нефрит</a><a href="#ElephantGun" data-type="white">Слонобой</a><a href="#PainTax" data-type="white">Болевой тариф</a><a href="#CheatDeath" data-type="white">Обман смерти</a><a href="#Concentration" data-type="white">Концентрация</a><a href="#Tankbuster" data-type="white">Танкобой</a><a href="#BountyTag" data-type="white">Премия за голову</a><a href="#OneArmyMan" data-type="equip">Один в поле воин</a><a href="#HeavyLungs" data-type="green">Тяжёлые лёгкие</a><a href="#LaughingFungus" data-type="green">Смехогриб</a><a href="#AssemblyBlueprint" data-type="green">Сборочный чертёж</a><a href="#GoldenSneakers" data-type="green">Золотые кроссовки</a><a href="#UnfocusPrisma" data-type="white">Расфокусированная призма</a><a href="#ReserveCapacitor" data-type="green">Резервный конденсатор</a><a href="#GlassMagnifier" data-type="white">Стеклянная лупа</a><a href="#ThinWings" data-type="white">Тонкие крылья</a><a href="#MassacreCurse" data-type="white">Проклятие резни</a><a href="#MagmaFragment" data-type="white">Осколок магмы</a><a href="#IceMixture" data-type="white">Смесь льдов</a><a href="#GearFeather" data-type="white">Перо Гира</a><a href="#FearEyes" data-type="white">Глаза страха</a><a href="#ShadowShield" data-type="green">Щит теней</a><a href="#Rhinoplasty" data-type="white">Ринопластика</a><a href="#GreenTea" data-type="green">Зеленый чай</a><a href="#Accountant" data-type="green">Бухгалтер</a><a href="#BloodyRelic" data-type="green">Кровавая реликвия</a><a href="#GoldBar" data-type="white">Золотой слиток</a><a href="#FearEyesDeactivate" data-type="white">Мертвые глаза</a><a href="#GravityLoopDeactivate" data-type="white">Пустой контейнер</a><a href="#GiftPurity" data-type="white">Дар чистоты</a><a href="#GravityLoop" data-type="white">Гравитационная петля</a><a href="#Obereg" data-type="white">Оберег</a><a href="#ShieldGenerator" data-type="white">Генератор щита</a><a href="#SeaFossil" data-type="green">Морское ископаемое</a><a href="#Community" data-type="red">Сообщество</a><a href="#EyeDiamond" data-type="red">Глаз алмаз</a><a href="#AtGMissileMk0" data-type="white">Ракета «воздух-земля» Mk.0</a><a href="#SporeOBloom" data-type="white">Спороцветущий</a><a href="#NewtonsMechanism" data-type="green">Механизм Ньютона</a><a href="#CoolGlasses" data-type="green">Крутые очки</a><a href="#DeepcoreGK2" data-type="green">Deepcore GK2</a><a href="#Totemetry" data-type="green">Тотеметрия</a><a href="#RadialAlloy" data-type="green">Радиальный сплав</a><a href="#Maslenitsa" data-type="red">Масленица</a><a href="#ShineOSun" data-type="red">Сияй, о Солнце</a><a href="#Dombra" data-type="red">Домбыра</a><a href="#VioletFrenzy" data-type="red">Лиловое неистовство</a><a href="#DeadWater" data-type="red">Мёртвая вода</a></nav>
     <main class="grid">
     <article class="card" id="RiftBeacon" data-type="red" style="--accent:#ff6b5e">
       <header class="card-head">
@@ -124,10 +118,9 @@
       </header>
       <p class="pickup"><span class="c-g">Переживите смертельный удар</span>, вскрыв <span class="c-p">разлом</span>.</p>
       <p class="desc">Падение ниже <span class="c-b">25%</span> HP даёт <span class="c-g">барьер</span> на <span class="c-g">25%</span> макс. HP и открывает <span class="c-p">разлом</span> на <span class="c-b">8с</span>: враги в радиусе <span class="c-b">~250</span> получают <span class="c-r">50% урона</span> <span class="c-stack">(+10% за шт.)</span> каждые <span class="c-b">0.5с</span> и периодически <span class="c-b">отбрасываются прочь</span>. <span class="c-b">Убийства</span> при активном разломе продлевают его на <span class="c-b">1с</span>. Перезаряжается каждый этап.</p>
-      
       <div class="key">RiftBeacon</div>
     </article>
-    <article class="card" id="CompoundingIdol" data-type="red" style="--accent:#ff6b5e">
+    <article class="card" id="IngrownIdol" data-type="red" style="--accent:#ff6b5e">
       <header class="card-head">
         <div class="name-wrap">
           <span class="rarity-tag" style="--c:#ff6b5e">Легендарные</span>
@@ -135,10 +128,10 @@
         </div>
         <span class="prio prio-r"><span class="c-r">Высокий приоритет</span></span>
       </header>
-      <p class="pickup">Кормится <span class="c-r">убийствами</span>, затем <span class="c-b">врастает</span> в вас навсегда.</p>
-      <p class="desc">Каждое <span class="c-b">убийство</span> даёт <span class="c-y">+0.4%</span> <span class="c-y">урона</span> и <span class="c-y">скорости атаки</span>, до <span class="c-b">80%</span> <span class="c-stack">(+40% за шт.)</span>. На входе в <span class="c-b">3-й этап</span> идол <span class="c-r">раскалывается</span>, делая накопленный бонус <span class="c-b">постоянным</span>.</p>
-      <div class="lore"><div class="lore-meta"><span class="lore-dest">Хранилище реликвий,<br>Раскоп № 13,<br>Титан</span><span class="lore-date">27.02.2057</span></div><p class="lore-story">Сначала это холодный комок, который умещается в кулаке. Пронесите его через бой - и он теплеет. Пронесите через два - и он уже нашёл щели между пальцами и устроился под кожей. Медики зовут это «прирастанием третьего этапа» и вырезать перестали: идол забирает накопленную силу и оставляет её в кости, и новобранец, потерявший всю кисть, всё равно сохраняет дар. Так что мы даём ему доделать своё. Два этапа, иногда три - и он ваш, хотели вы того или нет.</p></div>
-      <div class="key">CompoundingIdol</div>
+      <p class="pickup">Кормится <span class="c-r">убийствами</span> и, насытившись, спускает <span class="c-r">зверя</span> на охоту за вас.</p>
+      <p class="desc">Каждое <span class="c-b">убийство</span> кормит идол: <span class="c-y">1</span> обычное, <span class="c-y">2</span> элита, <span class="c-y">3</span> босс. Каждые <span class="c-b">30 подношений</span> идол призывает <span class="c-r">мощного зверя</span>, который охотится на врагов <span class="c-b">45с</span> и бьёт на <span class="c-y">200% урона</span> <span class="c-stack">(+50% за шт.)</span>. После <span class="c-b">20-й минуты</span> подношения вдвое меньше (<span class="c-y">0.5</span> / <span class="c-y">1</span> / <span class="c-y">2</span>).</p>
+      <div class="lore"><div class="lore-meta"><span class="lore-dest">Хранилище реликвий,<br>Раскоп № 13,<br>Титан</span><span class="lore-date">27.02.2057</span></div><p class="lore-story">Сначала это холодный комок, который умещается в кулаке. Кормите его - ему всё равно, чья кровь, важно лишь сколько - и он теплеет, устраивается под кожей и ждёт. Насытившись, резьба раскалывается, и наружу выходит нечто: не идол и не вы, а то, что вы делаете вдвоём, и оно охотится так же, как голодал идол. Оно выматывает себя до конца и снова сворачивается в кость. Медики перестали спрашивать, что это; они просто считают то, что оно оставляет после себя.</p></div>
+      <div class="key">IngrownIdol</div>
     </article>
     <article class="card" id="ContagionBarb" data-type="green" style="--accent:#6fd57f">
       <header class="card-head">
@@ -150,10 +143,9 @@
       </header>
       <p class="pickup">Удары вызывают <span class="c-r">кровотечение</span>, что <span class="c-r">распространяется</span> при убийстве.</p>
       <p class="desc"><span class="c-b">15%</span> <span class="c-stack">(+5% за шт.)</span> шанс при попадании вызвать <span class="c-r">кровотечение</span>: <span class="c-r">40% урона в секунду</span> в течение <span class="c-b">4с</span>. Убийство кровоточащего врага <span class="c-r">переносит</span> кровотечение на <span class="c-b">1</span> <span class="c-stack">(+1 за шт.)</span> ближайшего врага.</p>
-      
       <div class="key">ContagionBarb</div>
     </article>
-    <article class="card" id="LoadedDice" data-type="green" style="--accent:#6fd57f">
+    <article class="card" id="CharlatansDie" data-type="green" style="--accent:#6fd57f">
       <header class="card-head">
         <div class="name-wrap">
           <span class="rarity-tag" style="--c:#6fd57f">Необычные</span>
@@ -163,8 +155,7 @@
       </header>
       <p class="pickup">Первый сундук за этап может дать <span class="c-b">предмет получше</span>.</p>
       <p class="desc"><span class="c-b">Первый сундук</span> за этап с шансом <span class="c-b">35%</span> <span class="c-stack">(+10% за шт.)</span> дополнительно роняет предмет более высокой редкости (<span class="c-g">необычный</span> или <span class="c-r">редкий</span>).</p>
-      
-      <div class="key">LoadedDice</div>
+      <div class="key">CharlatansDie</div>
     </article>
     <article class="card" id="StandingRequisition" data-type="green" style="--accent:#6fd57f">
       <header class="card-head">
@@ -176,7 +167,6 @@
       </header>
       <p class="pickup">Каждый этап доставляет <span class="c-b">выбор</span> предметов.</p>
       <p class="desc">В начале каждого этапа неподалёку появляется <span class="c-b">ящик-доставка</span> с <span class="c-b">выбором из 2</span> предметов - заберите один, второй пропадёт. Больше предметов повышает шансы на <span class="c-b">редкость</span>.</p>
-      
       <div class="key">StandingRequisition</div>
     </article>
     <article class="card" id="LootFever" data-type="green" style="--accent:#6fd57f">
@@ -189,10 +179,9 @@
       </header>
       <p class="pickup">Подбор предметов <span class="c-g">усиливает характеристики</span>.</p>
       <p class="desc">Подбор любого <span class="c-b">предмета</span> даёт стак <span class="c-r">азарта</span>: <span class="c-y">+3%</span> к <span class="c-y">урону</span>, <span class="c-y">скорости атаки</span>, <span class="c-b">скорости передвижения</span> и <span class="c-g">регенерации</span> на <span class="c-b">20с</span>. Суммируется до <span class="c-b">4</span> <span class="c-stack">(+2 за шт.)</span> раз.</p>
-      
       <div class="key">LootFever</div>
     </article>
-    <article class="card" id="FlechetteModule" data-type="green" style="--accent:#6fd57f">
+    <article class="card" id="MagicMissile" data-type="green" style="--accent:#6fd57f">
       <header class="card-head">
         <div class="name-wrap">
           <span class="rarity-tag" style="--c:#6fd57f">Необычные</span>
@@ -203,7 +192,7 @@
       <p class="pickup">Ваши атаки <span class="c-y">пускают дротики, что не промахиваются</span>.</p>
       <p class="desc">Каждая атака тратит заряд и пускает <span class="c-y">дротик</span> в ближайшего врага на <span class="c-y">120% урона</span> <span class="c-stack">(+60% за шт.)</span>. Запас <span class="c-b">4</span> <span class="c-stack">(+2 за шт.)</span> заряда, восстановление <span class="c-b">1</span> каждые <span class="c-b">2.5с</span>.</p>
       <div class="lore"><div class="lore-meta"><span class="lore-dest">Палуба досуга 4,<br>Интендантский склад,<br>UES Safe Travels</span><span class="lore-date">11.07.2056</span></div><p class="lore-story">Найдено в рундуке любителя настолок, между мешочком кубиков и потрёпанным сводом правил. Наручный излучатель бросает тонкие дротики - без оперения, без заряда, который мы могли бы измерить, - и всё же каждый дротик находит цель, даже когда стрелок промахивается. На корпусе процарапаны два слова: ВОЛШЕБНАЯ СТРЕЛА. Единственный техник, вскрывший экземпляр, доложил, что после этого тот перестал подкручивать выстрелы, так что вскрывать перестали. Выдавать как есть.</p></div>
-      <div class="key">FlechetteModule</div>
+      <div class="key">MagicMissile</div>
     </article>
     <article class="card" id="BountyContract" data-type="green" style="--accent:#6fd57f">
       <header class="card-head">
@@ -213,12 +202,11 @@
         </div>
         <span class="prio prio-g"><span class="c-g">Приоритетный</span></span>
       </header>
-      <p class="pickup"><span class="c-r">Добивайте</span> ослабленных элит и получайте <span class="c-b">золото</span> за убийства.</p>
-      <p class="desc">Мгновенно <span class="c-r">убивает</span> <span class="c-r">элиту</span> с HP ниже <span class="c-b">15%</span> <span class="c-stack">(-2% за шт., минимум 5%)</span>. Любое <span class="c-b">убийство</span> даёт <span class="c-b">$8</span> <span class="c-stack">(+$4 за шт.)</span>; <span class="c-r">казнённые элиты</span> дают <span class="c-b">$40</span> <span class="c-stack">(+$20 за шт.)</span>. Золото растёт со временем.</p>
-      
+      <p class="pickup"><span class="c-r">Добивайте</span> ослабленных элит и получайте <span class="c-b">золото</span> за каждую убитую элиту.</p>
+      <p class="desc">Мгновенно <span class="c-r">убивает</span> <span class="c-r">элиту</span> (не босса) с HP ниже <span class="c-b">15%</span> <span class="c-stack">(+5% за шт., максимум 50%)</span>. Каждое <span class="c-b">убийство элиты</span> даёт <span class="c-b">$40</span> <span class="c-stack">(+$20 за шт.)</span>. Обычные убийства золота не приносят. Золото растёт со временем.</p>
       <div class="key">BountyContract</div>
     </article>
-    <article class="card" id="BarnacleTurret" data-type="green" style="--accent:#6fd57f">
+    <article class="card" id="Golemshot" data-type="green" style="--accent:#6fd57f">
       <header class="card-head">
         <div class="name-wrap">
           <span class="rarity-tag" style="--c:#6fd57f">Необычные</span>
@@ -227,9 +215,9 @@
         <span class="prio prio-g"><span class="c-g">Приоритетный</span></span>
       </header>
       <p class="pickup">Использование интерактивов <span class="c-b">будит голема-стража</span>.</p>
-      <p class="desc">Активация любого <span class="c-b">интерактива</span> разворачивает <span class="c-y">голема-турель</span> на <span class="c-b">30с</span>, бьющего ближайшего врага в радиусе <span class="c-b">~250</span> раз в <span class="c-b">0.75с</span> на <span class="c-y">40% урона</span> <span class="c-stack">(+20% за шт.)</span>. Одновременно до <span class="c-b">1</span> <span class="c-stack">(+1 за шт.)</span> голема.</p>
+      <p class="desc">Активация любого <span class="c-b">интерактива</span> разворачивает <span class="c-y">голема-турель</span> на <span class="c-b">30с</span>, бьющего ближайшего врага в радиусе <span class="c-b">~250</span> раз в <span class="c-b">0.75с</span> на <span class="c-y">100% урона</span> <span class="c-stack">(+50% за шт.)</span>. Одновременно до <span class="c-b">1</span> <span class="c-stack">(+1 за шт.)</span> голема.</p>
       <div class="lore"><div class="lore-meta"><span class="lore-dest">Участок 0451,<br>Заброшенный раскоп,<br>Анекс Хоксес</span><span class="lore-date">19.11.2056</span></div><p class="lore-story">Горняки оставили их в туннелях - приземистые керамические истуканы по колено ростом, чтобы стеречь участок, пока смена спит. Они просыпаются, когда рядом кто-то приводит в действие механизм: рычаг, замок, бур. Тогда голем упирается ногами, открывает створку в груди и бьёт по всему, что не значится в платёжной ведомости. Ходить он не умеет и за вами не пойдёт. Поставьте его у того, что вскрываете, - и полминуты он отрабатывает своё, а потом снова складывается в камень, через который вы перешагнули бы не глядя.</p></div>
-      <div class="key">BarnacleTurret</div>
+      <div class="key">Golemshot</div>
     </article>
     <article class="card" id="BombardierSwarm" data-type="green" style="--accent:#6fd57f">
       <header class="card-head">
@@ -239,9 +227,8 @@
         </div>
         <span class="prio prio-g"><span class="c-g">Приоритетный</span></span>
       </header>
-      <p class="pickup">Периодически <span class="c-r">сбрасывает бомбы</span> на врагов и с ваших дронов.</p>
-      <p class="desc">Раз в <span class="c-b">10с</span> сбрасывает <span class="c-r">бомбу</span> на случайного врага рядом и под каждым вашим <span class="c-b">дроном</span>: <span class="c-r">250% урона</span> <span class="c-stack">(+125% за шт.)</span> в небольшом радиусе с <span class="c-b">оглушением</span> на <span class="c-b">1с</span>.</p>
-      
+      <p class="pickup">Призывает <span class="c-y">дрона-бомбардира</span>, роняющего <span class="c-r">динамит</span> на врагов.</p>
+      <p class="desc">Призывает <span class="c-y">дрона-бомбардира</span>: он летит к ближайшему врагу и раз в <span class="c-b">10с</span> роняет <span class="c-r">шашку динамита</span>; каждый ваш <span class="c-b">дрон</span> поблизости роняет ещё одну. Динамит падает под действием гравитации и взрывается на <span class="c-r">250% урона</span> <span class="c-stack">(+125% за шт.)</span> в радиусе <span class="c-b">~150</span> с <span class="c-b">оглушением</span> на <span class="c-b">1с</span>.</p>
       <div class="key">BombardierSwarm</div>
     </article>
     <article class="card" id="RustMite" data-type="red" style="--accent:#ff6b5e">
@@ -254,7 +241,6 @@
       </header>
       <p class="pickup">Удары заставляют врагов <span class="c-r">получать больше урона</span>.</p>
       <p class="desc"><span class="c-y">100% шанс</span> при попадании наложить <span class="c-r">Ржавчину</span> - каждый стак повышает получаемый целью урон из <span class="c-b">любого источника</span> на <span class="c-r">+4%</span>, <span class="c-r">навсегда</span>.</p>
-      
       <div class="key">RustMite</div>
     </article>
     <article class="card" id="MosquitoNet" data-type="red" style="--accent:#ff6b5e">
@@ -267,7 +253,6 @@
       </header>
       <p class="pickup"><span class="c-b">Сбивает</span> снаряды и периодически <span class="c-b">блокирует удар</span>.</p>
       <p class="desc">Каждые <span class="c-b">0.5 сек</span> сбивает <span class="c-b">2</span> <span class="c-stack">(+2 за шт.)</span> <span class="c-r">вражеских снаряда</span> в радиусе <span class="c-b">~12 м</span> (перезарядка <span class="c-b">растёт со скоростью атаки</span>). Каждые <span class="c-b">10 сек</span> <span class="c-stack">(-1 сек за шт.)</span> полностью <span class="c-b">блокирует</span> один входящий удар.</p>
-      
       <div class="key">MosquitoNet</div>
     </article>
     <article class="card" id="OrbitalLens" data-type="red" style="--accent:#ff6b5e">
@@ -280,7 +265,6 @@
       </header>
       <p class="pickup">Шанс призвать <span class="c-r">метеор</span> при попадании.</p>
       <p class="desc"><span class="c-y">3%</span> <span class="c-stack">(+2% за шт.)</span> шанс при попадании призвать <span class="c-r">метеор</span> на <span class="c-y">800%</span> <span class="c-stack">(+250% за шт.)</span> базового урона. Чем больше <span class="c-y">урона вы наносите</span>, тем <span class="c-y">выше шанс и урон метеора</span> (со временем спадает).</p>
-      
       <div class="key">OrbitalLens</div>
     </article>
     <article class="card" id="FaultyConductor" data-type="red" style="--accent:#ff6b5e">
@@ -293,7 +277,6 @@
       </header>
       <p class="pickup">Периодическая <span class="c-b">волна</span> <span class="c-y">заряжает союзников</span> и усиливает <span class="c-b">дронов</span>.</p>
       <p class="desc">Каждые <span class="c-b">15 сек</span> <span class="c-stack">(-20% за шт.)</span> выпускает волну, <span class="c-y">заряжающую союзников</span> на <span class="c-b">7 сек</span>: <span class="c-y">+30% к скорости атаки и передвижения</span>. <span class="c-b">Дроны</span> постоянно наносят <span class="c-y">+15%</span> <span class="c-stack">(+15% за шт.)</span> урона.</p>
-      
       <div class="key">FaultyConductor</div>
     </article>
     <article class="card" id="RavenousVine" data-type="red" style="--accent:#ff6b5e">
@@ -306,7 +289,6 @@
       </header>
       <p class="pickup">Враги рядом <span class="c-g">кормят лозу</span>; созрев, она <span class="c-y">цветёт</span>: урон по области и <span class="c-y">лечение</span>.</p>
       <p class="desc">Враги в <span class="c-b">5 тайлах</span> <span class="c-stack">(+1.5 за шт.)</span>, до <span class="c-b">6</span> <span class="c-stack">(+4 за шт.)</span>, <span class="c-g">кормят лозу</span>: чем их больше, тем быстрее она зреет. Созрев, лоза наносит <span class="c-y">600%</span> <span class="c-stack">(+300% за шт.)</span> урона всем врагам вокруг и лечит на <span class="c-y">9% макс. HP</span> <span class="c-stack">(+4.5% за шт.)</span>.</p>
-      
       <div class="key">RavenousVine</div>
     </article>
     <article class="card" id="CascadeFailure" data-type="red" style="--accent:#ff6b5e">
@@ -319,7 +301,6 @@
       </header>
       <p class="pickup"><span class="c-r">Заражает</span> врагов и <span class="c-r">детонирует</span> общий урон.</p>
       <p class="desc"><span class="c-r">Заражает</span> до <span class="c-b">4</span> <span class="c-stack">(+2 за шт.)</span> врагов. <span class="c-y">50%</span> урона, который вы наносите заражённым, идёт в <span class="c-b">общий пул</span>. Каждые <span class="c-b">3 сек</span> все заражённые получают <span class="c-y">100% пула</span>.</p>
-      
       <div class="key">CascadeFailure</div>
     </article>
     <article class="card" id="ArmySurplus" data-type="red" style="--accent:#ff6b5e">
@@ -332,7 +313,6 @@
       </header>
       <p class="pickup">Выдаёт <span class="c-b">боевого дрона</span> и усиливает <span class="c-b">дронов</span>.</p>
       <p class="desc">Разворачивает <span class="c-b">боевого дрона</span>, который сам сражается. Все <span class="c-b">дроны</span> получают <span class="c-y">+25%</span> <span class="c-stack">(+25% за шт.)</span> урона и <span class="c-y">+15%</span> <span class="c-stack">(+15% за шт.)</span> макс. здоровья.</p>
-      
       <div class="key">ArmySurplus</div>
     </article>
     <article class="card" id="CashbackChip" data-type="green" style="--accent:#6fd57f">
@@ -357,7 +337,7 @@
         <span class="prio prio-y"><span class="c-y">Снаряжение</span></span>
       </header>
       <p class="pickup">Призывает <span class="c-r">теневого убийцу</span>, что мигает меж врагов.</p>
-      <p class="desc">При использовании призывает <span class="c-r">тень</span>, которая <span class="c-b">мигает</span> к ближайшему врагу, бьёт на <span class="c-r">300% урона</span> и тут же исчезает - и так <span class="c-b">30 секунд</span>. Неуязвима.</p>
+      <p class="desc">При использовании призывает <span class="c-r">тень</span>, которая <span class="c-b">мигает</span> к ближайшему врагу, бьёт на <span class="c-r">133% урона</span> и тут же исчезает - и так <span class="c-b">13 секунд</span>. Неуязвима.</p>
       <div class="lore"><div class="lore-meta"><span class="lore-dest">Карантинный чан 7,<br>Лаборатория симбиотики,<br>UES PRIME</span><span class="lore-date">30.06.2057</span></div><p class="lore-story">Его доставили в запаянном чане - маслянистая чёрная масса, отражавшая всё, что вставало перед ней. Поставь рядом бойца - и она перенимала его облик, а после научилась исчезать из виду меж двух вдохов.<br><br>Мы ни разу не видели, как оно пересекает зал. Вот оно здесь, вот уже на враге, вот его уже нет - а враг лежит.<br><br>Мы записали это как «автономный суррогат для проникновения». Команда назвала по тихому цветку, что убивает без звука.</p></div>
       <div class="key">Nightshade</div>
     </article>
@@ -556,10 +536,10 @@
       <div class="lore"><div class="lore-meta"><span class="lore-dest">Спринт-Кузница,<br>Экипировка Курьеров,<br>Нео-Олимпия</span><span class="lore-date">11.05.2057</span></div><p class="lore-story">Пара кроссовок, покрытых мягким золотом, лёгких, несмотря на металл. Курьер, что носил их, клялся: в день зарплаты он бежал быстрее, чем в любое другое утро, - и тут же тяжелел, стоило карманам опустеть.<br><br>Сперва мы смеялись. Потом измерили. Чем богаче владелец, тем легче его шаг, будто само золото хочет, чтобы его несли куда-нибудь, всё равно куда, лишь бы быстрее. Потрать его - и обувь снова тяжёлая, как простая кожа.<br><br>Мы записали это как «мотивационный прототип». Про себя же думаю: они просто любят деньги сильнее, чем их хозяин, и спешат потратить их за него.</p></div>
       <div class="key">GoldenSneakers</div>
     </article>
-    <article class="card" id="UnfocusPrisma" data-type="green" style="--accent:#6fd57f">
+    <article class="card" id="UnfocusPrisma" data-type="white" style="--accent:#cdd2db">
       <header class="card-head">
         <div class="name-wrap">
-          <span class="rarity-tag" style="--c:#6fd57f">Необычные</span>
+          <span class="rarity-tag" style="--c:#cdd2db">Обычные</span>
           <h2 class="card-name">Расфокусированная призма</h2>
         </div>
         <span class="prio prio-g"><span class="c-g">Приоритетный/хрупкий</span></span>
@@ -757,11 +737,10 @@
           <span class="rarity-tag" style="--c:#cdd2db">Обычные</span>
           <h2 class="card-name">Мертвые глаза</h2>
         </div>
-        
+        <span class="prio prio-n"></span>
       </header>
       <p class="pickup">Совсем немного увеличевает <span class="c-y">урон</span></p>
       <p class="desc">Увеличивает <span class="c-y">базовый урон</span> на <span class="c-y">1 <span class="c-stack">(+1 за шт.)</span>.</p>
-      
       <div class="key">FearEyesDeactivate</div>
     </article>
     <article class="card" id="GravityLoopDeactivate" data-type="white" style="--accent:#cdd2db">
@@ -770,11 +749,10 @@
           <span class="rarity-tag" style="--c:#cdd2db">Обычные</span>
           <h2 class="card-name">Пустой контейнер</h2>
         </div>
-        
+        <span class="prio prio-n"></span>
       </header>
       <p class="pickup"></p>
       <p class="desc"></p>
-      
       <div class="key">GravityLoopDeactivate</div>
     </article>
     <article class="card" id="GiftPurity" data-type="white" style="--accent:#cdd2db">
@@ -1027,7 +1005,6 @@
     </main>
     <div class="empty" id="empty">Нет предметов этого типа.</div>
   </div>
-
 <script>
   (function () {
     var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));

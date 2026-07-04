@@ -4,8 +4,9 @@
 -- Каждые 3 сек все заражённые получают 100% накопленного урона.
 
 -- Спрайт предмета (болванка из template), импакт-эффект из готового Explosive.png, звук детонации (его даёшь ты).
-local sprite    = Resources.sprite_load("DeerItems", "item/CascadeFailure", PATH.."assets/sprites/items/sRedItems/CascadeFailure.png", 1, 16, 16)
-local explosive = Resources.sprite_load("DeerItems", "particle/CascadeBurst", PATH.."assets/sprites/particle/Explosive.png", 5, 32, 32)
+local sprite    = Resources.sprite_load("DeerItems", "item/CascadeFailure", PATH.."assets/sprites/items/sRedItems/CascadeFailure.png", 1, 18, 18)
+local explosive = Resources.sprite_load("DeerItems", "particle/CascadeBurst", PATH.."assets/sprites/particle/voltOverloadHit.png", 6, 16, 16)
+local mark      = Resources.sprite_load("DeerItems", "particle/CascadeFailureMark", PATH.."assets/sprites/particle/CascadeFailureMark.png", 1, 9.5, 8.5)
 local sound     = Resources.sfx_load("DeerItems", "CascadeFailure/detonate", PATH.."assets/sounds/CascadeFailure.ogg")
 
 local GUID = _ENV["!guid"]
@@ -133,11 +134,9 @@ end)
 item:onPostDraw(function(actor, stack)
     local data = actor:get_data("CascadeFailure", GUID)
     if not data.infected then return end
-    gm.draw_set_colour(Color(0x33ff66))
     for vid, v in pairs(data.infected) do
         if v and Instance.exists(v) and v:buff_stack_count(infectBuff) > 0 then
-            gm.draw_ellipse(v.x - 5, v.y - 22, v.x + 5, v.y - 12, true)
+            gm.draw_sprite(mark, 0, v.x, v.y - 17)
         end
     end
-    gm.draw_set_colour(Color.WHITE)
 end)
