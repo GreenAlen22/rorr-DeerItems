@@ -1,5 +1,5 @@
 -- DeerItems-Obereg
--- Даёт +30 брони за стак, если здоровье персонажа ≤ 50% от максимума.
+-- Даёт +20 брони за стак, если здоровье персонажа ≤ 50% от максимума.
 
 -- Загружаем спрайт предмета
 -- Загружаем спрайт партикла, отображаемого над игроком, пока предмет активен
@@ -19,7 +19,7 @@ item:set_loot_tags(Item.LOOT_TAG.category_healing)
 item:onPostStatRecalc(function(actor, stack)
     -- Если текущее здоровье ≤ 50% от максимального — даём бонус к броне
     if actor.hp <= actor.maxhp * 0.50 then
-        actor.armor = actor.armor + (30 * stack)
+        actor.armor = actor.armor + (20 * stack)
     end
 end)
 

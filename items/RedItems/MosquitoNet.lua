@@ -20,10 +20,14 @@ local INTERCEPT_BASE  = 2     -- базовое число сбиваемых с
 local INTERCEPT_STACK = 2     -- +2 за стак
 local MAX_PER_TICK    = 14    -- кэп сбиваний за тик (защита от стоимости/имбы на роях)
 
-local BLOCK_BASE = 10 * 60    -- КД блока удара: 10 сек при 1 стаке
-local BLOCK_PER  = 60         -- -1 сек за каждый стак
-local BLOCK_MIN  = 4 * 60     -- пол КД блока: 4 сек
+local BLOCK_BASE = 7 * 60          -- КД блока удара: 7 сек при 1 стаке
+local BLOCK_REDUCTION = 0.10       -- -10% КД за стак гиперболически
+local BLOCK_DAMAGE_FRAC = 0.10     -- блокирует только удары больше 10% текущего HP
 -- ──────────────────────────────────────────────────────────────────────────────
+
+local function block_cooldown(stack)
+    return math.ceil(BLOCK_BASE / (1 + BLOCK_REDUCTION * math.max(0, stack - 1)))
+end
 
 -- Снаряды, помеченные как *NoSync, каждый клиент гасит ЛОКАЛЬНО (урон у него клиентский,
 -- он его и так не получит). Синхронные снаряды сносим только на хосте, иначе десинк.
@@ -119,6 +123,8 @@ pcall(function()
 
         local dmg = args[4] and args[4].value
         if not dmg or dmg <= 0 then return end
+        if not v.hp or v.hp <= 0 then return end
+        if dmg <= v.hp * BLOCK_DAMAGE_FRAC then return end
 
         local data  = v:get_data("MosquitoNet", GUID)
         local frame = Global._current_frame
@@ -127,7 +133,7 @@ pcall(function()
 
         -- Блокируем удар и запускаем КД (спадает за стаки).
         args[4].value = 0
-        data.mn_block_next = frame + math.max(BLOCK_MIN, BLOCK_BASE - BLOCK_PER * stack)
+        data.mn_block_next = frame + block_cooldown(stack)
 
         pcall(function()
             local efSparks = Object.find("ror-efSparks")

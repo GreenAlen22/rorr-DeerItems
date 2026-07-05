@@ -8,11 +8,14 @@ local sprite = Resources.sprite_load("DeerItems", "item/BountyContract", PATH.."
 local GUID = _ENV["!guid"]
 
 -- ── Баланс ──
-local THRESH_BASE  = 0.15   -- казнь элиты ниже 15% HP (1 шт.)
-local THRESH_STACK = 0.05   -- +5% к порогу за шт. (с стаком добивать ЛЕГЧЕ)
-local THRESH_MAX   = 0.50   -- но не выше 50%
+local THRESH_STACK = 0.12   -- гиперболический вклад каждого стака в порог казни
 local GOLD_BASE    = 40     -- золото за убийство элиты (×множитель цен)
 local GOLD_STACK   = 20     -- +20 за шт.
+
+local function diminishing_fraction(per_stack, stack)
+    if stack <= 0 then return 0 end
+    return 1 - 1 / (per_stack * stack + 1)
+end
 
 -- Безопасное приведение значения GML-функции (true / 1.0 / 0.0) к булеву.
 -- Важно: GM.* возвращает double, и 0.0 в Lua ИСТИННО, поэтому без обёртки фильтр не работает.
@@ -59,7 +62,7 @@ item:onHitProc(function(actor, victim, stack, hit_info)
     if not (victim.maxhp and victim.maxhp > 0) then return end
     if paid[victim.id] then return end
 
-    local thresh = math.min(THRESH_MAX, THRESH_BASE + THRESH_STACK * (stack - 1))
+    local thresh = diminishing_fraction(THRESH_STACK, stack)
     if (victim.hp / victim.maxhp) < thresh then
         reward(actor, victim, stack)   -- награда за добивание
         victim.hp = -1000000           -- мгновенная казнь

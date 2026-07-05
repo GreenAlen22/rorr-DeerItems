@@ -15,10 +15,10 @@ local GUID = _ENV["!guid"]
 
 -- Балансные константы
 local SHIELD_FRAC       = 0.04   -- даёт щит = 4% от макс. HP
-local ARMOR_PER_STACK   = 30     -- +30 брони за стак, пока есть щит
+local ARMOR_PER_STACK   = 5     -- +5 брони за стак, пока есть щит
 local PULSE_PLAYER_DMG  = 1.5    -- пульс: 150% от урона игрока (плоско)
-local PULSE_SHIELD_BASE = 1.3    -- пульс: +130% от макс. щита
-local PULSE_SHIELD_STACK= 0.1    -- +10% от макс. щита за стак сверх первого
+local PULSE_SHIELD_BASE = 0.9    -- пульс: +90% от макс. щита
+local PULSE_SHIELD_STACK= 0.5    -- +50% от макс. щита за стак сверх первого
 local STUN_SECONDS      = 1.5    -- длительность оглушения от пульса
 local RADIUS_BASE       = 3 * 32      -- базовый радиус пульса (3 м)
 local RADIUS_STACK      = 0.5 * 32    -- +0.5 м радиуса за стак сверх первого

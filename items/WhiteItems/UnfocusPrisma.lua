@@ -2,7 +2,7 @@
 -- Увеличивает урон по врагам на расстоянии более 13 метров на 25% (+25% за стак).
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/UnfocusPrisma", PATH.."assets/sprites/items/sGreenItems/UnfocusPrisma.png", 1, 16, 16)
+local sprite = Resources.sprite_load("DeerItems", "item/UnfocusPrisma", PATH.."assets/sprites/items/sWhiteItems/UnfocusPrisma.png", 1, 16, 16)
 
 -- Создание предмета UnfocusPrisma
 -- Привязка спрайта к предмету
@@ -27,9 +27,9 @@ item:onHitProc(function(actor, victim, stack, hit_info)
     local dy = victim.y - actor.y
     local dist = math.sqrt(dx * dx + dy * dy)
 
-    -- Бонус только по дальним целям: +25% урона за каждый стак
+    -- Бонус только по дальним целям: +40% урона за каждый стак
     if dist > RANGE then
-        local mult = 1 + 0.25 * stack
+        local mult = 1 + 0.40 * stack
         hit_info:set_damage(hit_info.damage * mult)
     end
 end)

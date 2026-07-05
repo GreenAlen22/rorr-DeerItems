@@ -1,3 +1,6 @@
 .instruction/
 .dist/ 
 assets/template/
+language/russian_markdown.md
+language/russian.html
+.gitignore

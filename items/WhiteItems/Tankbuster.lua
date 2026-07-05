@@ -9,11 +9,11 @@ local sprite = Resources.sprite_load("DeerItems", "item/Tankbuster", PATH.."asse
 local GUID = _ENV["!guid"]
 
 -- Балансные константы
-local COOLDOWN_FRAMES  = 7 * 60   -- перезарядка 7 секунд
-local PLAYER_DMG_BASE  = 0.40     -- 40% урона игрока
-local PLAYER_DMG_STACK = 0.20     -- +20% за стак
-local MAXHP_BASE       = 0.02     -- 2% макс. HP цели
-local MAXHP_STACK      = 0.01     -- +1% за стак
+local COOLDOWN_FRAMES  = 5 * 60   -- перезарядка 5 секунд
+local PLAYER_DMG_BASE  = 1.00     -- 100% урона игрока
+local PLAYER_DMG_STACK = 0.70     -- +70% за стак
+local MAXHP_BASE       = 0.04     -- 4% макс. HP цели
+local MAXHP_STACK      = 0.02     -- +2% за стак
 
 -- Создание предмета: белый тир, тег «урон»
 local item = Item.new("DeerItems", "Tankbuster")

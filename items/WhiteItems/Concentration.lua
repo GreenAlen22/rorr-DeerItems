@@ -13,7 +13,7 @@ local readySound = Resources.sfx_load("DeerItems", "sound/Concentration", PATH..
 local GUID = _ENV["!guid"]
 
 -- Балансные константы
-local SAFE_FRAMES   = 5 * 60   -- 5 секунд без урона до зарядки
+local SAFE_FRAMES   = 3 * 60   -- 3 секунд без урона до зарядки
 local DMG_PER_STACK = 0.60     -- +60% урона за стак на усиленном ударе
 
 -- Создание предмета: белый тир, тег «урон»

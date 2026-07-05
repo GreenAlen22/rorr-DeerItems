@@ -8,10 +8,10 @@ local sprite = Resources.sprite_load("DeerItems", "item/CharlatansDie", PATH.."a
 local GUID = _ENV["!guid"]
 
 -- ── Баланс ──
-local CHANCE_BASE = 0.35
-local CHANCE_STACK = 0.10
-local RARE_BASE   = 0.30      -- из сработавших — доля редких (иначе необычный)
-local RARE_STACK  = 0.10
+local CHANCE_BASE = 0.5
+local CHANCE_STACK = 0.5
+local RARE_BASE   = 0.08      -- из сработавших — доля редких (иначе необычный)
+local RARE_STACK  = 0.05
 
 local function truthy(v) return v ~= nil and v ~= false and v ~= 0 end
 

@@ -3,9 +3,9 @@
 -- Ядро прежнее: считаем врагов ВОКРУГ игрока. Но счётчик больше НЕ множит статы
 -- (этим уже заняты Community/IngrownIdol) — он КОРМИТ лозу «эссенцией».
 -- Пока враги рядом, лоза копит эссенцию (тем быстрее, чем больше врагов в радиусе).
--- При достижении порога — «цветёт»: всплеск AoE-урона по врагам вокруг + лечение игрока.
+-- Пока враги рядом, лоза периодически бьёт по области; при достижении порога — «цветёт»: большой взрыв + лечение.
 -- Динамика прежняя: смертельна в гуще боя, бесполезна в одиночку. Стаки расширяют
--- радиус И потолок учитываемых врагов (=> заряд быстрее) и усиливают всплеск.
+-- радиус И потолок учитываемых врагов (=> заряд быстрее), усиливают урон и лечение.
 
 -- Спрайт предмета (болванка из template). Нова переиспользует готовый Explosive.png. Звук не нужен.
 local sprite      = Resources.sprite_load("DeerItems", "item/RavenousVine", PATH.."assets/sprites/items/sRedItems/RavenousVine.png", 1, 18, 18)
@@ -15,19 +15,22 @@ local GUID = _ENV["!guid"]
 
 -- ── Баланс ──────────────────────────────────────────────────────────────────────
 local TILE         = 32     -- px в одном тайле
-local RADIUS_BASE  = 5 * TILE     -- радиус при 1 стаке (5 тайлов = 160px)
+local RADIUS_BASE  = 4 * TILE     -- радиус при 1 стаке (4 тайла = 128px)
 local RADIUS_STACK = 1.5 * TILE   -- +1.5 тайла радиуса за каждый доп. стак (+48px)
 local CAP_BASE     = 2      -- потолок учитываемых врагов = CAP_BASE + CAP_STACK*stack
 local CAP_STACK    = 4      -- => стак1=6, стак2=10, стак3=14
 local COUNT_PERIOD = 15     -- как часто пересчитываем врагов рядом, кадров (4 раза/сек)
+local DAMAGE_PERIOD = 30    -- как часто лоза бьёт по области, кадров (2 раза/сек)
 
 local ESS_PER_ENEMY = 1.0   -- эссенции в секунду за каждого учтённого врага
 local THRESHOLD     = 24    -- эссенции для «цветения» (6 врагов => всплеск раз в ~4с)
 
-local BURST_DMG_BASE  = 6.0   -- урон всплеска: 600% урона игрока...
-local BURST_DMG_STACK = 3.0   -- ...+300% за каждый доп. стак
-local HEAL_BASE       = 0.09  -- лечение всплеска: 9% макс. HP...
-local HEAL_STACK      = 0.045 -- ...+4.5% за каждый доп. стак
+local DAMAGE_BASE  = 0.70  -- урон тика: 70% базового урона...
+local DAMAGE_STACK = 0.30  -- ...+30% за каждый доп. стак
+local BURST_DMG_BASE  = 4.0   -- урон взрыва цветения: 400% урона игрока...
+local BURST_DMG_STACK = 2.0   -- ...+200% за каждый доп. стак
+local HEAL_BASE    = 0.12  -- лечение цветения: 12% макс. HP...
+local HEAL_STACK   = 0.06  -- ...+6% за каждый доп. стак
 -- ──────────────────────────────────────────────────────────────────────────────
 
 local function radius_for(stack) return RADIUS_BASE + (stack - 1) * RADIUS_STACK end
@@ -67,16 +70,29 @@ item:onPostStep(function(actor, stack)
         data.ess = data.ess + nb * ESS_PER_ENEMY / 60
     end
 
-    -- Цветение: всплеск AoE-урона + лечение, остаток эссенции переносим.
+    -- Периодический AoE-урон по тому же радиусу, пока лозу кормит хотя бы один враг.
+    if data.rv_damage_next == nil then data.rv_damage_next = frame end
+    if nb > 0 and frame >= data.rv_damage_next then
+        data.rv_damage_next = frame + DAMAGE_PERIOD
+
+        local radius = radius_for(stack)
+        local dmg_coef = DAMAGE_BASE + DAMAGE_STACK * (stack - 1)
+        local atk = actor:fire_explosion(actor.x, actor.y, radius, radius, dmg_coef, nil, nil, false)
+        if atk and atk.attack_info then
+            atk.attack_info.proc = false
+            atk.attack_info:set_critical(false)
+        end
+    end
+
+    -- Цветение: большой AoE-взрыв + лечение, остаток эссенции переносим.
     if data.ess >= THRESHOLD then
         data.ess = data.ess - THRESHOLD
 
         local radius = radius_for(stack)
         local dmg_coef = BURST_DMG_BASE + BURST_DMG_STACK * (stack - 1)
-        -- Урон без визуала (sprite=nil, как в RiftBeacon); нову рисуем отдельно ниже.
         local atk = actor:fire_explosion(actor.x, actor.y, radius, radius, dmg_coef, nil, nil, false)
         if atk and atk.attack_info then
-            atk.attack_info.proc = false                 -- всплеск не должен прокать другие предметы/сам себя
+            atk.attack_info.proc = false                 -- взрыв цветения не должен прокать другие предметы/сам себя
             atk.attack_info:set_critical(false)
         end
 
@@ -95,6 +111,7 @@ item:onRemove(function(actor, stack)
         data.ess      = 0
         data.rv_count = 0
         data.rv_next  = nil
+        data.rv_damage_next = nil
     end
 end)
 

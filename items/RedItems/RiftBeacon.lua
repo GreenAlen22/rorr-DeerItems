@@ -1,12 +1,13 @@
 -- DeerItems-RiftBeacon / «Маяк разлома» / "Rift Beacon"
--- Падение ниже 25% HP даёт барьер и на 8с открывает разлом вокруг игрока: враги получают урон
--- и периодически выбрасываются прочь. Любое убийство при активном разломе продлевает его на 1с.
--- Срабатывает раз за этап (перезаряжается в начале нового этапа).
+-- Падение ниже 25% HP даёт барьер и на 8с открывает разлом вокруг игрока: враги
+-- периодически выбрасываются прочь. Любое убийство при активном разломе продлевает его на 1с.
+-- После срабатывания ломается и чинится в начале нового этапа.
 
 local sprite = Resources.sprite_load("DeerItems", "item/RiftBeacon", PATH.."assets/sprites/items/sRedItems/RiftBeacon.png", 1, 18, 18)
 
 local GUID = _ENV["!guid"]
 local RIFT_COLOR = Color(0x9b4dff)
+local deactivate
 
 local function truthy(v) return v ~= nil and v ~= false and v ~= 0 end
 
@@ -16,9 +17,6 @@ local BARRIER_FRAC = 0.25
 local LIFE_BASE    = 8 * 60
 local LIFE_MAX     = 16 * 60     -- потолок продления убийствами
 local RADIUS       = 250
-local DMG_TICK     = 30          -- урон раз в 0.5с
-local DMG_BASE     = 0.5         -- 50% урона за тик
-local DMG_STACK    = 0.1
 local TP_TICK      = 60          -- выброс раз в 1с
 local TP_DIST      = 250
 
@@ -29,7 +27,6 @@ obj:clear_callbacks()
 
 obj:onCreate(function(self)
     self.life = LIFE_BASE
-    self.dt = 0
     self.tt = 0
     self:projectile_sync(4)   -- синкаем позицию клиентам (объект следует за игроком на хосте)
 end)
@@ -47,20 +44,6 @@ obj:onStep(function(self)
 
     self.life = self.life - 1
     if self.life <= 0 then self:destroy(); return end
-
-    local stack = data.stack or 1
-
-    -- Урон по области раз в 0.5с
-    self.dt = self.dt + 1
-    if self.dt >= DMG_TICK then
-        self.dt = 0
-        local coef = DMG_BASE + DMG_STACK * (stack - 1)
-        local atk = parent:fire_explosion(self.x, self.y, RADIUS, RADIUS, coef, nil, nil, false)
-        if atk and atk.attack_info then
-            atk.attack_info.proc = false
-            atk.attack_info:set_critical(false)
-        end
-    end
 
     -- Выброс врагов прочь раз в 1с (боссов не трогаем)
     self.tt = self.tt + 1
@@ -94,6 +77,22 @@ item:set_tier(Item.TIER.rare)
 item:set_loot_tags(Item.LOOT_TAG.category_utility)
 item:clear_callbacks()
 
+local function break_item(actor)
+    deactivate = deactivate or Item.find("DeerItems-RiftBeaconDeactivate")
+
+    local normal = actor:item_stack_count(item, Item.STACK_KIND.normal)
+    if normal > 0 then
+        actor:item_remove(item, normal)
+        actor:item_give(deactivate, normal)
+    end
+
+    local temp = actor:item_stack_count(item, Item.STACK_KIND.temporary_blue)
+    if temp > 0 then
+        actor:item_remove(item, temp, Item.STACK_KIND.temporary_blue)
+        actor:item_give(deactivate, temp, Item.STACK_KIND.temporary_blue)
+    end
+end
+
 -- Триггер по низкому HP (раз за этап)
 item:onPostStep(function(actor, stack)
     if gm._mod_net_isClient() then return end
@@ -109,8 +108,8 @@ item:onPostStep(function(actor, stack)
     local inst = obj:create(actor.x, actor.y)
     local idata = inst:get_data(nil, GUID)
     idata.parent = actor
-    idata.stack = stack
     data.zone = inst
+    break_item(actor)
 end)
 
 -- Любое убийство при активном разломе продлевает его на 1с

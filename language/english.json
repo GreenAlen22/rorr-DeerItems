@@ -3,8 +3,13 @@
         "RiftBeacon": {
             "name": "Rift Beacon",
             "pickup": "<g>Survive a deadly hit</c> by tearing open a <p>rift</c>.",
-            "description": "Dropping below <b>25%</c> health grants a <g>barrier</c> for <g>25%</c> of max health and opens a <p>rift</c> for <b>8s</c>: enemies within <b>~250</c> take <r>50% damage</c> <c_stack>(+10% per stack)</c> every <b>0.5s</c> and are periodically <b>flung away</c>. <b>Kills</c> during the rift extend it by <b>1s</c>. Recharges each stage.",
+            "description": "Dropping below <b>25%</c> health grants a <g>barrier</c> for <g>25%</c> of max health and opens a <p>rift</c> for <b>8s</c>: enemies within <b>~250</c> are periodically <b>flung away</c>. <b>Kills</c> during the rift extend it by <b>1s</c>. Breaks after triggering and repairs each stage.",
             "priority": "<r>High Priority</c>"
+        },
+        "RiftBeaconDeactivate": {
+            "name": "Broken Rift Beacon",
+            "pickup": "Repairs at the start of the next stage.",
+            "description": "Repairs into <p>Rift Beacon</c> at the start of the next stage."
         },
         "IngrownIdol": {
             "name": "Ingrown Idol",
@@ -51,7 +56,7 @@
         "BountyContract": {
             "name": "Bounty Contract",
             "pickup": "<r>Execute</c> weakened elites and earn <b>gold</c> for every elite slain.",
-            "description": "Instantly <r>kills</c> <r>elites</c> (not bosses) below <b>15%</c> <c_stack>(+5% per stack, max 50%)</c> health. Every <b>elite kill</c> grants <b>$40</c> <c_stack>(+$20 per stack)</c>. Ordinary kills grant no gold. Gold scales with time.",
+            "description": "Instantly <r>kills</c> <r>elites</c> (not bosses) below <b>12%</c> <c_stack>(+12% per stack, hyperbolic)</c> health. Every <b>elite kill</c> grants <b>$40</c> <c_stack>(+$20 per stack)</c>. Ordinary kills grant no gold. Gold scales with time.",
             "priority": "<g>Priority</c>"
         },
         "Golemshot": {
@@ -78,7 +83,7 @@
         "MosquitoNet": {
             "name": "Mosquito Net",
             "pickup": "<b>Shoot down</c> projectiles and periodically <b>block a hit</c>.",
-            "description": "Every <b>0.5s</c>, shoot down <b>2</c> <c_stack>(+2 per stack)</c> <r>enemy projectiles</c> within <b>~12m</c> (recharge <b>scales with attack speed</c>). Every <b>10s</c> <c_stack>(-1s per stack)</c>, fully <b>block</c> one incoming hit.",
+            "description": "Every <b>0.5s</c>, shoot down <b>2</c> <c_stack>(+2 per stack)</c> <r>enemy projectiles</c> within <b>~12m</c> (recharge <b>scales with attack speed</c>). Every <b>7s</c> <c_stack>(-10% per stack, hyperbolic)</c>, fully <b>block</c> one incoming hit if it deals more than <b>10%</c> of current health.",
             "priority": "<r>High Priority</c>"
         },
         "OrbitalLens": {
@@ -114,7 +119,7 @@
         "CashbackChip": {
             "name": "Cashback Chip",
             "pickup": "Get <y>gold</c> back on <y>every purchase</c>.",
-            "description": "Refunds <y>10%</c> <c_stack>(+10% per stack)</c> of the <y>gold</c> spent on <b>any purchase</c>. Additionally, the <g>first chest</c> <c_stack>(+1 per stack)</c> you buy each stage is <g>free</c>.",
+            "description": "Refunds <y>10%</c> <c_stack>(+10% per stack, hyperbolic)</c> of the <y>gold</c> spent on <b>any purchase</c>. Additionally, the <g>first chest</c> <c_stack>(+1 per stack)</c> you buy each stage is <g>free</c>.",
             "destination": "Clearing House,\nOuter Ring Exchange,\n[REDACTED]",
             "date": "21.04.2057",
             "story": "A slim card of brushed alloy, warm to the touch, with a single contact that never tarnishes. The traders on the outer ring passed it hand to hand without quite trusting it: every time coin left your account, a fraction crept quietly back, as if the chip skimmed the seller instead of you.\n\nNo one could say where the returned money came from. The ledgers always balanced - to the buyer's favor. The cashiers stopped checking and started smiling.\n\nWe filed it as 'loyalty instrument, anomalous yield.' To myself I noted: the house always wins, unless the house is in your pocket.",
@@ -168,7 +173,7 @@
         "ElephantGun": {
             "name": "Elephant Gun",
             "pickup": "Deal <y>extra damage</c> to <r>bosses</c>.",
-            "description": "Deal <y>+20%</c> <c_stack>(+20% per stack)</c> more damage to <r>bosses</c>.",
+            "description": "Deal <y>+15%</c> <c_stack>(+15% per stack)</c> more damage and gain <y>+10% Critical Chance</c> <c_stack>(+10% per stack)</c> against <r>bosses</c>.",
             "destination": "Big-Game Reserve,\nTrophy Hold,\nSavannah Belt, Earth",
             "date": "16.10.2056",
             "story": "A rifle too heavy for any sane shoulder, bored wide enough to swallow a fist. It was never meant for small things - fire it at a scurrying target and you'll only deafen yourself. But aim it at something vast, something that thinks its size makes it safe, and the round goes in like a verdict.\n\nThe big-game hunter who carried it kept one rule in his log: «Never waste it on what you could simply outrun. Save it for what you cannot.»",

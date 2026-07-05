@@ -12,8 +12,9 @@ local GUID = _ENV["!guid"]
 -- ── Баланс ──
 local PER_STACK    = 0.03      -- +3% к характеристикам за каждый стак азарта
 local DURATION     = 20 * 60   -- каждый стак живёт 20 секунд
-local BASE_CAP     = 4         -- макс. стаков при 1 шт. предмета
-local CAP_PER_ITEM = 2         -- +2 к капу за каждую доп. шт.
+local CAP_DURATION = 10 * 60   -- +10 секунд за стак
+local BASE_CAP     = 3         -- макс. стаков при 1 шт. предмета
+local CAP_PER_ITEM = 1         -- +1 к капу за каждую доп. шт.
 
 -- Предмет
 local item = Item.new("DeerItems", "LootFever")
@@ -36,7 +37,7 @@ buff:clear_callbacks()
 buff:onApply(function(actor, stack)
     local data = actor:get_data("LootFever", GUID)
     if not data.timers then data.timers = {} end
-    table.insert(data.timers, DURATION)
+    table.insert(data.timers, DURATION + CAP_DURATION * (actor:item_stack_count(item) - 1))
 end)
 
 -- Тик таймеров: истёкшие стаки снимаем; сверху держим кап по числу предметов

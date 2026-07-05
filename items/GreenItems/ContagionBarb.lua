@@ -10,8 +10,8 @@ local buff_sprite = Resources.sprite_load("DeerItems", "buff/ContagionBleed", PA
 local GUID = _ENV["!guid"]
 
 -- ── Баланс ──
-local CHANCE_BASE  = 0.15
-local CHANCE_STACK = 0.05
+local CHANCE_BASE  = 0.08
+local CHANCE_STACK = 0.08
 local BLEED_TIME   = 4 * 60     -- кровотечение 4с
 local BLEED_TICK   = 30         -- урон раз в 0.5с
 local BLEED_COEF   = 0.20       -- 20% урона за тик = 40%/с

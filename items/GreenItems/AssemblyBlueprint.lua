@@ -3,7 +3,7 @@
 -- При гибели дрона/турели владельца — шанс восстановить его на 50% HP (10% +10% гиперболически, максимум 80%).
 --
 -- Как это устроено (в игре нет коллбеков «куплен дрон» / «погиб дрон» на уровне предмета):
---   * Покупка ловится поллингом множества союзных дронов владельца (как в HeavyLungs — по команде),
+--   * Покупка ловится поллингом множества союзных дронов с проверкой их владельца,
 --     раз в POLL_PERIOD кадров. Новый дрон, которого мы раньше не видели и который НЕ создан нами,
 --     считается «купленным» и проходит ролл дублирования.
 --   * Гибель ловится глобальным хуком actor_set_dead (тот же приём, что gm.post_script_hook в HeavyLungs):
@@ -48,24 +48,37 @@ local function hyper_chance(per, stack, cap)
     return c
 end
 
+local function as_existing_instance(inst)
+    if not inst then return nil end
+    local ok, exists = pcall(function() return Instance.exists(inst) end)
+    if ok and exists then
+        return Instance.wrap(inst)
+    end
+    return nil
+end
+
+local function same_instance(a, b)
+    if not a or not b then return false end
+    if a == b then return true end
+    if a.id and b.id then return a.id == b.id end
+    if a.value and b.value then return a.value == b.value end
+    return false
+end
+
+local function drone_owner(drone)
+    return as_existing_instance(drone.parent) or as_existing_instance(drone.owner)
+end
+
 --==================================================================================================
 -- СОСТОЯНИЕ (на уровне файла — живёт весь забег)
 --==================================================================================================
--- Текущее число стаков предмета по командам (как g_team_stack в HeavyLungs).
--- Нужно ролу восстановления: умершему дрону приписываем стак его команды.
-local g_team_stack = {}
-
 -- Множество уже учтённых дронов: [instance.id] = true. Раз в поллинг перестраивается из
 -- актуального набора (мёртвые/исчезнувшие id отсеиваются сами).
-local g_known = {}
+local g_owner_state = {}
 
 -- Базовый набор «засеян»? До первого засева существующие дроны не считаем покупками
 -- (иначе подбор предмета при уже имеющейся армии раздал бы бесплатные дубликаты).
-local g_started = false
-
 -- Кадр последнего поллинга — чтобы в мультиплеере несколько владельцев не сканировали один кадр дважды.
-local g_last_poll = -1
-
 -- «Сломанный дрон» — покупаемый интерактив pInteractableDrone, который игра роняет при гибели ЛЮБОГО
 -- дрона. Если мы дрона воскресили, эту покупаемую версию надо убрать: иначе её можно ещё и докупить,
 -- получив второго дрона из одной смерти (дюп).
@@ -121,73 +134,59 @@ local function spawn_drone_copy(src, x, y, owner, hp_frac, lineage)
     return inst
 end
 
--- Поиск игрока нужной команды, держащего этот предмет (запасной владелец для восстановления,
--- если у погибшего дрона не оказалось валидного parent — у ванильных дронов он не всегда выставлен).
-local function find_team_owner(team)
-    local players = Instance.find_all(oP)
-    for _, p in ipairs(players) do
-        if p.team == team and (p:item_stack_count(item) or 0) > 0 then
-            return p
-        end
-    end
-    return nil
-end
-
 --==================================================================================================
 -- ЛОГИКА ПРЕДМЕТА
 --==================================================================================================
 item:clear_callbacks()
 
--- Держим стак команды свежим
-item:onStatRecalc(function(actor, stack)
-    if stack > 0 then g_team_stack[actor.team] = stack end
-end)
-
--- При получении предмета: если это первый стак на команде — пересеиваем базовый набор дронов,
+-- При получении предмета пересеиваем базовый набор дронов для этого владельца,
 -- чтобы уже имеющиеся дроны не приняли за «только что купленные».
 item:onAcquire(function(actor, stack)
-    local had = g_team_stack[actor.team]
-    g_team_stack[actor.team] = stack
-    if not had then
-        g_known = {}
-        g_started = false
+    if not g_owner_state[actor.id] then
+        g_owner_state[actor.id] = { known = {}, started = false, last_poll = -1 }
     end
 end)
 
--- При полной потере предмета убираем стак команды
+-- При полной потере предмета убираем состояние владельца
 item:onRemove(function(actor, stack)
-    if stack <= 1 then g_team_stack[actor.team] = nil end
+    if stack <= 1 then
+        g_owner_state[actor.id] = nil
+    end
 end)
 
 -- Поллинг покупок: ищем новых союзных дронов и катим дублирование.
 item:onPostStep(function(actor, stack)
     if stack <= 0 then return end
-    g_team_stack[actor.team] = stack
 
     -- Спавн — только на хосте
     if gm._mod_net_isClient() then return end
 
-    local frame = Global._current_frame
-    if frame == g_last_poll then return end          -- этот кадр уже сканировали (другой владелец)
-    if frame % POLL_PERIOD ~= 0 then return end
-    g_last_poll = frame
+    local state = g_owner_state[actor.id]
+    if not state then
+        state = { known = {}, started = false, last_poll = -1 }
+        g_owner_state[actor.id] = state
+    end
 
-    -- Все союзные дроны команды (радиус — вся арена), как в HeavyLungs
+    local frame = Global._current_frame
+    if frame == state.last_poll then return end
+    if frame % POLL_PERIOD ~= 0 then return end
+    state.last_poll = frame
+
+    -- Сначала берём союзников по команде, затем ниже оставляем только дронов этого владельца.
     local found = List.wrap(actor:find_characters_circle(actor.x, actor.y, FIND_RADIUS, false, actor.team, true))
 
     local seen = {}
     for _, char in ipairs(found) do
-        if char.object_index ~= oP then              -- игроков не трогаем
+        local owner = drone_owner(char)
+        if char.object_index ~= oP and same_instance(owner, actor) then              -- игроков не трогаем
             local id = char.id
             seen[id] = true
 
-            if not g_known[id] then
+            if not state.known[id] then
                 -- Дрон, которого мы раньше не видели
-                if g_started and not g_spawned[id] then
+                if state.started and not g_spawned[id] then
                     -- Настоящая покупка → ролл дублирования
                     if math.random() < hyper_chance(DUP_PER_STACK, stack, DUP_CAP) then
-                        local owner = char.parent
-                        if not (owner and Instance.exists(owner)) then owner = actor end
                         spawn_drone_copy(char, char.x, char.y, owner, nil, "dup")  -- дубликат покупки (линия "dup"), полное HP
                     end
                 end
@@ -196,8 +195,8 @@ item:onPostStep(function(actor, stack)
         end
     end
 
-    g_known = seen          -- заменяем набор, отсеивая исчезнувшие id
-    g_started = true
+    state.known = seen          -- заменяем набор, отсеивая исчезнувшие id
+    state.started = true
 end)
 
 --==================================================================================================
@@ -210,20 +209,11 @@ gm.post_script_hook(gm.constants.actor_set_dead, function(self, other, result, a
     if gm._mod_net_isClient() then return end
     if self.object_index == oP then return end       -- игроки — не дроны
 
-    -- Восстанавливаем только дронов команды, у которой есть держатель предмета.
-    -- Враги (другая команда) сюда не попадают: для их команды стака нет.
-    local team = self.team
-    local stack = g_team_stack[team]
-    if not stack or stack <= 0 then return end
-
-    -- Владелец: предпочтительно parent дрона, иначе любой игрок команды с предметом
-    local owner = self.parent
-    if not (owner and Instance.exists(owner)) then
-        owner = find_team_owner(team)
-    else
-        owner = Instance.wrap(owner)
-    end
+    -- Восстанавливаем только дронов, чей реальный владелец держит предмет.
+    local owner = drone_owner(self)
     if not owner or not Instance.exists(owner) then return end
+    local stack = owner:item_stack_count(item) or 0
+    if stack <= 0 then return end
 
     -- Защита от повторного срабатывания actor_set_dead на ОДНОМ инстансе (иначе двойное воскрешение
     -- и неверная пометка линии). Обрабатываем гибель конкретного дрона один раз.

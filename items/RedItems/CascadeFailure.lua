@@ -19,10 +19,15 @@ local RELEASE_PERIOD = 180    -- детонация каждые 3 сек
 local POOL_CAP_COEF  = 25     -- кап детонации: не больше 2500% урона игрока на одну цель (анти-runaway)
 local AOE_W          = 280    -- радиус взрыва (~9 м)
 local AOE_H          = 280
+local POOL_TEXT_COLOR = Color(0x150c43)
 -- ──────────────────────────────────────────────────────────────────────────────
 
 -- Метка заражения: постоянная (is_timed=false), служит только индикатором — статов не меняет.
 -- Внешний вид заражённых рисуем сами встроенной графикой (см. onPostDraw), иконку не показываем.
+local function round_pool(pool)
+    return math.floor((pool or 0) + 0.5)
+end
+
 local infectBuff = Buff.new("DeerItems", "CascadeInfect")
 infectBuff.show_icon = false
 infectBuff.is_debuff = true
@@ -134,9 +139,13 @@ end)
 item:onPostDraw(function(actor, stack)
     local data = actor:get_data("CascadeFailure", GUID)
     if not data.infected then return end
+    local pool_text = string.format("%d", round_pool(data.pool))
     for vid, v in pairs(data.infected) do
         if v and Instance.exists(v) and v:buff_stack_count(infectBuff) > 0 then
             gm.draw_sprite(mark, 0, v.x, v.y - 17)
+            gm.draw_set_colour(POOL_TEXT_COLOR)
+            gm.draw_text(v.x - (#pool_text * 3), v.y + 2, pool_text)
+            gm.draw_set_colour(Color.WHITE)
         end
     end
 end)

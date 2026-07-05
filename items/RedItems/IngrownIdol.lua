@@ -199,7 +199,7 @@ end)
 
 -- HUD: прогресс к зверю — справа сверху, примерно на середине верхней части экрана.
 -- Координаты в HUD-единицах (display/hud_scale) — попадание калибровать не нужно (см. memory).
-Hook.add_post(gm.constants.draw_hud, function()
+gm.post_script_hook(gm.constants.draw_hud, function()
     local p = Player.get_client()
     if not p or not Instance.exists(p) then return end
     if (p:item_stack_count(item) or 0) <= 0 then return end

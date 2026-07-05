@@ -30,7 +30,7 @@ item:clear_callbacks()
 -- Бафф-флаг «берсерк». Сам по себе статов не меняет — служит индикатором состояния
 -- (по нему экранный хук решает, красить ли экран, а HUD показывает иконку).
 local buff = Buff.new("DeerItems", "VioletFrenzy")
-buff.show_icon = true
+buff.show_icon = false
 buff.is_debuff = false
 buff.max_stack = 1
 buff:clear_callbacks()

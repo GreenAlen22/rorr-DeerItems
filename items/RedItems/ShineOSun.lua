@@ -13,6 +13,8 @@ local GUID = _ENV["!guid"]
 
 -- Максимум солнц на карте одновременно (у одного владельца)
 local MAX_SUNS = 5
+local SUN_Y_OFFSET = 6 * 32
+local SUN_SPAWN_COOLDOWN = 5 * 60
 -- Цвет отрисовки зоны действия солнца — создаётся один раз, а не каждый кадр
 local SUN_COLOR = Color(0xffcc33)
 
@@ -34,6 +36,8 @@ item:onKillProc(function(actor, victim, stack)
         local data = actor:get_data(nil, GUID)
         data.suns = data.suns or {}
 
+        if (data.sun_spawn_cooldown or 0) > 0 then return end
+
         -- Ограничение: не больше MAX_SUNS солнц на карте одновременно
         if #data.suns >= MAX_SUNS then return end
 
@@ -44,22 +48,28 @@ item:onKillProc(function(actor, victim, stack)
 
         -- Размер зоны действия зависит от количества стаков
         local radius = (12 + 2.5 * (stack - 1)) * 32
+        local sunRadius = radius + SUN_Y_OFFSET
 
         table.insert(data.suns, {
             x = victim.x,
-            y = victim.y - (6 * 32),     -- визуально выше врага (4 метра вверх)
+            y = victim.y - SUN_Y_OFFSET, -- визуально выше врага (4 метра вверх)
             dmg = dmg,
-            w = radius,
-            h = radius + (6 * 32),       -- вертикальное растяжение зоны
+            w = sunRadius,
+            h = sunRadius,
             t = 5 * 60,                  -- общее время жизни (5 секунд)
             tick = 12                    -- интервал урона: 12 кадров
         })
+        data.sun_spawn_cooldown = SUN_SPAWN_COOLDOWN
     end
 end)
 
 -- Обработка каждого активного солнца: урон по области каждые 12 кадров
 item:onPostStep(function(actor, stack)
     local data = actor:get_data(nil, GUID)
+    if (data.sun_spawn_cooldown or 0) > 0 then
+        data.sun_spawn_cooldown = data.sun_spawn_cooldown - 1
+    end
+
     if not data.suns then return end
 
     for i = #data.suns, 1, -1 do

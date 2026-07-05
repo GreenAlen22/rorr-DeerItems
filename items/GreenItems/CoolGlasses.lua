@@ -16,9 +16,13 @@ local item = Item.new("DeerItems", "CoolGlasses")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.uncommon)
 item:set_loot_tags(Item.LOOT_TAG.category_damage)
+item:clear_callbacks()
 
 -- При попадании атакой — если был крит, создаётся взрыв
-item:onAttackHit(function(actor, victim, stack, attack_info)
+item:onHitProc(function(actor, victim, stack, hit_info)
+    if not gm._mod_net_isHost() then return end
+    local attack_info = hit_info and hit_info.attack_info
+    if not attack_info then return end
     if attack_info.critical then
         -- Получаем базовый урон до модификаторов
         local base_damage = attack_info:get_damage_nocrit()

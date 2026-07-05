@@ -26,6 +26,66 @@ item:set_loot_tags(Item.LOOT_TAG.category_healing)
 
 item:clear_callbacks()
 
+local GUID = _ENV["!guid"]
+local DAMAGE_TEXT_LIFE = 45
+
+local objDamageText = Object.new("DeerItems", "CheatDeathDamageText")
+objDamageText:set_depth(-1000)
+objDamageText:clear_callbacks()
+objDamageText:onCreate(function(self)
+    self.amount = 0
+    self.life = DAMAGE_TEXT_LIFE
+    self.max_life = DAMAGE_TEXT_LIFE
+    self.vx = 0
+    self.vy = -0.45
+end)
+objDamageText:onStep(function(self)
+    self.x = self.x + self.vx
+    self.y = self.y + self.vy
+    self.life = self.life - 1
+    if self.life <= 0 then self:destroy() end
+end)
+objDamageText:onDraw(function(self)
+    local alpha = math.max(0, self.life / self.max_life)
+    gm.draw_set_alpha(alpha)
+    gm.draw_set_colour(Color.RED)
+    gm.draw_text(self.x, self.y, string.format("%d", self.amount))
+    gm.draw_set_colour(Color.WHITE)
+    gm.draw_set_alpha(1)
+end)
+
+local function add_delayed_damage(actor, total)
+    local data = actor:get_data("CheatDeath", GUID)
+    if not data.cd_ticks then data.cd_ticks = {} end
+    table.insert(data.cd_ticks, {
+        damage = total / DOT_TICKS,
+        ticks = DOT_TICKS,
+        timer = 0,
+    })
+end
+
+local function is_invincible(actor)
+    local invincible = actor.invincible
+    return invincible == true or (type(invincible) == "number" and invincible > 0)
+end
+
+local function spawn_damage_text(actor, amount)
+    local inst = objDamageText:create(actor.x + math.random(-8, 8), actor.y - 42)
+    inst.amount = math.max(1, math.floor(amount + 0.5))
+    inst.vx = math.random(-6, 6) / 20
+end
+
+local function deal_internal_damage(actor, amount)
+    if gm._mod_net_isClient() or amount <= 0 or actor.hp <= 0 then return end
+    if is_invincible(actor) then return end
+
+    actor.hp = actor.hp - amount
+    if actor.hp <= 0 then
+        actor.hp = -1000000
+    end
+    spawn_damage_text(actor, amount)
+end
+
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
     if stack <= 0 then return end
     -- КРИТИЧНО: пропускаем урон от самого себя. Иначе тики НАШЕГО же кровотечения снова
@@ -41,7 +101,28 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
 
     -- Возвращаем отложенную часть HP (удар уже прошёл полностью)...
     actor:heal(total)
-    -- ...и наносим её же кровотечением: total за DOT_TICKS тиков как «сырой» урон, красным.
-    -- source=actor + use_raw_damage=true → урон тика берётся как есть, без ×actor.damage.
-    actor:apply_dot(total / DOT_TICKS, actor, DOT_TICKS, DOT_RATE, Color.RED, true)
+    -- ...и списываем её как HP-only debt: это не новый damage event и не прокает on-damaged предметы.
+    add_delayed_damage(actor, total)
+end)
+
+Actor:onPostStep("DeerItems-CheatDeathTicks", function(actor)
+    local data = actor:get_data("CheatDeath", GUID)
+    local ticks = data.cd_ticks
+    if not ticks then return end
+
+    for i = #ticks, 1, -1 do
+        local tick = ticks[i]
+        tick.timer = tick.timer - 1
+        if tick.timer <= 0 then
+            deal_internal_damage(actor, tick.damage)
+            tick.ticks = tick.ticks - 1
+            if tick.ticks <= 0 then
+                table.remove(ticks, i)
+            else
+                tick.timer = DOT_RATE
+            end
+        end
+    end
+
+    if #ticks == 0 then data.cd_ticks = nil end
 end)

@@ -15,7 +15,7 @@ local sound = Resources.sfx_load("DeerItems", "sound/Totemetry", PATH.."assets/s
 local item = Item.new("DeerItems", "Totemetry")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
+item:set_loot_tags(Item.LOOT_TAG.category_healing, Item.LOOT_TAG.item_blacklist_engi_turrets)
 
 -- Константы поведения тотема
 local RADIUS_BASE   = 7.5 * 32 * 2      -- Базовый радиус (480 px)

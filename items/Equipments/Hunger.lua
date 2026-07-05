@@ -14,6 +14,8 @@ local HungerSpawn = Resources.sfx_load("DeerItems", "Hunger/hum", PATH.."assets/
 local COOLDOWN    = 60          -- кулдаун, секунды
 local LIFE        = 10 * 60     -- время жизни дыры, кадры (10 сек)
 local PULL_RADIUS = 6 * 32      -- радиус притяжения, px (6 тайлов ≈ 192px)
+local PULL_STRENGTH_MIN = 12    -- сила всасывания на краю, px/кадр
+local PULL_STRENGTH_MAX = 48    -- сила всасывания в центре, px/кадр
 local HOLE_SPEED  = 1.2         -- скорость полёта дыры вперёд, px/кадр (1.5x от прежних 0.8)
 
 -- Цвета воронки — создаём один раз, а не каждый кадр
@@ -55,10 +57,9 @@ obj:onStep(function(self)
         if not is_boss and not truthy(target.intangible) then
             local lastx, lasty = target.x, target.y
             local dist = gm.point_distance(self.x, self.y, target.x, target.y)
-            -- Очень сильное втягивание к центру: квадратичный разгон. У края ~6 px/кадр,
-            -- в ядре до ~24 px/кадр (раньше было 4..15 — ещё усилили).
+            -- Очень сильное втягивание к центру: квадратичный разгон от PULL_STRENGTH_MIN до PULL_STRENGTH_MAX.
             local t = 1 - math.min(dist / self.radius, 1)   -- 0 на краю, 1 в центре
-            local strength = 6 + 18 * t * t
+            local strength = PULL_STRENGTH_MIN + (PULL_STRENGTH_MAX - PULL_STRENGTH_MIN) * t * t
             local d = gm.point_direction(self.x, self.y, target.x, target.y)
             target.x = target.x - math.cos(math.rad(d)) * strength
             target.y = target.y + math.sin(math.rad(d)) * strength

@@ -1,6 +1,6 @@
 -- DeerItems-CashbackChip / «Кэшбэк-Чип» / "Cashback Chip"
 -- Пассивка (адаптация Executive Card из RoR2). Два независимых эффекта:
---   (a) С ЛЮБОЙ покупки за золото возвращается 10% потраченного +3% за доп. стак.
+--   (a) С ЛЮБОЙ покупки за золото возвращается 10% потраченного за стак гиперболически.
 --   (b) Раз за этап первый сундук бесплатный, доп. стаки дают +10% к следующему бесплатному сундуку.
 
 -- Иконка предмета (заглушка-шаблон — замени текстуру по этому пути)
@@ -9,7 +9,6 @@ local sound = Resources.sfx_load("DeerItems", "sound/GoldBar", PATH.."assets/sou
 
 -- ── Настройки баланса ──
 local CASHBACK_BASE = 0.10
-local CASHBACK_STACK = 0.03
 local FREE_CHEST_BASE = 1
 local FREE_CHEST_STACK_CHANCE = 0.10
 
@@ -46,7 +45,8 @@ local function is_chest(interactable)
 end
 
 local function cashback_fraction(stack)
-    return CASHBACK_BASE + CASHBACK_STACK * math.max(0, stack - 1)
+    if stack <= 0 then return 0 end
+    return 1 - 1 / (CASHBACK_BASE * stack + 1)
 end
 
 local function should_refund_chest(actor_id, stack)
@@ -83,7 +83,7 @@ item:onInteractableActivate(function(actor, stack, interactable)
         return   -- бесплатный сундук не комбинируем с 10%-возвратом (и так вернули всё)
     end
 
-    -- (a) 10% кэшбэк с любой покупки за золото +3% за доп. стак.
+    -- (a) 10% кэшбэк с любой покупки за золото, настакивается гиперболически без капа.
     give_gold(math.floor(cost * cashback_fraction(stack)))
 end)
 

@@ -9,7 +9,7 @@ local boom = Resources.sfx_load("DeerItems", "sound/boom", PATH.."assets/sounds/
 local launch = Resources.sfx_load("DeerItems", "sound/launch", PATH.."assets/sounds/launch.ogg")
 local explosive = Resources.sprite_load("DeerItems", "particle/explosive", PATH.."assets/sprites/particle/Explosive.png", 5, 32, 32)
 local AtgActorSprite = Resources.sprite_load("DeerItems", "particle/AtgActorSprite", PATH.."assets/sprites/particle/AtgActorSprite.png", 1, 34, 34)
-local missile = Resources.sprite_load("DeerItems", "particle/missile", PATH.."assets/sprites/particle/Missile.png", 1, 8, 5)
+local missile = Resources.sprite_load("DeerItems", "particle/missile", PATH.."assets/sprites/particle/Missile.png", 3, 13, 7)
 
 -- Создаём объект ракеты
 local oMissile = Object.new("DeerItems", "missile")

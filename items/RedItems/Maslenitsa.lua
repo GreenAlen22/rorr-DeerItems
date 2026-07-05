@@ -4,7 +4,7 @@
 -- ror-toughTimes
 -- ror-repulsionArmor
 -- ror-colossalKnurl
--- Даёт 25 брони за стак. Дополнительно даёт +2 брони за каждый предмет из списка “защитных”, начиная со второго стака.
+-- Даёт 15 брони за стак. Дополнительно даёт +2 (+3 за стак) брони за каждый предмет из списка “защитных”, начиная со второго стака.
 
 -- Загружаем спрайт предмета
 local sprite = Resources.sprite_load("DeerItems", "item/Maslenitsa", PATH.."assets/sprites/items/sRedItems/Maslenitsa.png", 1, 18, 18)
@@ -34,7 +34,9 @@ item:onStatRecalc(function(actor, stack)
             Item.find("ror", "repulsionArmor"),
             Item.find("ror", "colossalKnurl"),
             Item.find("DeerItems", "Obereg"),
-            Item.find("DeerItems", "ShadowShield")
+            Item.find("DeerItems", "ShadowShield"),
+            Item.find("DeerItems", "FacetedJade"),
+            Item.find("DeerItems", "NewtonsMechanism")
         }
     end
 
@@ -44,7 +46,7 @@ item:onStatRecalc(function(actor, stack)
         bonusCount = bonusCount + actor:item_stack_count(it, Item.STACK_KIND.normal)
     end
 
-    -- Базовая броня: +25 за стак
-    -- Дополнительная броня: +2 за каждый предмет из списка на каждый стак после первого
-    actor.armor = actor.armor + (25 * stack) + bonusCount * (2 * (stack - 1))
+    -- Базовая броня: +15 за стак
+    -- Дополнительная броня: +2 (+3 за стак) за каждый предмет из списка на каждый стак после первого
+    actor.armor = actor.armor + (15 * stack) + bonusCount * (1 +(2* (stack - 1)))
 end)

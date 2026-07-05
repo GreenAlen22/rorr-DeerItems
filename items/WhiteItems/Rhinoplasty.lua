@@ -1,5 +1,5 @@
 -- DeerItems-Rhinoplasty
--- За каждые 4 убийства даёт временный бафф, который по истечении времени лечит. Имеет кулдаун 20 секунд между срабатываниями.
+-- За каждые 3 убийства даёт временный бафф, который по истечении времени лечит. Имеет кулдаун 20 секунд между срабатываниями.
 
 -- Загружаем спрайт предмета
 -- Загружаем спрайт баффа
@@ -47,15 +47,15 @@ item:onPostStep(function(actor, stack)
     if data.cooldown > 0 then
         data.cooldown = data.cooldown - 1
 
-    -- Если достигнуто 4+ убийства и кулдаун отсутствует — даём бафф
-    elseif data.kills >= 4 then
-        local stacksToGive = math.floor(data.kills / 4)
+    -- Если достигнуто 3+ убийства и кулдаун отсутствует — даём бафф
+    elseif data.kills >= 3 then
+        local stacksToGive = math.floor(data.kills / 3)
 
-        -- Применение баффа на 10 секунд за каждые 4 убийства
+        -- Применение баффа на 10 секунд за каждые 3 убийства
         actor:buff_apply(buff, 60 * 10, stacksToGive)
 
         -- Сохраняем остаток убийств, сбрасываем кулдаун
-        data.kills = data.kills % 4
+        data.kills = data.kills % 3
         data.cooldown = 60 * 20
     end
 end)

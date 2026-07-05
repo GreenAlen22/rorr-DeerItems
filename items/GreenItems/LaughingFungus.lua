@@ -20,16 +20,45 @@ item:set_loot_tags(Item.LOOT_TAG.category_healing)
 -- Константы поведения (1 метр = 32 пикселя)
 local STILL_NEEDED  = 60            -- сколько кадров стоять неподвижно для активации зоны (1 сек)
 local HEAL_TICK     = 60            -- период лечения после активации (раз в 1 сек)
-local RADIUS_BASE   = 3 * 32        -- базовый радиус зоны: 3 м
-local RADIUS_STACK  = 1.5 * 32      -- прибавка радиуса за каждый стак сверх первого: +1.5 м
+local ZONE_RADIUS_BASE   = 3 * 32   -- базовая полуширина зоны: 3 м
+local ZONE_RADIUS_STACK  = 1.5 * 32 -- прибавка полуширины за каждый стак сверх первого: +1.5 м
+local ZONE_HEIGHT_SCALE  = 0.5      -- высота зоны относительно ширины: 0.5 = срезана в 2 раза по высоте
+local ZONE_INNER_SCALE   = 1 / 3    -- размер внутреннего кольца визуализации
 local HEAL_BASE     = 0.06          -- базовое лечение: 6% от макс. HP владельца
 local HEAL_STACK    = 0.03          -- прибавка лечения за каждый стак сверх первого: +3%
-local MOVE_EPS      = 1             -- порог в пикселях: смещение меньше считаем «стоянием на месте»
+local MOVE_POS_EPS  = 0.01          -- порог в пикселях: ловит subpixel-движение во время зажатой атаки
+local MOVE_SPEED_EPS = 0.01         -- порог скорости: ловит движение меньше 1 пикселя за кадр
 local ZONE_Y_OFFSET = 40           -- центр зоны приподнят над ногами персонажа
 local ZONE_TTL      = 5            -- запас кадров жизни зоны без обновления (страховка от «висячих» зон)
 
 -- Цвет отрисовки зоны — создаётся один раз, а не каждый кадр в onDraw
 local ZONE_COLOR    = Color(0x33CC33)
+
+local function zone_radius_for(stack)
+    return ZONE_RADIUS_BASE + ZONE_RADIUS_STACK * (stack - 1)
+end
+
+local function zone_height_for(radius)
+    return radius * ZONE_HEIGHT_SCALE
+end
+
+local function is_in_zone(target, x, y, radius, height)
+    local dx = (target.x - x) / radius
+    local dy = (target.y - y) / height
+    return dx * dx + dy * dy <= 1
+end
+
+local function is_actor_moving(actor, data, px, py)
+    local moved_by_position = math.abs(px - (data.lf_px or px)) > MOVE_POS_EPS
+                           or math.abs(py - (data.lf_py or py)) > MOVE_POS_EPS
+
+    local phspeed = actor.pHspeed or actor.hspeed or 0
+    local pvspeed = actor.pVspeed or actor.vspeed or 0
+    local moved_by_speed = math.abs(phspeed) > MOVE_SPEED_EPS
+                        or math.abs(pvspeed) > MOVE_SPEED_EPS
+
+    return moved_by_position or moved_by_speed
+end
 
 --==================================================================================================
 -- ОБЪЕКТ-ЗОНА
@@ -48,7 +77,8 @@ objZone:clear_callbacks()
 
 -- При создании зоны
 objZone:onCreate(function(self)
-    self.radius = RADIUS_BASE
+    self.radius = ZONE_RADIUS_BASE
+    self.height = zone_height_for(self.radius)
     self.life   = 0           -- сколько кадров зона существует (пригодится для анимации партиклов)
     self.ttl    = ZONE_TTL    -- кадры до самоуничтожения, если предмет перестал обновлять зону
 end)
@@ -62,10 +92,14 @@ end)
 
 -- Визуализация зоны. Точка входа для будущих партиклов — заменяй/дополняй содержимое этого коллбека.
 objZone:onDraw(function(self)
-    local x, y, r = self.x, self.y, self.radius
+    local x, y, r, h = self.x, self.y, self.radius, self.height
     gm.draw_set_colour(ZONE_COLOR)
-    gm.draw_circle(x, y, r, true)
-    gm.draw_circle(x, y, r / 3, true)
+    gm.draw_ellipse(x - r, y - h, x + r, y + h, true)
+    gm.draw_ellipse(
+        x - r * ZONE_INNER_SCALE, y - h * ZONE_INNER_SCALE,
+        x + r * ZONE_INNER_SCALE, y + h * ZONE_INNER_SCALE,
+        true
+    )
 end)
 
 --==================================================================================================
@@ -91,8 +125,7 @@ item:onPostStep(function(actor, stack)
     local px, py = actor.x, actor.y
 
     -- Сместился ли владелец заметно с прошлого кадра
-    local moved = math.abs(px - (data.lf_px or px)) > MOVE_EPS
-                or math.abs(py - (data.lf_py or py)) > MOVE_EPS
+    local moved = is_actor_moving(actor, data, px, py)
     data.lf_px, data.lf_py = px, py
 
     -- При движении: гасим зону и сбрасываем отсчёт
@@ -111,7 +144,8 @@ item:onPostStep(function(actor, stack)
 
     -- Зона активна: создаём объект, если его ещё нет, и каждый кадр обновляем под владельца.
     -- Спавним локально на каждой машине — визуализация рисуется у каждого клиента сама.
-    local radius = RADIUS_BASE + RADIUS_STACK * (stack - 1)
+    local radius = zone_radius_for(stack)
+    local height = zone_height_for(radius)
     local zone = data.lf_zone
     if not (zone and Instance.exists(zone)) then
         zone = objZone:create(actor.x, actor.y - ZONE_Y_OFFSET)
@@ -120,6 +154,7 @@ item:onPostStep(function(actor, stack)
     zone.x      = actor.x
     zone.y      = actor.y - ZONE_Y_OFFSET
     zone.radius = radius
+    zone.height = height
     zone.ttl    = ZONE_TTL   -- продлеваем жизнь зоны, пока владелец стоит
 
     -- Импульс лечения: ровно в момент активации (1 сек) и далее каждую секунду
@@ -129,9 +164,12 @@ item:onPostStep(function(actor, stack)
     if gm._mod_net_isClient() then return end
 
     local heal = actor.maxhp * (HEAL_BASE + HEAL_STACK * (stack - 1))
-    local targets = List.wrap(actor:find_characters_circle(actor.x, actor.y - ZONE_Y_OFFSET, radius, false, 1, true))
+    local zone_x, zone_y = actor.x, actor.y - ZONE_Y_OFFSET
+    local targets = List.wrap(actor:find_characters_circle(zone_x, zone_y, radius, false, 1, true))
     for _, ally in ipairs(targets) do
-        ally:heal(heal)
+        if is_in_zone(ally, zone_x, zone_y, radius, height) then
+            ally:heal(heal)
+        end
     end
 end)
 
