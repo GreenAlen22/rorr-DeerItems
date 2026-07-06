@@ -17,9 +17,7 @@ local CAP_STACK      = 2      -- +2 заражённых за стак
 local CAPTURE_FRAC   = 0.5    -- 50% наносимого заражённым урона уходит в пул
 local RELEASE_PERIOD = 180    -- детонация каждые 3 сек
 local POOL_CAP_COEF  = 25     -- кап детонации: не больше 2500% урона игрока на одну цель (анти-runaway)
-local AOE_W          = 280    -- радиус взрыва (~9 м)
-local AOE_H          = 280
-local POOL_TEXT_COLOR = Color(0x150c43)
+local POOL_TEXT_COLOR = Color(0x6a2cff)
 -- ──────────────────────────────────────────────────────────────────────────────
 
 -- Метка заражения: постоянная (is_timed=false), служит только индикатором — статов не меняет.
@@ -35,6 +33,13 @@ infectBuff.max_stack = 1
 infectBuff.is_timed  = false
 infectBuff:clear_callbacks()
 
+local function is_infected_actor(actor)
+    return actor
+        and Instance.exists(actor)
+        and actor.buff_stack ~= nil
+        and actor:buff_stack_count(infectBuff) > 0
+end
+
 local item = Item.new("DeerItems", "CascadeFailure")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.rare)
@@ -45,7 +50,7 @@ item:clear_callbacks()
 local function prune_count(data)
     local cnt = 0
     for vid, v in pairs(data.infected) do
-        if v and Instance.exists(v) and v:buff_stack_count(infectBuff) > 0 then
+        if is_infected_actor(v) then
             cnt = cnt + 1
         else
             data.infected[vid] = nil
@@ -59,6 +64,7 @@ item:onHitProc(function(actor, victim, stack, hit_info)
     if stack <= 0 then return end
     if not gm._mod_net_isHost() then return end
     if not (victim and Instance.exists(victim)) then return end
+    if victim.buff_stack == nil then return end
 
     local data = actor:get_data("CascadeFailure", GUID)
     data.infected = data.infected or {}
@@ -98,15 +104,15 @@ item:onPostStep(function(actor, stack)
     local base = actor.damage or 0
     if base <= 0 then return end
 
-    -- Кап на один залп + перевод плоского пула в коэффициент fire_explosion (×урон игрока).
+    -- Кап на один залп + перевод плоского пула в коэффициент fire_direct (×урон игрока).
     local capped = math.min(data.pool, base * POOL_CAP_COEF)
     local coef   = capped / base
 
     local fired = false
     for vid, v in pairs(data.infected) do
-        if v and Instance.exists(v) and v:buff_stack_count(infectBuff) > 0 then
+        if is_infected_actor(v) then
             -- proc=false/без крита ОБЯЗАТЕЛЬНО: иначе детонация снова попадёт в onHitProc и зациклится.
-            local atk = actor:fire_explosion(v.x, v.y, AOE_W, AOE_H, coef, nil, nil, false)
+            local atk = actor:fire_direct(v, coef, nil, nil, nil, nil, false)
             if atk and atk.attack_info then
                 atk.attack_info.proc = false
                 atk.attack_info:set_critical(false)
@@ -128,7 +134,7 @@ item:onRemove(function(actor, stack)
     local data = actor:get_data("CascadeFailure", GUID)
     if not data.infected then return end
     for vid, v in pairs(data.infected) do
-        if v and Instance.exists(v) and v:buff_stack_count(infectBuff) > 0 then
+        if is_infected_actor(v) then
             v:buff_remove(infectBuff, v:buff_stack_count(infectBuff))
         end
     end
@@ -141,11 +147,13 @@ item:onPostDraw(function(actor, stack)
     if not data.infected then return end
     local pool_text = string.format("%d", round_pool(data.pool))
     for vid, v in pairs(data.infected) do
-        if v and Instance.exists(v) and v:buff_stack_count(infectBuff) > 0 then
-            gm.draw_sprite(mark, 0, v.x, v.y - 17)
+        if is_infected_actor(v) then
+            gm.draw_sprite(mark, 0, v.x, v.y - 14)
             gm.draw_set_colour(POOL_TEXT_COLOR)
-            gm.draw_text(v.x - (#pool_text * 3), v.y + 2, pool_text)
+            gm.draw_text(v.x - (#pool_text * 3) - 9, v.y + 2, pool_text)
             gm.draw_set_colour(Color.WHITE)
+        else
+            data.infected[vid] = nil
         end
     end
 end)

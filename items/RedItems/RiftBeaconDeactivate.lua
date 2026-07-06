@@ -10,19 +10,27 @@ local active
 local item = Item.new("DeerItems", "RiftBeaconDeactivate", true)
 item:set_sprite(sprite)
 
-item:onKillProc(function(actor, victim, stack)
+local function extend_zone(actor)
     local data = actor:get_data("RiftBeacon", GUID)
+    if data.last_extend_frame == Global._current_frame then return end
+
     local z = data.zone
     if z and z:exists() then
+        data.last_extend_frame = Global._current_frame
         z.life = math.min(LIFE_MAX, (z.life or 0) + 60)
     end
+end
+
+item:onKillProc(function(actor, victim, stack)
+    extend_zone(actor)
 end)
 
 item:onStageStart(function(actor, stack)
     active = active or Item.find("DeerItems-RiftBeacon")
 
     local data = actor:get_data("RiftBeacon", GUID)
-    data.used = false
+    data.below_stack_gate = nil
+    data.last_extend_frame = nil
     data.zone = nil
 
     local normal = actor:item_stack_count(item, Item.STACK_KIND.normal)

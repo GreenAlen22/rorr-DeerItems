@@ -79,10 +79,14 @@ oSkull:onStep(function(self)
         -- Попадание
         if self:is_colliding(t) then
             if gm._mod_net_isHost() and self:attack_collision_canhit(t) then
-                -- Плоский урон = 250% энергии души. proc=false обязателен: иначе урон черепа
+                -- Плоский урон = 150% энергии души. damage у fire_explosion — коэффициент от урона актёра,
+                -- поэтому фиксируем итог через raw damage, чтобы энергия души не умножалась на actor.damage.
+                -- proc=false обязателен: иначе урон черепа
                 -- мог бы прокать другие предметы и сам себя.
                 local atk = self.parent:fire_explosion(self.x, self.y, 48, 48, self.dmg, burstSprite, nil, false)
                 if atk and atk.attack_info then
+                    atk.attack_info:use_raw_damage()
+                    atk.attack_info:set_damage(self.dmg)
                     atk.attack_info.proc = false
                     atk.attack_info:set_critical(false)
                 end
