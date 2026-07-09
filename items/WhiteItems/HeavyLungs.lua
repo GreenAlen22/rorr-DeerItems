@@ -146,7 +146,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     self.hp_regen = self.hp_regen * mult
 
     local data = self:get_data("DeerItems", GUID)
-    if data.hl_prev_hp and data.hl_prev_maxhp then
+    if data.hl_prev_hp and data.hl_prev_hp > 0 and data.hl_prev_maxhp and data.hl_prev_maxhp > 0 and self.hp > 0 then
         local missing_hp = math.max(0, data.hl_prev_maxhp - data.hl_prev_hp)
         self.hp = math.min(self.maxhp, math.max(1, self.maxhp - missing_hp))
     end
