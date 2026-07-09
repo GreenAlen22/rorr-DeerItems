@@ -91,7 +91,7 @@ item:set_loot_tags(Item.LOOT_TAG.category_healing)
 item:clear_callbacks()
 
 -- Главная логика на хосте: пересчёт врагов рядом, накопление эссенции, «цветение».
--- Урон/лечение авторитетны на хосте (как RiftBeacon/DeadWater); клиентам HP синхронизируется.
+-- Урон/лечение авторитетны на хосте (как RiftBeacon/TwistedOpinion); клиентам HP синхронизируется.
 item:onPostStep(function(actor, stack)
     if gm._mod_net_isClient() then return end
     if stack <= 0 then return end

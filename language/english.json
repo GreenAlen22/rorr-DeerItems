@@ -67,7 +67,7 @@
                         "ArmySurplus": "Army Surplus",
                         "CascadeFailure": "Cascade Failure",
                         "Community": "Community",
-                        "DeadWater": "Dead Water",
+                        "TwistedOpinion": "Dead Water",
                         "Dombra": "Dombra",
                         "EyeDiamond": "Eye Diamond",
                         "LeackedCapacitor": "Faulty Conductor",
@@ -671,7 +671,7 @@
             "story": "Recovered from a containment cell, sealed in a violet resin block. The handlers' log is mostly redacted; what remains describes a parasitic growth that fused to the host's spine and 'rewarded' kills with a flood of clarity - the world slowing, every motion arriving early. Test subjects reported the colour first: a faint lilac at the edges of sight that bloomed brighter the longer the hunt lasted. The final entry is a single line, underlined twice: it only quiets down while something is still dying.",
             "priority": "<r>High Priority</c>"
         },
-        "DeadWater": {
+        "TwistedOpinion": {
             "name": "Dead Water",
             "pickup": "<g>Healing</c> is amplified and stored as <p>soul energy</c> that strikes with <r>skulls</c>.",
             "description": "<g>Healing</c> is increased by <g>75%</c> <c_stack>(+50% per stack)</c>. <g>100%</c> <c_stack>(+75% per stack)</c> of healing is stored as <p>soul energy</c>. When <p>soul energy</c> reaches <b>10%</c> of your <g>maximum health</c>, a <r>skull</c> is released, dealing <r>150%</c> of the stored <p>soul energy</c>.",
