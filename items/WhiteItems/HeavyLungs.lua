@@ -25,6 +25,7 @@ local oP = gm.constants.oP
 -- у игрока этой команды. Используется глобальным хуком пересчёта статов (ниже),
 -- который усиливает каждого дрона на его собственном пересчёте.
 local g_team_stack = {}
+local g_prev_stats = {}
 
 -- Союзный «персонаж» считается дроном, если это не игрок.
 local function is_drone(char, owner)
@@ -129,9 +130,10 @@ gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result,
     local s = g_team_stack[self.team]
     if not s or s <= 0 then return end
 
-    local data = self:get_data("DeerItems", GUID)
-    data.hl_prev_hp = self.hp
-    data.hl_prev_maxhp = self.maxhp
+    g_prev_stats[self.id or self] = {
+        hp = self.hp,
+        maxhp = self.maxhp,
+    }
 end)
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
@@ -145,9 +147,12 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     self.maxhp = self.maxhp * mult
     self.hp_regen = self.hp_regen * mult
 
-    local data = self:get_data("DeerItems", GUID)
-    if data.hl_prev_hp and data.hl_prev_hp > 0 and data.hl_prev_maxhp and data.hl_prev_maxhp > 0 and self.hp > 0 then
-        local missing_hp = math.max(0, data.hl_prev_maxhp - data.hl_prev_hp)
+    local key = self.id or self
+    local prev = g_prev_stats[key]
+    g_prev_stats[key] = nil
+
+    if prev and prev.hp and prev.hp > 0 and prev.maxhp and prev.maxhp > 0 and self.hp > 0 then
+        local missing_hp = math.max(0, prev.maxhp - prev.hp)
         self.hp = math.min(self.maxhp, math.max(1, self.maxhp - missing_hp))
     end
 end)
