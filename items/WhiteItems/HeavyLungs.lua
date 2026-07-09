@@ -1,23 +1,20 @@
 -- DeerItems-HeavyLungs
--- Даёт щит, равный 5% от максимального HP за каждого дрона владельца.
--- Дополнительно увеличивает максимальное HP и реген ВСЕХ дронов владельца на 15% (+8% за стак).
+-- Увеличивает максимальное HP и реген ВСЕХ дронов владельца на 15% за стак.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/HeavyLungs", PATH.."assets/sprites/items/sGreenItems/HeavyLungs.png", 1, 16.5, 16.5)
+local sprite = Resources.sprite_load("DeerItems", "item/HeavyLungs", PATH.."assets/sprites/items/sWhiteItems/HeavyLungs.png", 1, 16.5, 16.5)
 
 -- guid мода выносим один раз — чтобы get_data не искал его через debug-стек каждый кадр
 local GUID = _ENV["!guid"]
 
 -- Константы поведения
-local SHIELD_PER_DRONE = 0.05    -- щит за каждого дрона: 5% от максимального HP владельца
-local DRONE_BUFF_BASE  = 0.07    -- база множителя дронов (см. формулу ниже)
-local DRONE_BUFF_STACK = 0.08    -- прибавка множителя дронов за стак
+local DRONE_BUFF_STACK = 0.15    -- +15% max HP/regen per stack
 local DRONE_FIND_RADIUS = 100000 -- радиус поиска дронов (фактически вся арена — дроны держатся у владельца)
 local COUNT_PERIOD     = 15      -- как часто (в кадрах) перепроверять число дронов
 
--- Итоговый множитель к HP/регену дрона: 1 + 0.07 + 0.08*стак.
+-- Итоговый множитель к HP/регену дрона: 1 + 0.15*стак.
 local function drone_mult(stack)
-    return 1 + (DRONE_BUFF_BASE + DRONE_BUFF_STACK * stack)
+    return 1 + DRONE_BUFF_STACK * stack
 end
 
 -- Объект игрока в RoRR. Нужен, чтобы отличать дронов (союзные «персонажи»)
@@ -62,29 +59,23 @@ end
 -- Создание предмета HeavyLungs
 -- Привязка спрайта к предмету
 -- Установка тира предмета: зелёный (необычный)
--- Назначение тега лута: предмет, повышающий живучесть
+-- Назначение тега лута: утилитарный предмет
 local item = Item.new("DeerItems", "HeavyLungs")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
+item:set_tier(Item.TIER.common)
+item:set_loot_tags(Item.LOOT_TAG.category_utility)
 
 item:clear_callbacks()
 
--- Пересчёт статов владельца: добавляем щит за каждого дрона и запоминаем их число/стаки.
+-- Пересчёт статов владельца: запоминаем число дронов и стаки.
 item:onStatRecalc(function(actor, stack)
     if stack <= 0 then return end
 
     -- Актуализируем стаки команды для усиления дронов (см. глобальный хук ниже)
     g_team_stack[actor.team] = stack
 
-    local data = actor:get_data("DeerItems", GUID)
-    local n = count_drones(actor)
-    data.hl_drones = n
+    actor:get_data("DeerItems", GUID).hl_drones = count_drones(actor)
 
-    -- Бонусный щит = 5% от максимального HP за каждого дрона
-    if n > 0 then
-        actor.maxshield = actor.maxshield + actor.maxhp * SHIELD_PER_DRONE * n
-    end
 end)
 
 -- При получении предмета (в т.ч. первого стака) сразу применяем усиление к уже существующим дронам.
@@ -104,19 +95,20 @@ item:onPostStep(function(actor, stack)
     local data = actor:get_data("DeerItems", GUID)
 
     -- Изменилось число стаков предмета (новый подбор) → множитель дронов другой,
-    -- но сами дроны об этом не знают. Пересчитываем их статы и щит владельца.
+    -- но сами дроны об этом не знают. Пересчитываем их статы.
     if data.hl_last_stack ~= stack then
         data.hl_last_stack = stack
         recalc_drones(actor)
-        actor:recalculate_stats()
     end
 
     data.hl_tick = (data.hl_tick or 0) + 1
     if data.hl_tick < COUNT_PERIOD then return end
     data.hl_tick = 0
 
-    if count_drones(actor) ~= data.hl_drones then
-        actor:recalculate_stats()
+    local n = count_drones(actor)
+    if n ~= data.hl_drones then
+        data.hl_drones = n
+        recalc_drones(actor)
     end
 end)
 
@@ -131,6 +123,17 @@ end)
 -- Глобальный хук пересчёта статов: усиливает каждого дрона на ЕГО собственном пересчёте.
 -- Множим уже посчитанные движком HP/реген, поэтому усиление корректно накладывается поверх
 -- любого роста характеристик дрона по ходу забега и не накапливается (база сбрасывается каждый пересчёт).
+gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
+    if self.object_index == oP then return end
+
+    local s = g_team_stack[self.team]
+    if not s or s <= 0 then return end
+
+    local data = self:get_data("DeerItems", GUID)
+    data.hl_prev_hp = self.hp
+    data.hl_prev_maxhp = self.maxhp
+end)
+
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     -- Игроков не трогаем — только их дронов
     if self.object_index == oP then return end
@@ -141,4 +144,10 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     local mult = drone_mult(s)
     self.maxhp = self.maxhp * mult
     self.hp_regen = self.hp_regen * mult
+
+    local data = self:get_data("DeerItems", GUID)
+    if data.hl_prev_hp and data.hl_prev_maxhp then
+        local missing_hp = math.max(0, data.hl_prev_maxhp - data.hl_prev_hp)
+        self.hp = math.min(self.maxhp, math.max(1, self.maxhp - missing_hp))
+    end
 end)

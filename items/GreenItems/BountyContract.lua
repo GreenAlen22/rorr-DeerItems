@@ -9,8 +9,8 @@ local GUID = _ENV["!guid"]
 
 -- ── Баланс ──
 local THRESH_STACK = 0.12   -- гиперболический вклад каждого стака в порог казни
-local GOLD_BASE    = 40     -- золото за убийство элиты (×множитель цен)
-local GOLD_STACK   = 20     -- +20 за шт.
+local GOLD_BASE    = 15     -- золото за убийство элиты (×множитель цен)
+local GOLD_STACK   = 15     -- +20 за шт.
 
 local function diminishing_fraction(per_stack, stack)
     if stack <= 0 then return 0 end
@@ -24,7 +24,7 @@ local function truthy(v) return v ~= nil and v ~= false and v ~= 0 end
 local item = Item.new("DeerItems", "BountyContract")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_loot_tags(Item.LOOT_TAG.category_damage)
 item:clear_callbacks()
 
 -- Является ли жертва элитой (актёр + элитный флаг). Босса добивать нельзя (см. ниже),

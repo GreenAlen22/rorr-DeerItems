@@ -30,7 +30,7 @@ local RADIUS_STACK      = 0.5 * 32    -- +0.5 м радиуса за стак с
 local item = Item.new("DeerItems", "NewtonsMechanism")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_loot_tags(Item.LOOT_TAG.category_damage)
 
 item:clear_callbacks()
 

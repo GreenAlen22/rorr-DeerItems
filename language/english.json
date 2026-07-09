@@ -1,4 +1,98 @@
 {
+    "ui": {
+        "options": {
+            "DeerItems": {
+                "header": "Deer Items",
+                "items": {
+                    "header": "Items",
+                    "all": "Enable Deer Items",
+                    "enableAll": "Enable All Items",
+                    "disableAll": "Disable All Items",
+                    "apply": "Apply Item Availability",
+                    "white": {
+                        "header": "White Items",
+                        "AtGMissileMk0": "ATG Missile Mk. 0",
+                        "BountyTag": "Bounty Tag",
+                        "CheatDeath": "Cheat Death",
+                        "Concentration": "Concentration",
+                        "ElephantGun": "Elephant Gun",
+                        "FacetedJade": "Faceted Jade",
+                        "FearEyes": "Fear Eyes",
+                        "GearFeather": "Gear Feather",
+                        "GiftPurity": "Gift Purity",
+                        "GlassMagnifier": "Glass Magnifier",
+                        "GoldBar": "Gold Bar",
+                        "GravityLoop": "Gravity Loop",
+                        "HeavyLungs": "Heavy Lungs",
+                        "IceMixture": "Ice Mixture",
+                        "MagmaFragment": "Magma Fragment",
+                        "MassacreCurse": "Massacre Curse",
+                        "Obereg": "Obereg",
+                        "PainTax": "Pain Tax",
+                        "Rhinoplasty": "Rhinoplasty",
+                        "ShieldGenerator": "Shield Generator",
+                        "SporeOBloom": "Spore O' Bloom",
+                        "Tankbuster": "Tankbuster",
+                        "ThinWings": "Thin Wings",
+                        "UnfocusPrisma": "Unfocus Prisma"
+                    },
+                    "green": {
+                        "header": "Green Items",
+                        "Accountant": "Accountant",
+                        "AssemblyBlueprint": "Assembly Blueprint",
+                        "BloodyRelic": "Bloody Relic",
+                        "BombardierSwarm": "Bombardier Swarm",
+                        "BountyContract": "Bounty Contract",
+                        "CashbackChip": "Cashback Chip",
+                        "CharlatansDie": "Charlatan's Die",
+                        "ContagionBarb": "Contagion Barb",
+                        "CoolGlasses": "Cool Glasses",
+                        "DeepcoreGK2": "Deepcore GK2",
+                        "GoldenSneakers": "Golden Sneakers",
+                        "Golemshot": "Golemshot",
+                        "GreenTea": "Green Tea",
+                        "LaughingFungus": "Laughing Fungus",
+                        "LootFever": "Loot Fever",
+                        "MagicMissile": "Magic Missile",
+                        "NewtonsMechanism": "Newton's Mechanism",
+                        "RadialAlloy": "Radial Alloy",
+                        "ReserveCapacitor": "Reserve Capacitor",
+                        "SeaFossil": "Sea Fossil",
+                        "ShadowShield": "Shadow Shield",
+                        "StandingRequisition": "Standing Requisition",
+                        "Totemetry": "Totemetry"
+                    },
+                    "red": {
+                        "header": "Red Items",
+                        "ArmySurplus": "Army Surplus",
+                        "CascadeFailure": "Cascade Failure",
+                        "Community": "Community",
+                        "DeadWater": "Dead Water",
+                        "Dombra": "Dombra",
+                        "EyeDiamond": "Eye Diamond",
+                        "LeackedCapacitor": "Faulty Conductor",
+                        "IngrownIdol": "Ingrown Idol",
+                        "Maslenitsa": "Maslenitsa",
+                        "MosquitoNet": "Mosquito Net",
+                        "OrbitalLens": "Orbital Lens",
+                        "RavenousVine": "Ravenous Vine",
+                        "RiftBeacon": "Rift Beacon",
+                        "RustMite": "Rust Mite",
+                        "ShineOSun": "Shine O' Sun",
+                        "VioletFrenzy": "Violet Frenzy"
+                    },
+                    "equipment": {
+                        "header": "Equipment",
+                        "Annihilator": "Annihilator",
+                        "Hunger": "Hunger",
+                        "Nightshade": "Nightshade",
+                        "OneArmyMan": "One Army Man",
+                        "TacticalVisor": "Tactical Visor"
+                    }
+                }
+            }
+        }
+    },
     "item": {
         "RiftBeacon": {
             "name": "Rift Beacon",
@@ -34,6 +128,7 @@
         },
         "StandingRequisition": {
             "name": "Standing Requisition",
+            "interact": "Choose",
             "pickup": "Each stage delivers a <b>choice</c> of items.",
             "description": "At the start of each stage, a <b>delivery crate</c> appears nearby offering a <b>choice of 2</c> items - take one, the other is lost. Higher stacks improve the <b>rarity</c> odds.",
             "priority": "<g>Priority</c>"
@@ -92,10 +187,10 @@
             "description": "<y>3%</c> <c_stack>(+2% per stack)</c> chance on hit to call a <r>meteor</c> for <y>800%</c> <c_stack>(+250% per stack)</c> base damage. The more <y>damage you deal</c>, the <y>higher the chance and meteor damage</c> (decays over time).",
             "priority": "<r>High Priority</c>"
         },
-        "FaultyConductor": {
+        "LeackedCapacitor": {
             "name": "Faulty Conductor",
             "pickup": "Periodic <b>wave</c> that <y>energizes allies</c> and empowers <b>drones</c>.",
-            "description": "Every <b>15s</c> <c_stack>(-20% per stack)</c>, release a wave that <y>energizes allies</c> for <b>7s</c>: <y>+30% attack and movement speed</c>. <b>Drones</c> permanently deal <y>+15%</c> <c_stack>(+15% per stack)</c> more damage.",
+            "description": "Every <b>15s</c> <c_stack>(-20% per stack)</c>, release a wave that <y>energizes allies</c> for <b>7s</c>: <y>+30% attack and movement speed</c>. <b>Drones</c> gain <y>+15%</c> <c_stack>(+15% per stack)</c> attack speed.",
             "priority": "<r>High Priority</c>"
         },
         "RavenousVine": {
@@ -113,7 +208,7 @@
         "ArmySurplus": {
             "name": "Army Surplus",
             "pickup": "Gain a <b>combat drone</c> and reinforce your <b>drones</c>.",
-            "description": "Deploy a <b>combat drone</c> that fights on its own. All <b>drones</c> gain <y>+25%</c> <c_stack>(+25% per stack)</c> damage and <y>+15%</c> <c_stack>(+15% per stack)</c> max health.",
+            "description": "Deploy a <b>combat drone</c> that fights on its own. All <b>drones</c> gain <y>+60%</c> <c_stack>(+60% per stack)</c> damage. <g>25%</c> of additional healing received by the player is passed to <b>drones</c>.",
             "priority": "<r>High Priority</c>"
         },
         "CashbackChip": {
@@ -235,8 +330,8 @@
         },
         "HeavyLungs": {
             "name": "Heavy Lungs",
-            "pickup": "Grants a <g>shield</c> per <b>drone</c> and reinforces <b>drones</c>.",
-            "description": "Grants a <g>shield</c> equal to <g>5%</c> of your <g>maximum HP</c> for each <b>drone</c>. Increases <b>drone</c> <g>HP</c> and <g>regeneration</c> by <g>10%</c> <c_stack>(+5% per stack)</c>.",
+            "pickup": "Reinforces <b>drones</c>.",
+            "description": "Increases <b>drone</c> <g>maximum health</c> and <g>regeneration</c> by <g>15%</c> <c_stack>(+15% per stack)</c>.",
             "destination": "Pulmonary Complex,\nLife-Support Bay,\nUES PRIME",
             "date": "02.09.2057",
             "story": "A pair of heavy breathing bellows, cast as if from lead - a chore to lift, yet almost silent at work. The engineers on the lower decks fitted them to old repair drones: a machine wearing them lasted longer and shrugged off overloads, as though it had learned to breathe deep and slow.\n\nWe tested them on our own tin cans. A drone with these lungs held under fire far more stubbornly, and around its owner a thin protective film seemed to settle - thicker the more machines circled nearby, as if they shared their own reserve of air with their master.\n\nIn the report I wrote 'pressurization circuit, improves bearer survivability'. To myself I thought otherwise: the one who breathes heavy is the one who is not alone.",
@@ -307,8 +402,8 @@
         },
         "GlassMagnifier": {
             "name": "Glass Magnifier",
-            "pickup": "Increases <y>base damage</c>.",
-            "description": "Increases <y>base damage</c> by <y>5 <c_stack>(+2 per stack)</c>.",
+            "pickup": "Increases <b>drone</c> <y>base damage</c>.",
+            "description": "Increases <b>drone</c> <y>base damage</c> by <y>4</c> <c_stack>(+3 per stack)</c>.",
             "destination": "Archive 7,\nDepartment of Optical Research,\nUES PRIME",
             "date": "14.04.2057",
             "story": "An old magnifier. The brass has darkened, but the glass is clean - as if polished only yesterday.\n\nLook through it and you don't see farther, or larger. You see where it will break. The hairline crack beneath a rivet, the tired grain in a steel beam, the very spot where a thing is already ready to split at a touch. One of our men, studying a lathe through it, muttered: \"It doesn't magnify. It passes sentence.\"\n\nLater he stopped looking at machines. His last notes are about people: whose armor ran thin, whose hand wavered, whose - as he put it - \"smile is hanging by a single thread.\" We put the magnifier away for good - after we found it aimed at a mirror, with him beside it.",
@@ -516,7 +611,7 @@
         "DeepcoreGK2": {
             "name": "Deepcore GK2",
             "pickup": "ROCK AND STONE!",
-            "description": "Gives <y>'Bosco'</c>, which periodically fires at enemies, dealing <y>3% damage</c> and <b>slowing</c> them. Each <b>new enemy</c> hit increases <b>movement speed</c> by <b>0.7%</c> until the end of the stage. Number of targets: <y>2</c> <c_stack>(+2 per stack)</c>, target range: <b>10m</c> <c_stack>(+1m per stack)</c>. Bosco's fire rate depends on <y>attack speed</c>.",
+            "description": "Grants <g>5%</c> shield for each <b>drone</c>. Gives <y>'Bosco'</c>, which periodically fires at enemies, dealing <y>5% damage</c> and <b>slowing</c> them. Number of targets: <y>2</c> <c_stack>(+2 per stack)</c>, target range: <b>10m</c> <c_stack>(+1m per stack)</c>. Bosco's fire rate depends on <y>attack speed</c>.",
             "destination": "9834,\nCortical Fund,\nMars",
             "date": "08.03.2057",
             "story": "Yo, thanks for the drone parts - they fit my boys like a glove. In return I'm sending you a pretty rare piece - not exactly contraband, but getting it was a real pain. A GK-series assault rifle and a (slightly worn) Autonomous Support Drone (A.S.D.) - exclusive gear from the military-mining company in the Hoxxes system! You'll figure out the rifle yourself, you're no fool, but about the drone - damn, even worn-out, I'd have kept it for myself. Most of its functions are gone, but it still has its laser! Can't say for sure, but it's a patented technology that allows it to remain functional almost indefinitely without losing combat potential. Just make sure no one finds out you've got it - the dwarf who sold it to me went through hell to get it.",

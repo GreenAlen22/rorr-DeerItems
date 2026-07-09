@@ -5,7 +5,8 @@
 -- и НЕ управляется как второй персонаж (в отличие от oPDrone + set_player, который делал именно так).
 -- Спавн — проверенным способом из примера Artifact of Assembly:
 --   gm.instance_create_depth(x, y, depth, gm.constants.oDrone1)  → готовый дрон-союзник.
--- Все настоящие дроны/союзники владельца (включая этого) получают +25% урона и +15% макс. HP за стак.
+-- Все настоящие дроны/союзники владельца (включая этого) получают +60% урона за стак.
+-- Часть дополнительного лечения владельца передается дронам.
 
 local sprite = Resources.sprite_load("DeerItems", "item/ArmySurplus", PATH.."assets/sprites/items/sRedItems/ArmySurplus.png", 1, 18, 18)
 
@@ -18,8 +19,9 @@ local oP   = gm.constants.oP
 local DRONE_OBJ = gm.constants.oDrone10 or gm.constants.oDrone1
 
 -- ── Баланс ────────────────────────────────────────────────────────────────────
-local DRONE_DMG_STACK = 0.25    -- +25% урона ВСЕХ дронов за стак
-local DRONE_HP_STACK  = 0.15    -- +15% макс. HP ВСЕХ дронов за стак
+local DRONE_DMG_STACK = 0.60    -- +60% drone damage per stack
+local HEAL_SHARE = 0.25
+local DRONE_RADIUS = 100000
 -- ──────────────────────────────────────────────────────────────────────────────
 
 local g_team_stack = {}   -- стаки предмета по командам — для хука усиления дронов
@@ -51,6 +53,42 @@ local function ensure_drone(actor)
     data.inst  = inst
 end
 
+local function heal_drones(actor, amount)
+    if amount <= 0 then return end
+
+    local found = List.wrap(actor:find_characters_circle(actor.x, actor.y, DRONE_RADIUS, false, actor.team, true))
+    for _, char in ipairs(found) do
+        if char ~= actor and char.object_index ~= oP then
+            char:heal(amount)
+        end
+    end
+end
+
+local function share_bonus_healing(actor)
+    local data = actor:get_data("ArmySurplus", GUID)
+    local hp = actor.hp
+    local maxhp = actor.maxhp
+    if not hp or not maxhp then return end
+
+    if data.as_prev_hp == nil or data.as_prev_maxhp ~= maxhp then
+        data.as_prev_hp = hp
+        data.as_prev_maxhp = maxhp
+        return
+    end
+
+    local gained = hp - data.as_prev_hp
+    if gained > 0 then
+        local expected_regen = math.max(0, actor.hp_regen or 0)
+        local bonus_heal = gained - expected_regen
+        if bonus_heal > 0 then
+            heal_drones(actor, bonus_heal * HEAL_SHARE)
+        end
+    end
+
+    data.as_prev_hp = actor.hp
+    data.as_prev_maxhp = maxhp
+end
+
 item:onStatRecalc(function(actor, stack)
     if stack > 0 then g_team_stack[actor.team] = stack end
 end)
@@ -58,6 +96,9 @@ end)
 item:onAcquire(function(actor, stack)
     g_team_stack[actor.team] = stack
     ensure_drone(actor)
+    local data = actor:get_data("ArmySurplus", GUID)
+    data.as_prev_hp = actor.hp
+    data.as_prev_maxhp = actor.maxhp
 end)
 
 item:onRemove(function(actor, stack)
@@ -76,9 +117,10 @@ item:onPostStep(function(actor, stack)
     if stack <= 0 then return end
     g_team_stack[actor.team] = stack
     ensure_drone(actor)
+    share_bonus_healing(actor)
 end)
 
--- Усиление урона и HP ВСЕХ дронов/союзников владельца — на пересчёте их статов
+-- Усиление урона ВСЕХ дронов/союзников владельца — на пересчёте их статов
 -- (приём из HeavyLungs: ванильные дроны не зовут item:onStatRecalc, ловим их в хуке).
 -- Наш развёрнутый oDrone1 — тоже дрон, поэтому усиливается этим же хуком (как и задумано).
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
@@ -86,5 +128,4 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     local s = g_team_stack[self.team]
     if not s or s <= 0 then return end
     self.damage = self.damage * (1 + DRONE_DMG_STACK * s)
-    self.maxhp  = self.maxhp  * (1 + DRONE_HP_STACK  * s)
 end)

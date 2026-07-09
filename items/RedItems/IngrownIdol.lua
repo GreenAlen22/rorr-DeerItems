@@ -156,7 +156,7 @@ local function beast_alive(b) return b ~= nil and b:exists() end
 local item = Item.new("DeerItems", "IngrownIdol")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.rare)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_loot_tags(Item.LOOT_TAG.category_damage)
 item:clear_callbacks()
 
 -- Кормим идол убийствами (подношения зависят от типа врага и минуты забега).

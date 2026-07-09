@@ -1,5 +1,5 @@
 -- DeerItems-DeepcoreGK2
--- Призывает дрона, который вращается вокруг игрока, находит врагов и наносит небольшой урон, а также увеличевает скорость игрока. Кол-во целей и радиус зависят от стаков.
+-- Призывает Bosco, который стреляет по врагам и замедляет их. Кол-во целей и радиус зависят от стаков.
 
 -- Загружаем спрайт дрона
 -- Загружаем спрайт предмета
@@ -12,14 +12,24 @@ local GUID = _ENV["!guid"]
 local BLEND = Color(0x221f00)
 local oP = gm.constants.oP
 
--- Прибавка к скорости движения за каждого УНИКАЛЬНОГО подбитого моба (1 моб = 1 стак).
--- Накопление сбрасывается при переходе на новую локацию (см. onStageStart внизу).
-local SPEED_PER_HIT = 0.07
-
 -- Замедление цели от выстрела дрона (небольшое): множитель к скорости и длительность в кадрах.
 local SLOW_MULT     = 0.85   -- -15% скорости передвижения цели
 local SLOW_DURATION = 90     -- держится 1.5 сек, обновляется при каждом попадании
-local HIT_DMG_FRAC  = 0.03   -- урон выстрела = 3% урона игрока (коэффициент для fire_direct)
+local HIT_DMG_FRAC  = 0.05   -- урон выстрела = 5% урона игрока (коэффициент для fire_direct)
+local PROC_CHANCE   = 0.20
+local SHIELD_PER_DRONE = 0.05
+local DRONE_FIND_RADIUS = 100000
+
+local function count_drones(actor)
+    local found = List.wrap(actor:find_characters_circle(actor.x, actor.y, DRONE_FIND_RADIUS, false, actor.team, true))
+    local n = 0
+    for _, char in ipairs(found) do
+        if char ~= actor and char.object_index ~= oP then
+            n = n + 1
+        end
+    end
+    return n
+end
 
 -- Создание предмета DeepcoreGK2
 -- Привязка спрайта к предмету
@@ -28,7 +38,7 @@ local HIT_DMG_FRAC  = 0.03   -- урон выстрела = 3% урона игр
 local item = Item.new("DeerItems", "DeepcoreGK2")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_loot_tags(Item.LOOT_TAG.category_healing)
 
 -- Скрытый дебафф замедления, который дрон вешает на цель (иконку не показываем — спрайт не нужен).
 local slowBuff = Buff.new("DeerItems", "DeepcoreSlow")
@@ -40,17 +50,18 @@ slowBuff:onStatRecalc(function(actor, stack)
     actor.pHmax = actor.pHmax * SLOW_MULT
 end)
 
--- Накопленную прибавку к скорости применяем при пересчёте статов: движок при
--- recalculate_stats сбрасывает pHmax к базе, поэтому прямое изменение не сохранялось.
 item:onStatRecalc(function(actor, stack)
-    local bonus = actor:get_data("DeerItems", GUID).bosco_speed
-    if bonus then
-        actor.pHmax = actor.pHmax + bonus
+    if stack > 0 then
+        local n = count_drones(actor)
+        actor:get_data("DeerItems", GUID).bosco_drones = n
+        if n > 0 then
+            actor.maxshield = actor.maxshield + actor.maxhp * SHIELD_PER_DRONE * n
+        end
     end
 end)
 
 -- Создание объекта-дрона Bosco
-local obj = Object.new("Bosco")
+local obj = Object.new("DeerItems", "Bosco")
 obj:set_sprite(droneSprite)
 obj:set_depth(1)
 
@@ -122,7 +133,6 @@ obj:onStep(function(self)
     -- Объекты эффектов и данные владельца берём один раз на выстрел, а не на каждую цель
     local efLineTracer = Object.find("ror-efLineTracer")
     local efSparks = Object.find("ror-efSparks")
-    local pdata = parent:get_data("DeerItems", GUID)
 
     -- Атака ближайших врагов
     local max_targets = 2 + 2 * stack
@@ -147,21 +157,16 @@ obj:onStep(function(self)
         sparks.sprite_index = gm.constants.sSparks1
         sparks.image_blend = BLEND
 
-        -- Копим прибавку к скорости: +1 стак за КАЖДОГО уникального моба (не за каждый удар).
-        -- Множество подбитых в этом этапе мобов храним у владельца; повторные удары по тому же
-        -- мобу скорость не добавляют. Сбрасывается на новой локации (onStageStart).
-        local hit_set = pdata.bosco_hit
-        if not hit_set then hit_set = {}; pdata.bosco_hit = hit_set end
-        if not hit_set[target.id] then
-            hit_set[target.id] = true
-            pdata.bosco_speed = (pdata.bosco_speed or 0) + SPEED_PER_HIT
-        end
-
         -- Наносим урон напрямую цели. damage у fire_direct — КОЭФФИЦИЕНТ (×урон игрока),
-        -- поэтому передаём долю напрямую: 0.03 = 3% урона игрока (раньше тут ошибочно
+        -- поэтому передаём долю напрямую: 0.05 = 5% урона игрока (раньше тут ошибочно
         -- умножали на parent.damage ещё раз → урон шёл «в квадрате»).
-        local attack_info = parent:fire_direct(target, HIT_DMG_FRAC).attack_info
-        attack_info:set_color(BLEND)
+        local hit = parent:fire_direct(target, HIT_DMG_FRAC)
+        if hit and hit.attack_info then
+            hit.attack_info:set_color(BLEND)
+            if math.random() >= PROC_CHANCE then
+                hit.attack_info.proc = false
+            end
+        end
 
         -- Небольшое замедление цели; обновляем длительность при каждом попадании
         target:buff_apply(slowBuff, SLOW_DURATION)
@@ -178,24 +183,26 @@ item:onAcquire(function(actor, stack)
     end
 end)
 
+item:onPostStep(function(actor, stack)
+    if stack <= 0 then return end
+
+    local data = actor:get_data("DeerItems", GUID)
+    data.bosco_count_tick = (data.bosco_count_tick or 0) + 1
+    if data.bosco_count_tick < 15 then return end
+    data.bosco_count_tick = 0
+
+    local n = count_drones(actor)
+    if n ~= data.bosco_drones then
+        data.bosco_drones = n
+        actor:recalculate_stats()
+    end
+end)
+
 -- Когда предмет удаляется — уничтожаем дрона, если предмета больше нет
 item:onRemove(function(actor, stack)
     local data = actor:get_data("DeerItems", GUID)
     if stack <= 1 and data.inst and data.inst:exists() then
         data.inst:destroy()
         data.inst = nil
-    end
-end)
-
--- На новой локации сбрасываем накопленную скорость и список подбитых мобов у всех игроков.
--- Используем vararg-функцию, чтобы не зависеть от числа аргументов колбэка.
-Callback.add(Callback.TYPE.onStageStart, "DeerItems-DeepcoreGK2-reset", function(...)
-    for _, p in ipairs(Instance.find_all(oP)) do
-        local d = p:get_data("DeerItems", GUID)
-        if (d.bosco_speed and d.bosco_speed > 0) or d.bosco_hit then
-            d.bosco_speed = 0
-            d.bosco_hit = {}
-            p:recalculate_stats()
-        end
     end
 end)

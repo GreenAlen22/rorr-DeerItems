@@ -21,7 +21,7 @@ local HOLE_SPEED  = 1.2         -- скорость полёта дыры впе
 
 local RADIUS_SPRITE_SIZE = 200
 local RADIUS_SCALE = (PULL_RADIUS * 2) / RADIUS_SPRITE_SIZE
-local VISUAL_DEPTH = 100000
+local VISUAL_DEPTH = 100
 
 local ANIM_TICK = 4
 local SPAWN_FRAME_FIRST = 0      -- кадры 1-7

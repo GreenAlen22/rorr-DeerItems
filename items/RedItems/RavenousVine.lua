@@ -15,9 +15,8 @@ local radiusSprite = Resources.sprite_load("DeerItems", "particle/RavenousVineRa
 local GUID = _ENV["!guid"]
 
 -- ── Баланс ──────────────────────────────────────────────────────────────────────
-local TILE         = 32     -- px в одном тайле
-local RADIUS_BASE  = 4 * TILE     -- радиус при 1 стаке (4 тайла = 128px)
-local RADIUS_STACK = 1.5 * TILE   -- +1.5 тайла радиуса за каждый доп. стак (+48px)
+local RADIUS_BASE  = 2 * 32     -- радиус при 1 стаке (2 метра = 64px)
+local RADIUS_STACK = 32   -- +1 метра радиуса за каждый доп. стак (+32px)
 local CAP_BASE     = 2      -- потолок учитываемых врагов = CAP_BASE + CAP_STACK*stack
 local CAP_STACK    = 4      -- => стак1=6, стак2=10, стак3=14
 local COUNT_PERIOD = 15     -- как часто пересчитываем врагов рядом, кадров (4 раза/сек)
@@ -88,7 +87,7 @@ end)
 local item = Item.new("DeerItems", "RavenousVine")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.rare)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_loot_tags(Item.LOOT_TAG.category_healing)
 item:clear_callbacks()
 
 -- Главная логика на хосте: пересчёт врагов рядом, накопление эссенции, «цветение».

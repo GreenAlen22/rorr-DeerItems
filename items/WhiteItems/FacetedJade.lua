@@ -21,7 +21,7 @@ local ARMOR_PER_STACK = 45       -- +45 брони за стак, пока щи�
 local item = Item.new("DeerItems", "FacetedJade")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_loot_tags(Item.LOOT_TAG.category_healing)
 
 item:clear_callbacks()
 

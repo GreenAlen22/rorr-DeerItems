@@ -148,7 +148,7 @@ end)
 local item = Item.new("DeerItems", "RiftBeacon")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.rare)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_loot_tags(Item.LOOT_TAG.category_healing)
 item:clear_callbacks()
 
 local function ready_stack_count(actor)

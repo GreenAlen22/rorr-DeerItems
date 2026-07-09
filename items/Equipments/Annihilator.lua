@@ -5,7 +5,7 @@
 
 -- Ассеты (заглушки-шаблоны — замени текстуры/звук по этим путям)
 local sprite       = Resources.sprite_load("DeerItems", "equipment/Annihilator", PATH.."assets/sprites/items/sEquipments/Annihilator.png", 1, 18, 18)
-local chargeSprite = Resources.sprite_load("DeerItems", "particle/AnnihilatorCharge", PATH.."assets/sprites/particle/AnnihilatorCharge.png", 14, 32, 32)
+local chargeSprite = Resources.sprite_load("DeerItems", "particle/AnnihilatorCharge", PATH.."assets/sprites/particle/AnnihilatorCharge.png", 14, 64, 64)
 local exploSprite  = Resources.sprite_load("DeerItems", "particle/AnnihilatorBoom", PATH.."assets/sprites/particle/AnnihilatorBoom.png", 8, 75, 75)
 local zapSprite    = Resources.sprite_load("DeerItems", "particle/AnnihilatorZap", PATH.."assets/sprites/particle/AnnihilatorZap.png", 4, 8, 8)
 local sndLaunch    = Resources.sfx_load("DeerItems", "Annihilator/launch", PATH.."assets/sounds/AnnihilatorLaunch.ogg")
