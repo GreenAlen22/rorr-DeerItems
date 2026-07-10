@@ -6,7 +6,7 @@
 -- Загружаем спрайт эффекта
 local sprite = Resources.sprite_load("DeerItems", "item/GravityLoop", PATH.."assets/sprites/items/sWhiteItems/GravityLoop.png", 1, 16, 16)
 local sound = Resources.sfx_load("DeerItems", "sound/GravityLoop", PATH.."assets/sounds/GravityLoop.ogg")
-local GravityLoopBreack = Resources.sprite_load("DeerItems", "particle/GravityLoopBreack", PATH.."assets/sprites/particle/GravityLoopBreack.png", 9, 32, 32)
+local GravityLoopBreack = Resources.sprite_load("DeerItems", "particle/GravityLoopBreack", PATH.."assets/sprites/particle/GravityLoopBreack.png", 15, 50, 50)
 
 -- ленивый кэш ссылки на сломанную версию (на загрузке может быть ещё не зарегистрирована)
 local deactivate

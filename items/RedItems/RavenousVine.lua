@@ -9,7 +9,7 @@
 
 -- Спрайт предмета (болванка из template). Нова переиспользует готовый Explosive.png. Звук не нужен.
 local sprite      = Resources.sprite_load("DeerItems", "item/RavenousVine", PATH.."assets/sprites/items/sRedItems/RavenousVine.png", 1, 18, 18)
-local bloomSprite = Resources.sprite_load("DeerItems", "particle/RavenousVineBloom", PATH.."assets/sprites/particle/RavenousVineExplosion.png", 15, 66, 66)
+local bloomSprite = Resources.sprite_load("DeerItems", "particle/RavenousVineBloom", PATH.."assets/sprites/particle/RavenousVineExplosion.png", 16, 50, 50)
 local radiusSprite = Resources.sprite_load("DeerItems", "particle/RavenousVineRadius", PATH.."assets/sprites/particle/RavenousVineRadius.png", 12, 100, 100)
 
 local GUID = _ENV["!guid"]
@@ -34,7 +34,6 @@ local HEAL_STACK   = 0.06  -- ...+6% за каждый доп. стак
 -- ──────────────────────────────────────────────────────────────────────────────
 
 local VINE_COLOR = Color(0x577147)
-local RADIUS_SPRITE_SIZE = 200
 local RADIUS_STAGE_FRAMES = 4
 local RADIUS_ANIM_PERIOD = 60
 local BLOOM_FRAMES = 15
@@ -43,7 +42,7 @@ local BLOOM_FRAME_PERIOD = 3
 local function radius_for(stack) return RADIUS_BASE + (stack - 1) * RADIUS_STACK end
 local function diameter_for(stack) return radius_for(stack) * 2 end
 local function cap_for(stack)    return CAP_BASE + CAP_STACK * stack end
-local function radius_texture_scale() return (RADIUS_BASE * 2) / RADIUS_SPRITE_SIZE end
+local function radius_texture_scale() return 1 end
 local function radius_stage_for(ess)
     local frac = math.min(1, math.max(0, (ess or 0) / THRESHOLD))
     if frac < 0.50 then return 0 end
