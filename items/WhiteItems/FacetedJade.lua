@@ -1,6 +1,6 @@
 -- DeerItems-FacetedJade
 -- Граненый нефрит: если не получать урон 5 секунд — даёт +45 брони за стак.
--- Первый же удар «съедает» бонус (броня снимается), и он восстанавливается снова после 5 секунд покоя.
+-- После удара активный бонус держится ещё 3 секунды, затем восстанавливается снова после 5 секунд покоя.
 -- (Адаптация Oddly-shaped Opal из RoR2: щит «вне опасности», только через броню.)
 
 -- Спрайт предмета
@@ -15,6 +15,7 @@ local GUID = _ENV["!guid"]
 
 -- Балансные константы
 local SAFE_FRAMES     = 5 * 60   -- сколько кадров без урона нужно, чтобы щит «зарядился» (5 сек)
+local GRACE_FRAMES    = 3 * 60   -- сколько кадров бонус держится после удара
 local ARMOR_PER_STACK = 45       -- +45 брони за стак, пока щит активен
 
 -- Создание предмета: белый тир, тег «утилита» (защитный)
@@ -28,6 +29,10 @@ item:clear_callbacks()
 -- «Вне опасности», если с последнего полученного урона прошло >= SAFE_FRAMES кадров
 local function is_safe(data)
     return (Global._current_frame - (data.fj_last_hit or -math.huge)) >= SAFE_FRAMES
+end
+
+local function is_bonus_active(data)
+    return is_safe(data) or (data.fj_grace_until or -math.huge) > Global._current_frame
 end
 
 -- Спрайт-щит рисуем ОТДЕЛЬНЫМ объектом ЗА игроком (depth = parent.depth+1 → за спиной),
@@ -67,20 +72,25 @@ end
 item:onAcquire(function(actor, stack)
     local data = actor:get_data("FacetedJade", GUID)
     data.fj_last_hit = Global._current_frame
-    data.fj_was_safe = false
+    data.fj_was_active = false
+    data.fj_grace_until = nil
 end)
 
 -- Запоминаем кадр последнего полученного урона (это сбрасывает «вне опасности»)
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
     -- Игнорируем урон от самого себя (чужие самоповреждающие эффекты не должны сбивать щит)
     if attacker and actor:same(attacker) then return end
-    actor:get_data("FacetedJade", GUID).fj_last_hit = Global._current_frame
+    local data = actor:get_data("FacetedJade", GUID)
+    if is_bonus_active(data) then
+        data.fj_grace_until = Global._current_frame + GRACE_FRAMES
+    end
+    data.fj_last_hit = Global._current_frame
 end)
 
 -- Пока «вне опасности» — даём броню (применяется при каждом пересчёте статов)
 item:onPostStatRecalc(function(actor, stack)
     if stack <= 0 then return end
-    if is_safe(actor:get_data("FacetedJade", GUID)) then
+    if is_bonus_active(actor:get_data("FacetedJade", GUID)) then
         actor.armor = actor.armor + ARMOR_PER_STACK * stack
     end
 end)
@@ -90,16 +100,17 @@ end)
 item:onPostStep(function(actor, stack)
     if stack <= 0 then return end
     local data = actor:get_data("FacetedJade", GUID)
+    local active = is_bonus_active(data)
     local safe = is_safe(data)
-    if safe ~= data.fj_was_safe then
+    if active ~= data.fj_was_active then
         actor:recalculate_stats()
         if safe then
             actor:sound_play(restoreSound, 1.0, 0.95 + math.random() * 0.1)
         end
-        data.fj_was_safe = safe
+        data.fj_was_active = active
     end
     -- Держим щит-объект в актуальном состоянии (за спиной игрока, пока бонус активен)
-    set_shield(actor, data, safe)
+    set_shield(actor, data, active)
 end)
 
 -- При потере предмета — убираем объект-щит (иначе остался бы висеть)

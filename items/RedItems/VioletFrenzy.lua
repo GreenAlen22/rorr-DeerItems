@@ -10,8 +10,9 @@ local sprite = Resources.sprite_load("DeerItems", "item/VioletFrenzy", PATH.."as
 local GUID = _ENV["!guid"]
 
 -- ── НАСТРОЙКИ ──
-local CD_FRAMES   = 30   -- перезарядка умений в берсерке: 0,5 сек = 30 кадров
-local SEC_PER_STACK = 4  -- длительность берсерка: 4 сек за стак (1 стак = 4с, 2 = 8с …)
+local BASE_SECONDS = 8
+local STACK_SECONDS = 6
+local SPEED_MULT  = 1.3
 local TINT        = Color(0x8A2BE2)  -- лиловый (blueviolet, RGB)
 local TINT_ALPHA  = 0.16             -- сила экранной подсветки
 
@@ -35,6 +36,10 @@ buff.is_debuff = false
 buff.max_stack = 1
 buff:clear_callbacks()
 
+buff:onStatRecalc(function(actor, stack)
+    actor.pHmax = actor.pHmax * SPEED_MULT
+end)
+
 -- Безопасное приведение значения GML-функции (true / 1.0 / 0.0) к булеву
 local function truthy(v)
     return v ~= nil and v ~= false and v ~= 0
@@ -55,15 +60,41 @@ item:onKillProc(function(actor, victim, stack)
     if not is_elite_or_boss(victim) then return end
     stack = stack or 1
     local data = actor:get_data(nil, GUID)
-    local full = SEC_PER_STACK * stack * 60
+    local full = (BASE_SECONDS + STACK_SECONDS * (stack - 1)) * 60
     data.berserk = math.max(data.berserk or 0, full)
 end)
 
--- Каждый кадр у держателя: пока берсерк активен — держим перезарядку всех 4 умений ≤ 0,5 сек.
--- Раньше тут писалось несуществующее поле sk.use_next_frame — поэтому −КД и НЕ работал.
--- Правильный метод тулкита — actor:override_active_skill_cooldown(slot, frames): он ставит
--- оставшийся кулдаун. Раз в CD_FRAMES кадров обнуляем кулдаун всех умений → между сбросами
--- они тикают нормально (не «замораживаются»), а ждать готовности приходится не дольше 0,5 сек.
+local function is_berserk(actor)
+    return (actor:get_data(nil, GUID).berserk or 0) > 0
+end
+
+local function reduce_slot_cooldown(actor, slot)
+    local sk = actor:get_active_skill(slot)
+    if not sk then return end
+
+    local cooldown = sk.cooldown or sk.cooldown_base or 0
+    if cooldown <= 0 then return end
+
+    local frame = Global._current_frame or 0
+    local remaining = (sk.use_next_frame or frame) - frame
+    if remaining <= 0 then return end
+
+    local reduced = remaining - cooldown * 0.5
+    actor:override_active_skill_cooldown(slot, math.max(0, math.ceil(reduced)))
+end
+
+local function reduce_other_skills(actor, used_slot)
+    if not is_berserk(actor) then return end
+
+    for _, slot in ipairs({ Skill.SLOT.primary, Skill.SLOT.secondary, Skill.SLOT.utility, Skill.SLOT.special }) do
+        if slot ~= used_slot then
+            reduce_slot_cooldown(actor, slot)
+        end
+    end
+end
+
+-- Каждый кадр у держателя: пока берсерк активен, поддерживаем таймер и визуальный бафф.
+-- Сокращение кулдаунов происходит только в onSecondaryUse/onUtilityUse/onSpecialUse.
 item:onPostStep(function(actor, stack)
     local data = actor:get_data(nil, GUID)
     local t = data.berserk or 0
@@ -74,18 +105,24 @@ item:onPostStep(function(actor, stack)
         actor:buff_apply(buff, 2)
     end
 
-    if (Global._current_frame % CD_FRAMES) == 0 then
-        for i = 0, 3 do
-            actor:override_active_skill_cooldown(i, 0)
-        end
-    end
-
     data.berserk = t - 1
     if data.berserk <= 0 then
         data.berserk = 0
         local n = actor:buff_stack_count(buff)
         if n > 0 then actor:buff_remove(buff, n) end
     end
+end)
+
+item:onSecondaryUse(function(actor, stack, active_skill)
+    reduce_other_skills(actor, Skill.SLOT.secondary)
+end)
+
+item:onUtilityUse(function(actor, stack, active_skill)
+    reduce_other_skills(actor, Skill.SLOT.utility)
+end)
+
+item:onSpecialUse(function(actor, stack, active_skill)
+    reduce_other_skills(actor, Skill.SLOT.special)
 end)
 
 -- Экранная подсветка: лёгкий лиловый оверлей на весь экран локального игрока, пока он в берсерке.

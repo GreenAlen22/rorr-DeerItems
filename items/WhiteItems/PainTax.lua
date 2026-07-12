@@ -10,7 +10,7 @@ local coinSound = Resources.sfx_load("DeerItems", "sound/PainTax", PATH.."assets
 local GUID = _ENV["!guid"]
 
 -- Балансные константы
-local GOLD_PER_STACK = 8     -- золото за стак за каждый удар
+local GOLD_PER_STACK = 6     -- золото за стак за каждый удар
 local SOUND_CHANCE   = 0.15  -- шанс звука при начислении
 local SOUND_COOLDOWN = 60    -- минимум кадров между звуками (анти-спам, 1 сек)
 
@@ -24,13 +24,15 @@ item:clear_callbacks()
 
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
     if stack <= 0 then return end
-    -- Игнорируем урон от самого себя (например, своё же кровотечение)
-    if attacker and actor:same(attacker) then return end
+    if not (attacker and Instance.exists(attacker)) then return end
+    if actor:same(attacker) or actor.team == attacker.team then return end
     -- Золото — только локальному игроку (HUD-золото клиентское)
     if not actor:same(Player.get_client()) then return end
 
     -- Сумма масштабируется глобальным множителем цен — «растёт со временем»
-    local money = GOLD_PER_STACK * stack * gm.cost_get_base_gold_price_scale()
+    local dmg = hit_info and (hit_info.damage or 0) or 0
+    local big_hit_mult = dmg > (actor.maxhp or 0) * 0.25 and 2 or 1
+    local money = GOLD_PER_STACK * stack * big_hit_mult * gm.cost_get_base_gold_price_scale()
     local hud = GM._mod_game_getHUD()
     if hud ~= -4 then
         hud.gold = hud.gold + money

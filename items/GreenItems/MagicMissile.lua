@@ -1,6 +1,7 @@
 -- DeerItems-MagicMissile / "Magic Missile"
 -- Using the primary skill spends one charge and fires a straight arrow in the owner's aim direction.
--- 300% damage (+100% per stack). 4 charges (+2 per stack), recharges 1 charge / 2.5s.
+-- 120% damage (+60% per stack). 4 charges (+2 per stack), recharges 1 charge / 2.5s.
+-- The arrow pierces up to 4 different enemies.
 -- Arrow hits do not proc items and cannot trigger themselves.
 
 local sprite = Resources.sprite_load("DeerItems", "item/MagicMissile", PATH.."assets/sprites/items/sGreenItems/MagicMissile.png", 1, 16, 16)
@@ -11,14 +12,15 @@ local MagicMissileLaunch = Resources.sfx_load("DeerItems", "sound/launch", PATH.
 local GUID  = _ENV["!guid"]
 local BLEND = Color(0xbfe3ff)
 
-local ARROW_BASE  = 3.0
-local ARROW_STACK = 1.0
+local ARROW_BASE  = 1.2
+local ARROW_STACK = 0.6
 local CAP_BASE   = 4
 local CAP_STACK  = 2
 local RECHARGE   = 150
 local ARROW_SPEED = 14
 local ARROW_LIFE  = 45
 local HIT_RADIUS = 12
+local PIERCE_TARGETS = 4
 
 local arrow = Object.new("DeerItems", "MagicMissileArrow")
 arrow:set_sprite(arrowSprite)
@@ -46,8 +48,15 @@ arrow:onStep(function(self)
 
     local enemy_team = self.team == 1 and 2 or 1
     local found = List.wrap(self:find_characters_circle(self.x, self.y, HIT_RADIUS, false, enemy_team, true))
+    local data = self:get_data("MagicMissile", GUID)
+    if not data.hit_targets then data.hit_targets = {} end
+    data.pierce_count = data.pierce_count or 0
+
     for _, target in ipairs(found) do
-        if Instance.exists(target) and self:attack_collision_canhit(target) then
+        if Instance.exists(target) and not data.hit_targets[target.id] and self:attack_collision_canhit(target) then
+            data.hit_targets[target.id] = true
+            data.pierce_count = data.pierce_count + 1
+
             local hit = self.parent:fire_direct(target, self.dmg_coef, self.direction, self.x, self.y)
             if hit and hit.attack_info then
                 hit.attack_info.proc = false
@@ -61,8 +70,10 @@ arrow:onStep(function(self)
                 sp.image_blend = BLEND
             end
 
-            self:destroy()
-            return
+            if data.pierce_count >= PIERCE_TARGETS then
+                self:destroy()
+                return
+            end
         end
     end
 end)

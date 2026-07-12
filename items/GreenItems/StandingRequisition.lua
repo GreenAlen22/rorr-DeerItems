@@ -2,18 +2,13 @@
 
 local sprite = Resources.sprite_load("DeerItems", "item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 18, 18)
 
-local RARE_BASE  = 0.10
-local RARE_STACK = 0.05
-local UNC_BASE   = 0.30
-local UNC_STACK  = 0.05
-
 local CHEST_SPAWN_WEIGHT = 200
 local CHEST_RECONCILE_DELAY = 8
 
 local item = Item.new("DeerItems", "StandingRequisition")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_loot_tags(Item.LOOT_TAG.category_utility, Item.LOOT_TAG.item_blacklist_engi_turrets)
 item:clear_callbacks()
 
 local stage_plans = {}
@@ -53,12 +48,16 @@ local Chest = setmetatable({}, {
 })
 
 local function roll_tier(stack)
-    local r = math.random()
-    local rare = RARE_BASE + RARE_STACK * (stack - 1)
-    local unc  = UNC_BASE + UNC_STACK * (stack - 1)
-    if r < rare then return Item.TIER.rare
-    elseif r < rare + unc then return Item.TIER.uncommon
-    else return Item.TIER.common end
+    local n = math.max(1, stack or 1)
+    local common_weight = 0.79
+    local uncommon_weight = 0.2 * n
+    local rare_weight = 0.01 * n * n
+    local total = common_weight + uncommon_weight + rare_weight
+    local r = math.random() * total
+
+    if r < common_weight then return Item.TIER.common end
+    if r < common_weight + uncommon_weight then return Item.TIER.uncommon end
+    return Item.TIER.rare
 end
 
 local function is_excluded(value, exclude)
@@ -123,6 +122,8 @@ local function collect_stage_plans()
                         stack = stack,
                         a = a.value,
                         b = b.value,
+                        paid_tier = roll_tier(stack),
+                        exclude_item = item.value,
                     }
                 end
             end

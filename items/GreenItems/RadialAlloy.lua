@@ -1,5 +1,5 @@
 -- DeerItems-RadialAlloy
--- При получении урона восстанавливает до 10 (+5 за стак после первого) HP, но не более (урон - 5).
+-- При получении урона восстанавливает до 12 HP за стак, но не более (урон - 5).
 
 -- Загружаем спрайт предмета
 local sprite = Resources.sprite_load("DeerItems", "item/RadialAlloy", PATH.."assets/sprites/items/sGreenItems/RadialAlloy.png", 1, 16, 16)
@@ -22,7 +22,7 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
     if dmg <= 0 then return end
 
     -- Сколько можно восстановить: максимум (урон - 5), не более лимита от стаков
-    local reduction = 10 + 5 * (stack - 1)
+    local reduction = 12 * stack
     local can_reduce = math.max(0, dmg - 5)
     local heal_back = math.min(reduction, can_reduce)
 
