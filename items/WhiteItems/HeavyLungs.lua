@@ -27,9 +27,13 @@ local oP = gm.constants.oP
 local g_team_stack = {}
 local g_prev_stats = {}
 
+local function is_not_drone(char)
+    return DeerItemsCernunnos and DeerItemsCernunnos.is_not_drone and DeerItemsCernunnos.is_not_drone(char)
+end
+
 -- Союзный «персонаж» считается дроном, если это не игрок.
 local function is_drone(char, owner)
-    return char ~= owner and char.object_index ~= oP
+    return char ~= owner and char.object_index ~= oP and not is_not_drone(char)
 end
 
 -- Подсчёт дронов владельца: ищем союзных персонажей по всей арене и отбрасываем игроков.
@@ -126,6 +130,7 @@ end)
 -- любого роста характеристик дрона по ходу забега и не накапливается (база сбрасывается каждый пересчёт).
 gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     if self.object_index == oP then return end
+    if is_not_drone(self) then return end
 
     local s = g_team_stack[self.team]
     if not s or s <= 0 then return end
@@ -139,6 +144,7 @@ end)
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     -- Игроков не трогаем — только их дронов
     if self.object_index == oP then return end
+    if is_not_drone(self) then return end
 
     local s = g_team_stack[self.team]
     if not s or s <= 0 then return end

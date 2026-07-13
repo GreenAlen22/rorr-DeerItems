@@ -20,11 +20,15 @@ local PROC_CHANCE   = 0.20
 local SHIELD_PER_DRONE = 0.05
 local DRONE_FIND_RADIUS = 100000
 
+local function is_not_drone(char)
+    return DeerItemsCernunnos and DeerItemsCernunnos.is_not_drone and DeerItemsCernunnos.is_not_drone(char)
+end
+
 local function count_drones(actor)
     local found = List.wrap(actor:find_characters_circle(actor.x, actor.y, DRONE_FIND_RADIUS, false, actor.team, true))
     local n = 0
     for _, char in ipairs(found) do
-        if char ~= actor and char.object_index ~= oP then
+        if char ~= actor and char.object_index ~= oP and not is_not_drone(char) then
             n = n + 1
         end
     end

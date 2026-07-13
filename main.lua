@@ -51,10 +51,15 @@ local function require_items()
     end
 end
 
-Initialize(function()
-    for _, name in ipairs(path.get_files(PATH.."Interactables")) do
+local function require_folder(folder_path)
+    for _, name in ipairs(path.get_files(folder_path)) do
         require(name)
     end
+end
+
+Initialize(function()
+    require_folder(PATH.."Interactables")
+    require_folder(PATH.."actor")
 
     require_items()
 

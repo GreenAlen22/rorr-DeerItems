@@ -69,6 +69,10 @@ local function drone_owner(drone)
     return as_existing_instance(drone.parent) or as_existing_instance(drone.owner)
 end
 
+local function is_not_drone(char)
+    return DeerItemsCernunnos and DeerItemsCernunnos.is_not_drone and DeerItemsCernunnos.is_not_drone(char)
+end
+
 --==================================================================================================
 -- СОСТОЯНИЕ (на уровне файла — живёт весь забег)
 --==================================================================================================
@@ -178,7 +182,7 @@ item:onPostStep(function(actor, stack)
     local seen = {}
     for _, char in ipairs(found) do
         local owner = drone_owner(char)
-        if char.object_index ~= oP and same_instance(owner, actor) then              -- игроков не трогаем
+        if char.object_index ~= oP and not is_not_drone(char) and same_instance(owner, actor) then              -- игроков не трогаем
             local id = char.id
             seen[id] = true
 
@@ -208,6 +212,7 @@ end)
 gm.post_script_hook(gm.constants.actor_set_dead, function(self, other, result, args)
     if gm._mod_net_isClient() then return end
     if self.object_index == oP then return end       -- игроки — не дроны
+    if is_not_drone(self) then return end
 
     -- Восстанавливаем только дронов, чей реальный владелец держит предмет.
     local owner = drone_owner(self)

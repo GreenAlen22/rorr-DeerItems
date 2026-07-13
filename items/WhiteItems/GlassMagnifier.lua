@@ -13,10 +13,14 @@ local DRONE_RADIUS = 100000
 
 local g_team_stack = {}
 
+local function is_not_drone(char)
+    return DeerItemsCernunnos and DeerItemsCernunnos.is_not_drone and DeerItemsCernunnos.is_not_drone(char)
+end
+
 local function recalc_drones(actor)
     local found = List.wrap(actor:find_characters_circle(actor.x, actor.y, DRONE_RADIUS, false, actor.team, true))
     for _, char in ipairs(found) do
-        if char ~= actor and char.object_index ~= oP then
+        if char ~= actor and char.object_index ~= oP and not is_not_drone(char) then
             char:recalculate_stats()
         end
     end
@@ -58,6 +62,7 @@ end)
 
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     if self.object_index == oP then return end
+    if is_not_drone(self) then return end
     local s = g_team_stack[self.team]
     if not s or s <= 0 then return end
     self.damage = self.damage + DRONE_DMG_BASE + DRONE_DMG_STACK * s

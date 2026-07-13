@@ -38,12 +38,16 @@ end)
 -- Текущее число стаков предмета по командам — для глобального хука усиления дронов.
 local g_team_stack = {}
 
+local function is_not_drone(char)
+    return DeerItemsCernunnos and DeerItemsCernunnos.is_not_drone and DeerItemsCernunnos.is_not_drone(char)
+end
+
 -- Принудительный пересчёт дронов владельца (их урон множит хук на ИХ пересчёте,
 -- поэтому при смене числа стаков их надо пересчитать вручную).
 local function recalc_drones(actor)
     local found = List.wrap(actor:find_characters_circle(actor.x, actor.y, DRONE_RADIUS, false, actor.team, true))
     for _, char in ipairs(found) do
-        if char ~= actor and char.object_index ~= oP then
+        if char ~= actor and char.object_index ~= oP and not is_not_drone(char) then
             char:recalculate_stats()
         end
     end
@@ -105,6 +109,7 @@ end)
 -- тот же приём, что в HeavyLungs.lua.
 gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
     if self.object_index == oP then return end
+    if is_not_drone(self) then return end
     local s = g_team_stack[self.team]
     if not s or s <= 0 then return end
     self.attack_speed = self.attack_speed * (1 + DRONE_AS_STACK * s)
