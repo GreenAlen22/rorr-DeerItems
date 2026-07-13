@@ -74,13 +74,22 @@ local function reduce_slot_cooldown(actor, slot)
 
     local cooldown = sk.cooldown or sk.cooldown_base or 0
     if cooldown <= 0 then return end
+    if not sk.cooldown_stopwatch or not actor:stopwatch_is_active(sk.cooldown_stopwatch) then return end
+
+    local remaining = actor:stopwatch_get_duration_remaining(sk.cooldown_stopwatch)
+    if not remaining or remaining <= 0 then return end
+
+    local reduced = math.max(0, math.ceil(remaining - cooldown * 0.5))
+    if reduced <= 0 then
+        actor:override_active_skill_cooldown(slot, 0)
+        return
+    end
 
     local frame = Global._current_frame or 0
-    local remaining = (sk.use_next_frame or frame) - frame
-    if remaining <= 0 then return end
-
-    local reduced = remaining - cooldown * 0.5
-    actor:override_active_skill_cooldown(slot, math.max(0, math.ceil(reduced)))
+    local duration = actor:stopwatch_get_duration(sk.cooldown_stopwatch) or cooldown
+    local ready_frame = frame + reduced
+    actor:stopwatch_stop(sk.cooldown_stopwatch)
+    actor:stopwatch_start(sk.cooldown_stopwatch, ready_frame, ready_frame - duration)
 end
 
 local function reduce_other_skills(actor, used_slot)

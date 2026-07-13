@@ -8,12 +8,13 @@ M.SPAWN_COST = 25
 
 local CHEST_SPAWN_RARITY = 1
 local CHEST_ANIM_DELAY = 10
-local GOLDEN_CHEST_BASE_COST = 400
+local PAID_CHOICE_BASE_COST = 200
 
 local CAPSULE_A_X = 31
 local CAPSULE_B_X = 62
 local CAPSULE_Y = 21
 local PRICE_TEXT_Y = -54
+local PRICE_TEXT_SCALE = 2.5
 local PRICE_HINT_X_RADIUS = 64
 local PRICE_HINT_TOP = 72
 local PRICE_HINT_BOTTOM = 32
@@ -69,12 +70,12 @@ local function item_from_contents(inst, index)
     return Item.wrap(item_id)
 end
 
-local function golden_chest_cost()
-    return math.floor(GOLDEN_CHEST_BASE_COST * gm.cost_get_base_gold_price_scale() + 0.5)
+local function paid_choice_cost()
+    return math.floor(PAID_CHOICE_BASE_COST * gm.cost_get_base_gold_price_scale() + 0.5)
 end
 
 local function refresh_cost(inst)
-    inst.cost = (inst.sr_chosen or 0) <= 0 and 0 or golden_chest_cost()
+    inst.cost = (inst.sr_chosen or 0) <= 0 and 0 or paid_choice_cost()
 end
 
 local function sync_contents_later(inst)
@@ -136,6 +137,18 @@ local function set_paid_contents(inst)
     set_chest_contents(inst, paid_choice_ids(inst))
 end
 
+local function refresh_contents_for_phase(inst)
+    local chosen = inst.sr_chosen or 0
+    if chosen == 0 then
+        set_initial_contents(inst)
+    elseif chosen == 1 then
+        set_paid_contents(inst)
+    else
+        inst.contents = Array.new()
+        sync_contents_later(inst)
+    end
+end
+
 local function actor_can_pay(actor, cost)
     return actor and Instance.exists(actor) and ((actor.gold or 0) >= cost)
 end
@@ -148,11 +161,9 @@ local function draw_price_hint(inst)
     if (frame - (data.price_hint_frame or -9999)) > 1 then return end
 
     local text = "$"..tostring(inst.cost or 0)
-    local x = inst.x - (#text * 3)
+    local x = inst.x - (#text * 3 * PRICE_TEXT_SCALE)
     local y = inst.y + PRICE_TEXT_Y
-    gm.draw_set_colour(data.price_hint_can_pay and Color.TEXT_YELLOW or Color.TEXT_RED)
-    gm.draw_text(x, y, text)
-    gm.draw_set_colour(Color.WHITE)
+    gm.draw_text_transformed_color(x, y, text, PRICE_TEXT_SCALE, PRICE_TEXT_SCALE, 0, Color.TEXT_YELLOW, Color.TEXT_YELLOW, Color.TEXT_YELLOW, Color.TEXT_YELLOW, 1)
 end
 
 local function update_price_hint(inst)
@@ -292,6 +303,10 @@ chest_obj:onCreate(function(self)
     self.sr_chosen = 0
 end)
 
+chest_obj:onDestroy(function(self)
+    self:instance_destroy_sync()
+end)
+
 chest_obj:onCheckCost(function(self, actor)
     refresh_cost(self)
     local chosen = self.sr_chosen or 0
@@ -367,6 +382,8 @@ chest_obj:onStep(function(self)
             return
         end
 
+        refresh_contents_for_phase(self)
+
         local selected_index = math.floor(self.selection or 0)
         local selected = item_from_contents(self, selected_index)
         if not selected then
@@ -430,9 +447,7 @@ chest_obj:onDeserialize(function(self, buffer)
     self.sr_exclude_item = buffer:read_int()
     self.sr_paid_slot = buffer:read_byte()
     self.sr_chosen = buffer:read_byte()
-    if (self.sr_chosen or 0) == 0 then
-        set_initial_contents(self)
-    end
+    refresh_contents_for_phase(self)
 end)
 
 M.object = chest_obj

@@ -3,7 +3,7 @@
 local sprite = Resources.sprite_load("DeerItems", "item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 18, 18)
 
 local CHEST_SPAWN_WEIGHT = 200
-local CHEST_RECONCILE_DELAY = 8
+local CHEST_RECONCILE_DELAYS = { 8, 60 }
 
 local item = Item.new("DeerItems", "StandingRequisition")
 item:set_sprite(sprite)
@@ -161,10 +161,9 @@ local function reconcile_chests()
     local free = {}
 
     for _, chest in ipairs(chests) do
-        if chest.sr_chosen == 1 then
-            -- Nothing to assign.
-        elseif (chest.sr_owner_id or -1) >= 0 and not by_owner[chest.sr_owner_id] then
-            by_owner[chest.sr_owner_id] = chest
+        local owner_id = chest.sr_owner_id or -1
+        if owner_id >= 0 and not by_owner[owner_id] then
+            by_owner[owner_id] = chest
         else
             free[#free + 1] = chest
         end
@@ -178,7 +177,15 @@ local function reconcile_chests()
             chest = table.remove(free, 1) or spawn_fallback_chest(plan, i)
             by_owner[plan.owner_id] = chest
         end
-        Chest.apply_plan(chest, plan)
+        if (chest.sr_chosen or 0) == 0
+        and (
+            (chest.sr_owner_id or -1) ~= plan.owner_id
+            or (chest.sr_choice_a or -1) < 0
+            or (chest.sr_choice_b or -1) < 0
+        )
+        then
+            Chest.apply_plan(chest, plan)
+        end
     end
 
     for owner_id, chest in pairs(by_owner) do
@@ -198,7 +205,9 @@ local function schedule_reconcile()
     local frame = Global._current_frame or 0
     if reconcile_scheduled_frame == frame then return end
     reconcile_scheduled_frame = frame
-    Alarm.create(reconcile_chests, CHEST_RECONCILE_DELAY)
+    for _, delay in ipairs(CHEST_RECONCILE_DELAYS) do
+        Alarm.create(reconcile_chests, delay)
+    end
 end
 
 gm.post_script_hook(gm.constants.run_create, function()

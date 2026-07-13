@@ -1,7 +1,6 @@
 -- DeerItems-Concentration
--- Концентрация: если не получать урон 5 секунд — следующая атака бьёт на +60% за стак сильнее.
--- После усиленного удара эффект тратится — снова нужно 5 секунд без урона.
--- (Альтернатива Oddly-shaped Opal: тот же триггер «вне опасности», но в атаку, а не в защиту.)
+-- Charges after SAFE_FRAMES; incoming damage does not reset it.
+-- The charge is spent only when the actor deals positive hit damage.
 
 -- Спрайт предмета
 -- Партикл готовности усиленного удара
@@ -35,15 +34,12 @@ item:onAcquire(function(actor, stack)
     data.cc_was_ready = false
 end)
 
--- Получение урона сбрасывает зарядку
-item:onDamagedProc(function(actor, attacker, stack, hit_info)
-    if attacker and actor:same(attacker) then return end
-    actor:get_data("Concentration", GUID).cc_last_hit = Global._current_frame
-end)
-
 -- Усиленный удар: при попадании, если заряжено — добавляем +60%/стак отдельным хитом
 item:onHitProc(function(actor, victim, stack, hit_info)
     if stack <= 0 then return end
+    local dmg = hit_info and (hit_info.damage or 0) or 0
+    if dmg <= 0 then return end
+
     local data = actor:get_data("Concentration", GUID)
     if not is_ready(data) then return end
 
@@ -51,7 +47,6 @@ item:onHitProc(function(actor, victim, stack, hit_info)
     -- но заряд тратим на всех клиентах, иначе партикл/звук готовности рассинхронятся.
     if gm._mod_net_isHost() then
         local base = actor.damage or 0
-        local dmg = hit_info and (hit_info.damage or 0) or 0
         if base > 0 and dmg > 0 then
             -- coef переводит «+60%/стак от урона этого попадания» в коэффициент fire_direct
             local coef = (DMG_PER_STACK * stack * dmg) / base
