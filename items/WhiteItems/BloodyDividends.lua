@@ -1,11 +1,11 @@
--- DeerItems-PainTax
+-- DeerItems-BloodyDividends
 -- Болевой тариф: при получении урона от врага даёт золото (8 за стак за удар), растёт со временем.
 -- (Адаптация Roll of Pennies из RoR2.)
 
 -- Спрайт предмета
 -- Звук монеты (редкий шанс + защита от спама)
-local sprite = Resources.sprite_load("DeerItems", "item/PainTax", PATH.."assets/sprites/items/sWhiteItems/PainTax.png", 1, 18, 18)
-local coinSound = Resources.sfx_load("DeerItems", "sound/PainTax", PATH.."assets/sounds/PainTax.ogg")
+local sprite = Resources.sprite_load("DeerItems", "item/BloodyDividends", PATH.."assets/sprites/items/sWhiteItems/BloodyDividends.png", 1, 18, 18)
+local coinSound = Resources.sfx_load("DeerItems", "sound/BloodyDividends", PATH.."assets/sounds/BloodyDividends.ogg")
 
 local GUID = _ENV["!guid"]
 
@@ -15,7 +15,7 @@ local SOUND_CHANCE   = 0.15  -- шанс звука при начислении
 local SOUND_COOLDOWN = 60    -- минимум кадров между звуками (анти-спам, 1 сек)
 
 -- Создание предмета: белый тир, тег «утилита»
-local item = Item.new("DeerItems", "PainTax")
+local item = Item.new("DeerItems", "BloodyDividends")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.common)
 item:set_loot_tags(Item.LOOT_TAG.category_utility)
@@ -39,7 +39,7 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
     end
 
     -- Звук с редким шансом и анти-спамом
-    local data = actor:get_data("PainTax", GUID)
+    local data = actor:get_data("BloodyDividends", GUID)
     local now = Global._current_frame
     if (now - (data.pt_last_sound or -SOUND_COOLDOWN)) >= SOUND_COOLDOWN and math.random() < SOUND_CHANCE then
         actor:sound_play(coinSound, 1.0, 0.95 + math.random() * 0.1)

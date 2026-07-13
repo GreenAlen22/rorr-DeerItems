@@ -21,7 +21,7 @@ item:set_tier(Item.TIER.uncommon)
 item:set_loot_tags(Item.LOOT_TAG.category_utility)
 item:clear_callbacks()
 
--- Начисление золота ЛОКАЛЬНОМУ игроку через HUD (как все денежные предметы мода: GoldBar/PainTax/BountyTag)
+-- Начисление золота ЛОКАЛЬНОМУ игроку через HUD (как все денежные предметы мода: GoldBar/BloodyDividends/BountyTag)
 local function give_gold(amount)
     if amount <= 0 then return end
     local hud = GM._mod_game_getHUD()

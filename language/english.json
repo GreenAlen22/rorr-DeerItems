@@ -28,7 +28,7 @@
                         "MagmaFragment": "Magma Fragment",
                         "MassacreCurse": "Massacre Curse",
                         "Obereg": "Obereg",
-                        "PainTax": "Pain Tax",
+                        "BloodyDividends": "Bloody dividends",
                         "Rhinoplasty": "Rhinoplasty",
                         "ShieldGenerator": "Shield Generator",
                         "SporeOBloom": "Spore O' Bloom",
@@ -274,8 +274,8 @@
             "story": "A rifle too heavy for any sane shoulder, bored wide enough to swallow a fist. It was never meant for small things - fire it at a scurrying target and you'll only deafen yourself. But aim it at something vast, something that thinks its size makes it safe, and the round goes in like a verdict.\n\nThe big-game hunter who carried it kept one rule in his log: «Never waste it on what you could simply outrun. Save it for what you cannot.»",
             "priority": "Standard"
         },
-        "PainTax": {
-            "name": "Pain Tax",
+        "BloodyDividends": {
+            "name": "Bloody dividends",
             "pickup": "Gain <y>gold</c> when you are <r>hurt</c>.",
             "description": "On taking <r>damage</c> from an enemy, gain <y>$8</c> <c_stack>(+8 per stack)</c>. <y>Increases over time</c>.",
             "destination": "Collections Floor,\nDebt Office,\nTitan",
