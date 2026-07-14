@@ -8,7 +8,8 @@ local sprite = Resources.sprite_load("DeerItems", "item/CharlatansDie", PATH.."a
 local GUID = _ENV["!guid"]
 
 -- ── Баланс ──
-local CHANCE_STEP = 0.10
+local CHANCE_BASE = 0.35
+local CHANCE_STACK = 0.20
 local EXTRA_STEP  = 0.05
 local MAX_EXTRA_ITEMS = 3
 local RARE_BASE   = 0.08      -- из сработавших — доля редких (иначе необычный)
@@ -36,6 +37,11 @@ end
 local function hyperbolic_chance(step, stack)
     local n = math.max(1, stack or 1)
     return 1 - (1 / (step * n + 1))
+end
+
+local function trigger_chance(stack)
+    local n = math.max(1, stack or 1)
+    return 1 - (1 / (CHANCE_BASE + CHANCE_STACK * (n - 1) + 1))
 end
 
 local function is_excluded(value, exclude)
@@ -82,7 +88,7 @@ item:onInteractableActivate(function(actor, stack, interactable)
     local y = (interactable and interactable.y) or actor.y
     local exclude = { item.value }
 
-    if math.random() > hyperbolic_chance(CHANCE_STEP, stack) then return end
+    if math.random() > trigger_chance(stack) then return end
 
     for i = 1, roll_extra_count(stack) do
         local tier = (math.random() <= (RARE_BASE + RARE_STACK * (stack - 1))) and Item.TIER.rare or Item.TIER.uncommon
