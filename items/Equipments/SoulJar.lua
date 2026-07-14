@@ -1,15 +1,15 @@
--- DeerItems-Nightshade / «Паслён» / "Nightshade"
+-- DeerItems-SoulJar / «Урна душ» / "Soul Jar"
 -- Активка (переработка Goobo Jr из RoR2): призывает теневого КЛОНА-телепортёра.
 -- Цикл, пока жив: невидим -> мигает к ближайшему врагу, появляется чёрной копией игрока
 -- и бьёт взрывом на 133% урона -> тут же уходит в невидимость -> повторяет. ~13с, неуязвим.
 -- Так нет ни «странной ходьбы», ни прохода сквозь текстуры — клон только мигает (телепорт).
 
 -- Ассеты (заглушки-шаблоны — замени текстуры/звук по этим путям)
-local sprite      = Resources.sprite_load("DeerItems", "equipment/Nightshade", PATH.."assets/sprites/items/sEquipments/Nightshade.png", 1, 18, 18)
-local cloneSprite = Resources.sprite_load("DeerItems", "object/NightshadeClone", PATH.."assets/sprites/particle/NightshadeClone.png", 1, 8, 8)
-local sndSummon   = Resources.sfx_load("DeerItems", "Nightshade/summon", PATH.."assets/sounds/NightshadeSummon.ogg")
-local sndHit      = Resources.sfx_load("DeerItems", "Nightshade/hit", PATH.."assets/sounds/NightshadeHit.ogg")
-local burst       = Resources.sprite_load("DeerItems", "particle/NightshadeBurst", PATH.."assets/sprites/particle/NightshadeBurst.png", 1, 8, 8)
+local sprite      = Resources.sprite_load("DeerItems", "equipment/SoulJar", PATH.."assets/sprites/items/sEquipments/SoulJar.png", 1, 18, 18)
+local cloneSprite = Resources.sprite_load("DeerItems", "object/SoulJarClone", PATH.."assets/sprites/particle/SoulJarClone.png", 1, 8, 8)
+local sndSummon   = Resources.sfx_load("DeerItems", "SoulJar/summon", PATH.."assets/sounds/SoulJarSummon.ogg")
+local sndHit      = Resources.sfx_load("DeerItems", "SoulJar/hit", PATH.."assets/sounds/SoulJarHit.ogg")
+local burst       = Resources.sprite_load("DeerItems", "particle/SoulJarBurst", PATH.."assets/sprites/particle/SoulJarBurst.png", 1, 8, 8)
 
 local GUID  = _ENV["!guid"]
 local oP    = gm.constants.oP
@@ -26,7 +26,7 @@ local HIDE_TIME   = 30        -- кадров невидим между удар
 local RETRY_TIME  = 18        -- короткая пауза, если врага рядом нет
 
 -- ── Объект-клон ──
-local obj = Object.new("DeerItems", "NightshadeClone")
+local obj = Object.new("DeerItems", "SoulJarClone")
 obj:set_sprite(cloneSprite)
 obj:set_depth(1)
 obj:clear_callbacks()
@@ -150,7 +150,7 @@ obj:onDeserialize(function(self, buffer)
 end)
 
 -- ── Снаряжение ──
-local equip = Equipment.new("DeerItems", "Nightshade")
+local equip = Equipment.new("DeerItems", "SoulJar")
 equip:set_sprite(sprite)
 equip:set_loot_tags(Item.LOOT_TAG.category_damage)
 equip:set_cooldown(COOLDOWN)
@@ -165,16 +165,16 @@ equip:onUse(function(actor)
     c.phase       = HIDE_TIME
     c.image_alpha = 0
     if actor.sprite_idle then c.sprite_index = actor.sprite_idle end
-    actor:get_data("DeerItems", GUID).nightshade_inst = c
+    actor:get_data("DeerItems", GUID).soul_jar_inst = c
 end)
 
 -- На новой локации убираем оставшихся клонов (страховка к таймеру жизни).
-Callback.add(Callback.TYPE.onStageStart, "DeerItems-Nightshade-clear", function(...)
+Callback.add(Callback.TYPE.onStageStart, "DeerItems-SoulJar-clear", function(...)
     for _, p in ipairs(Instance.find_all(oP)) do
         local d = p:get_data("DeerItems", GUID)
-        if d.nightshade_inst and d.nightshade_inst:exists() then
-            d.nightshade_inst:destroy()
-            d.nightshade_inst = nil
+        if d.soul_jar_inst and d.soul_jar_inst:exists() then
+            d.soul_jar_inst:destroy()
+            d.soul_jar_inst = nil
         end
     end
 end)

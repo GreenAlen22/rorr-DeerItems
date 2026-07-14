@@ -88,7 +88,7 @@ M.categories = {
         items = {
             { id = "Annihilator" },
             { id = "Hunger" },
-            { id = "Nightshade" },
+            { id = "SoulJar" },
             { id = "OneArmyMan" },
             { id = "TacticalVisor" },
         },
