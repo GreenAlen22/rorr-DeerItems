@@ -261,7 +261,7 @@ function M.create_at(x, y, plan)
 
     -- The initial packet must contain the plan. Syncing from onCreate sends the
     -- default -1 choices and leaves clients with an empty, unusable chest.
-    if Net.is_host() then
+    if not Net.is_client() then
         inst:instance_sync()
     end
 
@@ -291,7 +291,7 @@ chest_obj:onCreate(function(self)
 end)
 
 chest_obj:onDestroy(function(self)
-    if Net.is_host() then
+    if not Net.is_client() then
         self:instance_destroy_sync()
     end
 end)
@@ -301,10 +301,10 @@ chest_obj:onCheckCost(function(self, actor)
     local chosen = self.sr_chosen or 0
     if chosen >= 2 then return false end
     if chosen == 0 then
-        return item_from_contents(self, 0) ~= nil and item_from_contents(self, 1) ~= nil
+        return (self.sr_choice_a or -1) >= 0 and (self.sr_choice_b or -1) >= 0
     end
 
-    return item_from_contents(self, 0) ~= nil and actor_can_pay(actor, self.cost or 0)
+    return #paid_choice_ids(self) > 0 and actor_can_pay(actor, self.cost or 0)
 end)
 
 chest_obj:onStep(function(self)

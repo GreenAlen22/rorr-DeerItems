@@ -7,7 +7,7 @@
 -- Даёт 15 брони за стак. Дополнительно даёт +2 (+3 за стак) брони за каждый предмет из списка “защитных”, начиная со второго стака.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/Maslenitsa", PATH.."assets/sprites/items/sRedItems/Maslenitsa.png", 1, 18, 18)
+local sprite = Resources.sprite_load("DeerItems", "item/Maslenitsa", PATH.."assets/sprites/items/sRedItems/Maslenitsa.png", 1, 16, 16)
 
 -- Создание предмета Maslenitsa
 -- Привязка спрайта к предмету

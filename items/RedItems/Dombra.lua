@@ -121,7 +121,9 @@ item:onAttackHit(function(actor, victim, stack, attack_info)
     local sound_pitch = 0.8 + math.random() * 0.5
     actor:sound_play(sound, sound_volume, sound_pitch)
 
-    if gm._mod_net_isHost() then
+    -- В одиночной игре gm._mod_net_isHost() тоже возвращает true, однако
+    -- send_to_all разрешён только сетевому хосту.
+    if Net.is_host() then
         local message = packet_sound:message_begin()
         message:write_instance(actor)
         message:write_float(sound_volume)

@@ -21,6 +21,7 @@ local DRONE_OBJ = gm.constants.oDrone10 or gm.constants.oDrone1
 -- ── Баланс ────────────────────────────────────────────────────────────────────
 local DRONE_DMG_STACK = 0.60    -- +60% drone damage per stack
 local HEAL_SHARE = 0.25
+local HEAL_BUFFER_DURATION = 3 * 60
 local DRONE_RADIUS = 100000
 -- ──────────────────────────────────────────────────────────────────────────────
 
@@ -77,20 +78,26 @@ local function share_bonus_healing(actor)
     if data.as_prev_hp == nil or data.as_prev_maxhp ~= maxhp then
         data.as_prev_hp = hp
         data.as_prev_maxhp = maxhp
-        return
-    end
-
-    local gained = hp - data.as_prev_hp
-    if gained > 0 then
-        local expected_regen = math.max(0, actor.hp_regen or 0)
-        local bonus_heal = gained - expected_regen
-        if bonus_heal > 0 then
-            heal_drones(actor, bonus_heal * HEAL_SHARE)
+    else
+        local gained = hp - data.as_prev_hp
+        if gained > 0 then
+            local expected_regen = math.max(0, actor.hp_regen or 0)
+            local bonus_heal = gained - expected_regen
+            if bonus_heal > 0 then
+                data.as_heal_buffer = (data.as_heal_buffer or 0) + bonus_heal * HEAL_SHARE
+            end
         end
     end
 
     data.as_prev_hp = actor.hp
     data.as_prev_maxhp = maxhp
+
+    data.as_heal_buffer_timer = (data.as_heal_buffer_timer or HEAL_BUFFER_DURATION) - 1
+    if data.as_heal_buffer_timer <= 0 then
+        heal_drones(actor, data.as_heal_buffer or 0)
+        data.as_heal_buffer = 0
+        data.as_heal_buffer_timer = HEAL_BUFFER_DURATION
+    end
 end
 
 item:onStatRecalc(function(actor, stack)
@@ -103,6 +110,8 @@ item:onAcquire(function(actor, stack)
     local data = actor:get_data("ArmySurplus", GUID)
     data.as_prev_hp = actor.hp
     data.as_prev_maxhp = actor.maxhp
+    data.as_heal_buffer = 0
+    data.as_heal_buffer_timer = HEAL_BUFFER_DURATION
 end)
 
 item:onRemove(function(actor, stack)
