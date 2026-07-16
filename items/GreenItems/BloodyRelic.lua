@@ -15,6 +15,12 @@ item:set_loot_tags(Item.LOOT_TAG.category_damage)
 
 -- guid мода: ускоряет get_data (без обхода debug-стека на каждом кадре)
 local GUID = _ENV["!guid"]
+local PROC_CHANCE_PER_STACK = 0.10
+
+local function hyperbolic_chance(stack)
+    if stack <= 0 then return 0 end
+    return 1 - (1 - PROC_CHANCE_PER_STACK) ^ stack
+end
 
 -- Загружаем спрайт баффа
 local buff_sprite = Resources.sprite_load("DeerItems", "buff/BloodyRelic", PATH.."assets/sprites/buffs/BloodyRelic.png", 1, 7, 10)
@@ -71,9 +77,11 @@ buff:onStatRecalc(function(actor, stack)
     actor.attack_speed = actor.attack_speed + ((actor.attack_speed * 0.05) * stack)
 end)
 
--- При попадании атакой с шансом 10% за стак накладываем бафф
+-- При попадании: 20% за первый предмет, затем убывающий прирост шанса.
 item:onHitProc(function(actor, victim, stack, hit_info)
-    if math.random() <= 0.1 * stack then
+    if not gm._mod_net_isHost() then return end
+
+    if math.random() <= hyperbolic_chance(stack) then
         actor:buff_apply(buff, 1)
     end
 end)

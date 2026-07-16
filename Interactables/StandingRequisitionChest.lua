@@ -4,9 +4,6 @@ local GUID = _ENV["!guid"]
 
 local M = {}
 
-M.SPAWN_COST = 25
-
-local CHEST_SPAWN_RARITY = 1
 local CHEST_ANIM_DELAY = 10
 local PAID_CHOICE_BASE_COST = 200
 
@@ -36,18 +33,9 @@ chest_obj:clear_callbacks()
 
 local packet_select = Packet.new()
 
-local chest_card = Interactable_Card.new("DeerItems", "StandingRequisitionChest")
-chest_card.object_id = chest_obj
-chest_card.required_tile_space = 3
-chest_card.spawn_with_sacrifice = false
-chest_card.spawn_cost = M.SPAWN_COST
-chest_card.spawn_weight = 0
-chest_card.default_spawn_rarity_override = CHEST_SPAWN_RARITY
-chest_card.decrease_weight_on_spawn = true
-
-local stages_registered = false
-
 packet_select:onReceived(function(message)
+    if not Net.is_host() then return end
+
     local inst = message:read_instance()
     local selection = message:read_ushort()
     if not Instance.exists(inst) then return end
@@ -83,6 +71,12 @@ local function sync_contents_later(inst)
         Alarm.create(function()
             if Instance.exists(inst) then Helper.sync_crate_contents(inst) end
         end, 1)
+    end
+end
+
+local function sync_state(inst)
+    if Net.is_host() and Instance.exists(inst) then
+        inst:instance_resync()
     end
 end
 
@@ -226,29 +220,7 @@ local function draw_choice_prompt(inst, rel_x)
     gm.draw_sprite_ext(choice_sprite, 0, x, y, ITEM_ICON_SCALE, ITEM_ICON_SCALE, 0, Color.WHITE, 1)
 end
 
-local function stage_has_card(stage)
-    local list = List.wrap(stage.spawn_interactables)
-    return list:contains(chest_card)
-end
-
-function M.register_for_all_stages()
-    if stages_registered then return end
-
-    local stages = Stage.find_all()
-    for _, stage in ipairs(stages) do
-        if not stage_has_card(stage) then
-            stage:add_interactable(chest_card)
-        end
-    end
-
-    stages_registered = true
-end
-
-function M.set_spawn_weight(weight)
-    chest_card.spawn_weight = weight or 0
-end
-
-function M.apply_plan(inst, plan)
+local function configure_plan(inst, plan)
     if not inst or not Instance.exists(inst) or not plan then return end
 
     inst.sr_owner_id = plan.owner_id
@@ -265,6 +237,11 @@ function M.apply_plan(inst, plan)
     set_initial_contents(inst)
 end
 
+function M.apply_plan(inst, plan)
+    configure_plan(inst, plan)
+    sync_state(inst)
+end
+
 function M.get_instances()
     local chests = Instance.find_all(chest_obj)
     local live = {}
@@ -276,14 +253,24 @@ function M.get_instances()
     return live
 end
 
-function M.create_at(x, y)
-    return chest_obj:create(x, y)
+function M.create_at(x, y, plan)
+    if not plan then error("StandingRequisitionChest.create_at requires a plan") end
+
+    local inst = chest_obj:create(x, y)
+    configure_plan(inst, plan)
+
+    -- The initial packet must contain the plan. Syncing from onCreate sends the
+    -- default -1 choices and leaves clients with an empty, unusable chest.
+    if Net.is_host() then
+        inst:instance_sync()
+    end
+
+    return inst
 end
 
 chest_obj:onCreate(function(self)
     self:interactable_init()
     self:interactable_init_name()
-    self:instance_sync()
 
     self.mask_index = chest_sprite
     self.cost = 0
@@ -304,7 +291,9 @@ chest_obj:onCreate(function(self)
 end)
 
 chest_obj:onDestroy(function(self)
-    self:instance_destroy_sync()
+    if Net.is_host() then
+        self:instance_destroy_sync()
+    end
 end)
 
 chest_obj:onCheckCost(function(self, actor)
@@ -312,10 +301,10 @@ chest_obj:onCheckCost(function(self, actor)
     local chosen = self.sr_chosen or 0
     if chosen >= 2 then return false end
     if chosen == 0 then
-        return (self.sr_choice_a or -1) >= 0 and (self.sr_choice_b or -1) >= 0
+        return item_from_contents(self, 0) ~= nil and item_from_contents(self, 1) ~= nil
     end
 
-    return #paid_choice_ids(self) > 0 and actor_can_pay(actor, self.cost or 0)
+    return item_from_contents(self, 0) ~= nil and actor_can_pay(actor, self.cost or 0)
 end)
 
 chest_obj:onStep(function(self)
@@ -395,13 +384,13 @@ chest_obj:onStep(function(self)
 
         local remaining_index = selected_index == 0 and 1 or 0
         if self.sr_chosen == 0 then
-            self.contents = Array.new()
             self.sr_choice_a = -1
             self.sr_choice_b = -1
             self.sr_paid_slot = remaining_index
             self.sr_chosen = 1
             refresh_cost(self)
-            sync_contents_later(self)
+            set_paid_contents(self)
+            sync_state(self)
 
             self.active = 0
             self.image_index = 0
@@ -414,6 +403,8 @@ chest_obj:onStep(function(self)
         self.image_index = 1
         self.image_speed = 0
         self.contents = Array.new()
+        sync_contents_later(self)
+        sync_state(self)
     end
 end)
 
@@ -448,10 +439,21 @@ chest_obj:onDeserialize(function(self, buffer)
     self.sr_paid_slot = buffer:read_byte()
     self.sr_chosen = buffer:read_byte()
     refresh_contents_for_phase(self)
+
+    -- A remote activation parks the client at active=100 while the host
+    -- resolves the choice. The synchronized phase is authoritative and must
+    -- release that waiting state so the chest can be used again.
+    release_activator(self)
+    if self.sr_chosen >= 2 then
+        self.active = 4
+        self.image_index = math.max(1, self.image_index or 0)
+    else
+        self.active = 0
+        self.image_index = 0
+    end
 end)
 
 M.object = chest_obj
-M.card = chest_card
 
 _G.DeerItemsStandingRequisitionChest = M
 

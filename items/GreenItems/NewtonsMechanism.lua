@@ -14,11 +14,11 @@ local sound = Resources.sfx_load("DeerItems", "sound/voltOverload", PATH.."asset
 local GUID = _ENV["!guid"]
 
 -- Балансные константы
-local SHIELD_FRAC       = 0.04   -- даёт щит = 4% от макс. HP
 local ARMOR_PER_STACK   = 5     -- +5 брони за стак, пока есть щит
-local PULSE_PLAYER_DMG  = 1.5    -- пульс: 150% от урона игрока (плоско)
-local PULSE_SHIELD_BASE = 0.9    -- пульс: +90% от макс. щита
-local PULSE_SHIELD_STACK= 0.5    -- +50% от макс. щита за стак сверх первого
+local PULSE_PLAYER_BASE = 1.5    -- пульс: 150% базового урона
+local PULSE_PLAYER_STACK= 1.25   -- +125% базового урона за каждый доп. стак
+local PULSE_SHIELD_BASE = 1.25    -- пульс: +125% от макс. щита
+local PULSE_SHIELD_STACK= 1.0    -- +100% от макс. щита за стак сверх первого
 local STUN_SECONDS      = 1.5    -- длительность оглушения от пульса
 local RADIUS_BASE       = 3 * 32      -- базовый радиус пульса (3 м)
 local RADIUS_STACK      = 0.5 * 32    -- +0.5 м радиуса за стак сверх первого
@@ -34,25 +34,23 @@ item:set_loot_tags(Item.LOOT_TAG.category_damage)
 
 item:clear_callbacks()
 
--- Пересчёт статов: даём щит (4% от макс. HP) и, пока щит есть, +30 брони за стак.
+-- Пока у игрока есть щит из любого источника, даём броню.
 item:onStatRecalc(function(actor, stack)
     if stack <= 0 then return end
-    -- Щит = 4% от макс. HP (база сбрасывается каждый пересчёт, поэтому не накапливается)
-    actor.maxshield = actor.maxshield + actor.maxhp * SHIELD_FRAC
-    -- Броня — только пока у игрока реально есть щит
+    -- Броня — только пока у игрока реально есть щит.
     if (actor.shield or 0) > 0 then
         actor.armor = actor.armor + ARMOR_PER_STACK * stack
     end
 end)
 
--- Оглушающий пульс при пробитии щита: 100% урона игрока + 100%(+10%/стак) от макс. щита.
+-- Оглушающий пульс при пробитии щита: 150%(+75%/стак) базового урона + 100%(+50%/стак) от макс. щита.
 local function release_pulse(actor, stack)
     local radius = RADIUS_BASE + RADIUS_STACK * (stack - 1)
-    -- ПЛОСКИЙ урон по ТЗ: 100% урона игрока + 100%(+10%/стак) от макс. щита.
+    -- ПЛОСКИЙ урон по ТЗ: 150%(+75%/стак) базового урона + 100%(+50%/стак) от макс. щита.
     -- ВНИМАНИЕ: параметр damage у fire_explosion — это КОЭФФИЦИЕНТ (движок умножает его на
     -- actor.damage). Без поправки получалось dmg×actor.damage ≈ урон в квадрате (било слишком сильно).
     -- Поэтому форсим «сырой» урон через use_raw_damage()+set_damage(), как в Домбре.
-    local dmg = actor.damage * PULSE_PLAYER_DMG
+    local dmg = actor.damage * (PULSE_PLAYER_BASE + PULSE_PLAYER_STACK * (stack - 1))
               + actor.maxshield * (PULSE_SHIELD_BASE + PULSE_SHIELD_STACK * (stack - 1))
 
     -- Оба визуальных спрайта nil — рисуем РОВНО ОДИН спрайт вручную (без двойной молнии).
@@ -89,7 +87,9 @@ item:onPostStep(function(actor, stack)
     -- если детект пробития срабатывает несколько кадров подряд (щит «дёргается» у нуля или из-за
     -- пересчёта статов), пульс и его визуал больше не дублируются.
     if prev > 0 and shield <= 0 and (data.nm_cd or 0) <= 0 then
-        release_pulse(actor, stack)
+        if not gm._mod_net_isClient() then
+            release_pulse(actor, stack)
+        end
         data.nm_cd = 30
     end
 

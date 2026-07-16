@@ -2,25 +2,15 @@
 -- Kills feed the idol. At the threshold it summons or refreshes one team Cernunnos.
 
 local sprite = Resources.sprite_load("DeerItems", "item/IngrownIdol", PATH.."assets/sprites/items/sRedItems/IngrownIdol.png", 1, 16, 16)
-local barSprite = Resources.sprite_load("DeerItems", "particle/IngrownIdolCustomBar", PATH.."assets/sprites/particle/TwistedOpinionCustomBar.png", 1, 0, 0)
+local indicatorSprite = Resources.sprite_load("DeerItems", "particle/IngrownIdolIndicator", PATH.."assets/sprites/particle/IngrownIdolIndicator.png", 15, 0, 0)
 
 local GUID = _ENV["!guid"]
 
 local THRESHOLD = 30
+local OFFERINGS_PER_FRAME = 2
+local INDICATOR_MAX_FRAME = 14
 local LATE_MINUTE = 20
-local HUD_ENABLED = false
-
-local HUD_FILL_X = 4
-local HUD_FILL_Y = 8
-local HUD_FILL_W = 50
-local HUD_FILL_H = 6
-local HUD_FRAME_W = 58
-local HUD_X = 314
-local HUD_Y = 36
-local HUD_SKILLBAR_DX = 244
-local HUD_FILL_BG = Color(0x1b1020)
-local HUD_FILL_FG = Color(0xff5533)
-local HUD_FILL_LIVE = Color(0x55ff66)
+local HUD_MARGIN = 8
 
 local function truthy(v)
     return v ~= nil and v ~= false and v ~= 0
@@ -104,54 +94,20 @@ item:onStageStart(function(actor, stack)
     actor:get_data("IngrownIdol", GUID).beast = nil
 end)
 
-local g_bar = { x = 0, y = 0, frame = -1 }
-pcall(function()
-    if not gm.constants.hud_draw_skills then return end
-    gm.pre_script_hook(gm.constants.hud_draw_skills, function(self, other, result, args)
-        local okx, bx = pcall(function() return args[2].value end)
-        local oky, by = pcall(function() return args[3].value end)
-        if okx and oky and type(bx) == "number" and type(by) == "number" then
-            g_bar.x, g_bar.y, g_bar.frame = bx, by, (Global._current_frame or 0)
-        end
-    end)
-end)
-
-local function hud_position()
-    if g_bar.frame == (Global._current_frame or 0) then
-        return g_bar.x + HUD_SKILLBAR_DX, HUD_Y
-    end
-    return HUD_X, HUD_Y
-end
-
 gm.post_script_hook(gm.constants.draw_hud, function()
-    if not HUD_ENABLED then return end
-
     local player = Player.get_client()
     if not actor_exists(player) then return end
     if (player:item_stack_count(item, Item.STACK_KIND.any) or 0) <= 0 then return end
 
     local data = player:get_data("IngrownIdol", GUID)
     local fed = data.fed or 0
-    local frac = math.min(1, fed / THRESHOLD)
     local beast = data.beast
     if DeerItemsCernunnos and DeerItemsCernunnos.get_for_team then
         beast = DeerItemsCernunnos.get_for_team(player.team) or beast
     end
-    local live = beast_alive(beast)
+    local frame = beast_alive(beast) and INDICATOR_MAX_FRAME
+        or math.min(INDICATOR_MAX_FRAME, math.floor(fed / OFFERINGS_PER_FRAME))
+    local x = gm.display_get_gui_width() - 32 - HUD_MARGIN
 
-    local x, y = hud_position()
-    local fx = x + HUD_FILL_X
-    local fy = y + HUD_FILL_Y
-    local fill = math.floor(HUD_FILL_W * frac)
-
-    gm.draw_set_alpha(1)
-    gm.draw_set_colour(HUD_FILL_BG)
-    gm.draw_rectangle(fx, fy, fx + HUD_FILL_W - 1, fy + HUD_FILL_H - 1, false)
-    if fill > 0 then
-        gm.draw_set_colour(live and HUD_FILL_LIVE or HUD_FILL_FG)
-        gm.draw_rectangle(fx, fy, fx + fill - 1, fy + HUD_FILL_H - 1, false)
-    end
-    gm.draw_set_colour(Color.WHITE)
-    gm.draw_sprite(barSprite, 0, x, y)
-    gm.draw_sprite(sprite, 0, x + HUD_FRAME_W + 16, y + 17)
+    gm.draw_sprite(indicatorSprite, frame, x, HUD_MARGIN)
 end)

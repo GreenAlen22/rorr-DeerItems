@@ -40,6 +40,10 @@ oCharge:onCreate(function(self)
 end)
 
 oCharge:onStep(function(self)
+    -- The host owns charge simulation; clients render the projectile replicated by
+    -- projectile_sync instead of advancing a second local copy.
+    if gm._mod_net_isClient() then return end
+
     if not Instance.exists(self.parent) then self:destroy(); return end
     self.timer = self.timer + 1
     self.image_angle = self.direction
@@ -118,6 +122,10 @@ equip:set_loot_tags(Item.LOOT_TAG.category_damage)
 equip:set_cooldown(COOLDOWN)
 
 equip:onUse(function(actor)
+    -- Equipment callbacks run on every peer.  Spawn only on the host so the
+    -- projectile_sync replica is the sole charge visible to clients.
+    if not gm._mod_net_isHost() then return end
+
     actor:sound_play(sndLaunch, 1.0, 0.9 + math.random() * 0.2)
     local c = oCharge:create(actor.x + actor.image_xscale * 16, actor.y - 16)
     c.parent = actor

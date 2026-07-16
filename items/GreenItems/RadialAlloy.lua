@@ -15,6 +15,8 @@ item:set_loot_tags(Item.LOOT_TAG.category_healing)
 
 -- При получении урона: лечим часть обратно
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
+    if gm._mod_net_isClient() then return end
+
     if stack <= 0 then return end
 
     -- Извлекаем количество полученного урона

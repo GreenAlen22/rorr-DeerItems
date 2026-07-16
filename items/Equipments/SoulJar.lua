@@ -18,9 +18,9 @@ local BLACK = Color(0x000000)
 -- ── Настройки баланса ──
 local LIFETIME    = 800       -- время жизни клона, кадры (~13.3 сек; было 20 сек, уменьшено в 1.5 раза)
 local COOLDOWN    = 100       -- кулдаун, секунды (set_cooldown сам умножает на 60 — передаём 100)
-local DMG_COEF    = 1.33      -- урон удара = 133% урона игрока (было 200%, уменьшено в 1.5 раза)
+local DMG_COEF    = 2.33      -- урон удара = 133% урона игрока (было 200%, уменьшено в 1.5 раза)
 local HUNT_RANGE  = 520       -- радиус поиска врага ВОКРУГ ИГРОКА, px
-local STRIKE_AOE  = 140       -- радиус взрыва удара, px
+local STRIKE_AOE  = 160       -- радиус взрыва удара, px
 local SHOW_TIME   = 42        -- кадров клон виден в фазе удара (~0.7 сек)
 local HIDE_TIME   = 30        -- кадров невидим между ударами (~0.5 сек)
 local RETRY_TIME  = 18        -- короткая пауза, если врага рядом нет
@@ -108,6 +108,7 @@ obj:onStep(function(self)
         self.show  = 1
         self.state = 1
         self.phase = SHOW_TIME
+        self:instance_resync()
         puff(self, nil)
         if Instance.exists(parent) then parent:sound_play(sndSummon, 0.7, 1.4 + math.random() * 0.3) end
 
@@ -129,6 +130,7 @@ obj:onStep(function(self)
         self.show = 0
         self.state = 0
         self.phase = HIDE_TIME
+        self:instance_resync()
     end
 end)
 
@@ -165,6 +167,7 @@ equip:onUse(function(actor)
     c.phase       = HIDE_TIME
     c.image_alpha = 0
     if actor.sprite_idle then c.sprite_index = actor.sprite_idle end
+    c:instance_resync()
     actor:get_data("DeerItems", GUID).soul_jar_inst = c
 end)
 

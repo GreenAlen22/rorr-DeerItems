@@ -18,7 +18,20 @@ local sprite_shoot1    = Resources.sprite_load("DeerItems", "actor/CernunnosShoo
 gm.elite_generate_palettes(sprite_palette)
 
 local snd = Resources.sfx_load("DeerItems", "Cernunnos/beast", PATH.."assets/sounds/IngrownIdol.ogg")
-local snd_spawn_death = Resources.sfx_load("DeerItems", "Cernunnos/spawn_death", PATH.."assets/sounds/IngrownIdol.ogg")
+local snd_spawn = Resources.sfx_load("DeerItems", "Cernunnos/spawn", PATH.."assets/sounds/CernunnosSpawn.ogg")
+local snd_hit = Resources.sfx_load("DeerItems", "Cernunnos/hit", PATH.."assets/sounds/CernunnosHit.ogg")
+local snd_death = Resources.sfx_load("DeerItems", "Cernunnos/death", PATH.."assets/sounds/CernunnosDeath.ogg")
+
+local CernunnosSound = {
+    spawn = 1,
+    hit = 2,
+    death = 3,
+}
+local cernunnos_sounds = {
+    [CernunnosSound.spawn] = snd_spawn,
+    [CernunnosSound.hit] = snd_hit,
+    [CernunnosSound.death] = snd_death,
+}
 
 DeerItemsCernunnosConfig = DeerItemsCernunnosConfig or {
     life_frames = 45 * 60,
@@ -55,6 +68,12 @@ statePrimary:clear_callbacks()
 
 local function actor_exists(actor)
     return actor and Instance.exists(actor)
+end
+
+local function play_sound(actor, sound_id, volume, pitch)
+    local sound = cernunnos_sounds[sound_id]
+    if not sound or not actor_exists(actor) then return end
+    actor:sound_play(sound, volume, pitch)
 end
 
 local function data_of(actor)
@@ -284,9 +303,9 @@ cernunnos:onCreate(function(actor)
 
     actor.can_jump = true
     actor.mask_index = sprite_mask
-    actor.sound_spawn = snd_spawn_death
-    actor.sound_hit = gm.constants.wGuardHit
-    actor.sound_death = snd_spawn_death
+    actor.sound_spawn = snd_spawn
+    actor.sound_hit = snd_hit
+    actor.sound_death = snd_death
 
     actor:enemy_stats_init(1, BASE_HP, 50, 0)
     actor.pHmax_base = BASE_SPEED
@@ -309,7 +328,7 @@ cernunnos:onCreate(function(actor)
 
     actor:init_actor_late()
     actor:alarm_set(0, -1)
-    actor:sound_play(snd_spawn_death, 1.0, 1.0)
+    play_sound(actor, CernunnosSound.spawn, 1.0, 1.0)
 end)
 
 cernunnos:onStep(function(actor)
@@ -356,7 +375,7 @@ cernunnos:onStep(function(actor)
 end)
 
 cernunnos:onDestroy(function(actor)
-    actor:sound_play(snd_spawn_death, 1.0, 0.9 + math.random() * 0.2)
+    play_sound(actor, CernunnosSound.death, 1.0, 0.9 + math.random() * 0.2)
     local data = data_of(actor)
     release_taunted_enemies(actor, data)
     set_targettable(actor, false)
@@ -393,6 +412,7 @@ statePrimary:onStep(function(actor, data)
     if not data.fired and actor.image_index >= ATTACK_FRAME then
         data.fired = true
         actor:fire_explosion(actor.x, actor.y + CENTER_Y, ATTACK_W, ATTACK_H, 1, nil, nil, true)
+        play_sound(actor, CernunnosSound.hit, 1.0, 1.0)
     end
 
     actor:skill_util_exit_state_on_anim_end()

@@ -5,7 +5,7 @@
 -- Пока враги рядом, лоза копит эссенцию (тем быстрее, чем больше врагов в радиусе).
 -- Пока враги рядом, лоза периодически бьёт по области; при достижении порога — «цветёт»: большой взрыв + лечение.
 -- Динамика прежняя: смертельна в гуще боя, бесполезна в одиночку. Стаки расширяют
--- радиус И потолок учитываемых врагов (=> заряд быстрее), усиливают урон и лечение.
+-- радиус расширяется со стаками; больше врагов в нём ускоряет заряд и усиливает урон и лечение.
 
 -- Спрайт предмета (болванка из template). Нова переиспользует готовый Explosive.png. Звук не нужен.
 local sprite      = Resources.sprite_load("DeerItems", "item/RavenousVine", PATH.."assets/sprites/items/sRedItems/RavenousVine.png", 1, 18, 18)
@@ -17,8 +17,6 @@ local GUID = _ENV["!guid"]
 -- ── Баланс ──────────────────────────────────────────────────────────────────────
 local RADIUS_BASE  = 2 * 32     -- радиус при 1 стаке (2 метра = 64px)
 local RADIUS_STACK = 32   -- +1 метра радиуса за каждый доп. стак (+32px)
-local CAP_BASE     = 2      -- потолок учитываемых врагов = CAP_BASE + CAP_STACK*stack
-local CAP_STACK    = 4      -- => стак1=6, стак2=10, стак3=14
 local COUNT_PERIOD = 15     -- как часто пересчитываем врагов рядом, кадров (4 раза/сек)
 local DAMAGE_PERIOD = 30    -- как часто лоза бьёт по области, кадров (2 раза/сек)
 
@@ -41,8 +39,13 @@ local BLOOM_FRAME_PERIOD = 3
 
 local function radius_for(stack) return RADIUS_BASE + (stack - 1) * RADIUS_STACK end
 local function diameter_for(stack) return radius_for(stack) * 2 end
-local function cap_for(stack)    return CAP_BASE + CAP_STACK * stack end
-local function radius_texture_scale() return 1 end
+-- Сами кадры имеют origin (100, 100), но их содержимое слегка смещено от кадра к кадру.
+-- Выравниваем содержимое, не меняя исходный размер текстуры.
+local RADIUS_FRAME_OFFSETS = {
+    { 0, 1 }, { 3, 0 }, { 1, 1 }, { 0, 0 },
+    { 2, 1 }, { 3, -1 }, { 2, 1 }, { 1, -6 },
+    { 0, 4 }, { -4, 1 }, { 1, 4 }, { 1, -3 },
+}
 local function radius_stage_for(ess)
     local frac = math.min(1, math.max(0, (ess or 0) / THRESHOLD))
     if frac < 0.50 then return 0 end
@@ -99,16 +102,13 @@ item:onPostStep(function(actor, stack)
     local frame = Global._current_frame
     data.ess = data.ess or 0
 
-    -- Пересчёт врагов рядом раз в COUNT_PERIOD кадров (кэшируем число с кэпом).
+    -- Пересчёт всех врагов рядом раз в COUNT_PERIOD кадров.
     if data.rv_next == nil then data.rv_next = frame end
     if frame >= data.rv_next then
         data.rv_next = frame + COUNT_PERIOD
         local enemy_team = actor.team == 1 and 2 or 1
         local found = List.wrap(actor:find_characters_circle(actor.x, actor.y, radius_for(stack), false, enemy_team, true))
-        local n = #found
-        local cap = cap_for(stack)
-        if n > cap then n = cap end
-        data.rv_count = n
+        data.rv_count = #found
     end
 
     -- Накопление эссенции каждый кадр: тем быстрее, чем больше врагов в радиусе.
@@ -172,9 +172,9 @@ item:onPostDraw(function(actor, stack)
     if stack <= 0 then return end
     local data = actor:get_data("RavenousVine", GUID)
     local frame = radius_frame_for(data.ess)
-    local scale = radius_texture_scale()
+    local offset = RADIUS_FRAME_OFFSETS[frame + 1] or { 0, 0 }
 
-    gm.draw_sprite_ext(radiusSprite, frame, actor.x, actor.y, scale, scale, 0, Color.WHITE, 1)
+    gm.draw_sprite_ext(radiusSprite, frame, actor.x + offset[1], actor.y + offset[2], 1, 1, 0, Color.WHITE, 1)
     gm.draw_set_colour(VINE_COLOR)
     gm.draw_circle(actor.x, actor.y, radius_for(stack), true)
     gm.draw_set_colour(Color.WHITE)

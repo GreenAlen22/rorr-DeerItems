@@ -14,7 +14,8 @@ local CHANCE_BASE  = 0.08
 local CHANCE_STACK = 0.08
 local BLEED_TIME   = 4 * 60     -- кровотечение 4с
 local BLEED_TICK   = 30         -- урон раз в 0.5с
-local BLEED_COEF   = 0.20       -- 20% урона за тик = 40%/с
+local BLEED_TOTAL  = 90       -- 90% урона, наложившего болезнь
+local BLEED_TICKS  = BLEED_TIME / BLEED_TICK
 local SPREAD_BASE  = 1          -- целей распространения при 1 шт.
 local SPREAD_RAD   = 200
 
@@ -34,20 +35,27 @@ item:set_loot_tags(Item.LOOT_TAG.category_damage)
 item:clear_callbacks()
 
 -- Завести/обновить кровотечение на цели
-local function apply_bleed(actor, victim)
+local function apply_bleed(actor, victim, source_damage)
     if not (victim and Instance.exists(victim)) then return end
     if gm.object_is_ancestor(victim.object_index, gm.constants.pActor) ~= 1.0 then return end
+    if not source_damage or source_damage <= 0 then return end
     victim:buff_apply(bleed, BLEED_TIME)
     local data = actor:get_data("ContagionBarb", GUID)
     if not data.bleeds then data.bleeds = {} end
-    data.bleeds[victim.id] = { inst = victim, t = BLEED_TIME, tick = BLEED_TICK }
+    data.bleeds[victim.id] = {
+        inst = victim,
+        t = BLEED_TIME,
+        tick = BLEED_TICK,
+        tick_damage = source_damage * BLEED_TOTAL / BLEED_TICKS,
+        source_damage = source_damage,
+    }
 end
 
 -- При попадании: шанс наложить кровотечение
 item:onHitProc(function(actor, victim, stack, hit_info)
     if not gm._mod_net_isHost() then return end
     if math.random() <= (CHANCE_BASE + CHANCE_STACK * (stack - 1)) then
-        apply_bleed(actor, victim)
+        apply_bleed(actor, victim, hit_info and hit_info.damage)
     end
 end)
 
@@ -64,9 +72,15 @@ item:onPostStep(function(actor, stack)
             data.bleeds[id] = nil
         elseif b.tick <= 0 then
             b.tick = BLEED_TICK
-            -- proc=false: тик кровотечения не прокает предметы (в т.ч. себя)
-            local hit = actor:fire_direct(v, BLEED_COEF)
-            if hit and hit.attack_info then hit.attack_info.proc = false end
+            -- 8 тиков по 15% дают ровно 120% от урона, наложившего болезнь.
+            local base_damage = math.max(actor.damage or 0, 1)
+            local hit = actor:fire_direct(v, b.tick_damage / base_damage, nil, nil, nil, nil, false)
+            if hit and hit.attack_info then
+                hit.attack_info:use_raw_damage()
+                hit.attack_info:set_damage(b.tick_damage)
+                hit.attack_info.proc = false
+                hit.attack_info:set_critical(false)
+            end
         end
     end
 end)
@@ -77,6 +91,7 @@ item:onKillProc(function(actor, victim, stack)
     if not (victim and Instance.exists(victim)) then return end
     local data = actor:get_data("ContagionBarb", GUID)
     if not (data.bleeds and data.bleeds[victim.id]) then return end
+    local source_damage = data.bleeds[victim.id].source_damage
     data.bleeds[victim.id] = nil
 
     local targets = SPREAD_BASE + (stack - 1)
@@ -86,7 +101,7 @@ item:onKillProc(function(actor, victim, stack)
     for _, e in ipairs(found) do
         if picked >= targets then break end
         if Instance.exists(e) and e.id ~= victim.id then
-            apply_bleed(actor, e)
+            apply_bleed(actor, e, source_damage)
             picked = picked + 1
         end
     end
