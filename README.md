@@ -1,5 +1,5 @@
 ![DeerItems baner](https://github.com/GreenAlen22/rorr-DeerItems/blob/main/DeerItemsBaner.png?raw=true)  
-You can see the list of content [here](https://github.com/GreenAlen22/rorr-DeerItems/wiki/En). 
+You can see the list of content [here](https://github.com/GreenAlen22/rorr-DeerItems/wiki). 
 
 ---
 An item mod that adds all sorts of unique (and not so unique) items.
@@ -13,6 +13,9 @@ An item mod that adds all sorts of unique (and not so unique) items.
 With the V3 update, new items and a couple of new artifacts have been added to the mod.
 
 ![new Items List](https://github.com/GreenAlen22/rorr-DeerItems/blob/main/newItemsList.png?raw=true)
+
+Artifact of the Technician - More drones appear in the stage. The more players there are, the more drones appear.
+Artifact of Droneman - When a survivor becomes a drone, it inherits that survivor's items.
 ![artifacts](https://github.com/GreenAlen22/rorr-DeerItems/blob/main/artifacts.png?raw=true)
 
 Added mod options to enable or disable the existence of certain items in the run. Go to Game settings > Mods tab to configurate.
