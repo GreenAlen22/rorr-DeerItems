@@ -68,22 +68,28 @@ end)
 local obj = Object.new("DeerItems", "Bosco")
 obj:set_sprite(droneSprite)
 obj:set_depth(1)
+obj:clear_callbacks()
 
 -- При создании дрона: инициализация параметров
 obj:onCreate(function(self)
     local data = self:get_data(nil, GUID)
     self.persistent = true
     self.image_speed = 0.25
+    self.parent = -4
     data.angle = gm.irandom_range(0, 359)
     data.angle_speed = 50
     data.radius = 100
     data.charge = 0
+    self:projectile_sync(8)
 end)
 
 -- Поведение дрона каждый кадр
 obj:onStep(function(self)
+    if gm._mod_net_isClient() then return end
+
     local data = self:get_data(nil, GUID)
-    local parent = data.parent
+    local parent = self.parent
+    if not parent or not parent:exists() then parent = data.parent end
 
     -- Уничтожаем дрона, если владелец исчез
     if not parent or not parent:exists() then
@@ -177,11 +183,27 @@ obj:onStep(function(self)
     end
 end)
 
+obj:onDestroy(function(self)
+    self:instance_destroy_sync()
+end)
+
+obj:onSerialize(function(self, buffer)
+    buffer:write_instance(self.parent)
+end)
+
+obj:onDeserialize(function(self, buffer)
+    self.parent = buffer:read_instance()
+    self:get_data(nil, GUID).parent = self.parent
+end)
+
 -- Когда игрок получает предмет — создаём дрона, если его ещё нет
 item:onAcquire(function(actor, stack)
+    if gm._mod_net_isClient() then return end
+
     local data = actor:get_data("DeerItems", GUID)
     if not data.inst then
         local inst = obj:create(actor.x, actor.y)
+        inst.parent = actor
         inst:get_data(nil, GUID).parent = actor
         data.inst = inst
     end
@@ -204,6 +226,8 @@ end)
 
 -- Когда предмет удаляется — уничтожаем дрона, если предмета больше нет
 item:onRemove(function(actor, stack)
+    if gm._mod_net_isClient() then return end
+
     local data = actor:get_data("DeerItems", GUID)
     if stack <= 1 and data.inst and data.inst:exists() then
         data.inst:destroy()

@@ -17,6 +17,8 @@ item:set_loot_tags(Item.LOOT_TAG.category_damage)
 item:clear_callbacks()
 -- При убийстве врага срабатывает шанс на создание облака
 item:onKillProc(function(killer, victim, stack)
+    if not gm._mod_net_isHost() then return end
+
     if math.random() < 0.44 then
         -- Создаём ядовитое облако чуть выше трупа
         local cloud = GM.instance_create(victim.x, victim.y - 20, gm.constants.oMushDust)

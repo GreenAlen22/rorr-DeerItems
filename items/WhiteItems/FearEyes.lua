@@ -34,6 +34,8 @@ end
 
 -- При получении урона и снижении HP до 40%: преобразует стаки в сломанные
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
+    if gm._mod_net_isClient() then return end
+
     if actor.hp <= actor.maxhp * 0.40 then
         deactivate = deactivate or Item.find("DeerItems-FearEyesDeactivate")
         local item_used = deactivate

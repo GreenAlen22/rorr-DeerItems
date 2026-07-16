@@ -29,6 +29,8 @@ item:set_loot_tags(Item.LOOT_TAG.category_damage)
 
 -- При убийстве срабатывает шанс 22% создать "солнце" над врагом
 item:onKillProc(function(actor, victim, stack)
+    if not gm._mod_net_isHost() then return end
+
     if math.random() < 0.22 then
         stack = stack or 1
 
@@ -65,6 +67,8 @@ end)
 
 -- Обработка каждого активного солнца: урон по области каждые 12 кадров
 item:onPostStep(function(actor, stack)
+    if not gm._mod_net_isHost() then return end
+
     local data = actor:get_data(nil, GUID)
     if (data.sun_spawn_cooldown or 0) > 0 then
         data.sun_spawn_cooldown = data.sun_spawn_cooldown - 1

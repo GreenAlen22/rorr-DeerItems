@@ -2,7 +2,6 @@
 
 local sprite = Resources.sprite_load("DeerItems", "item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 18, 18)
 
-local CHEST_SPAWN_WEIGHT = 200
 local CHEST_RECONCILE_DELAYS = { 8, 60 }
 
 local item = Item.new("DeerItems", "StandingRequisition")
@@ -133,7 +132,7 @@ local function collect_stage_plans()
     return #stage_plans
 end
 
-local function spawn_fallback_chest(plan, index)
+local function spawn_chest(plan, index)
     local owner = Instance.wrap(plan.owner_id)
     local x, y
     if Instance.exists(owner) then
@@ -144,7 +143,7 @@ local function spawn_fallback_chest(plan, index)
         y = 0
     end
 
-    return Chest.create_at(x, y)
+    return Chest.create_at(x, y, plan)
 end
 
 local function reconcile_chests()
@@ -153,8 +152,6 @@ local function reconcile_chests()
     if #stage_plans == 0 then
         collect_stage_plans()
     end
-
-    Chest.set_spawn_weight(0)
 
     local chests = Chest.get_instances()
     local by_owner = {}
@@ -174,10 +171,14 @@ local function reconcile_chests()
         wanted_owner[plan.owner_id] = true
         local chest = by_owner[plan.owner_id]
         if not chest then
-            chest = table.remove(free, 1) or spawn_fallback_chest(plan, i)
+            chest = table.remove(free, 1)
+            if chest then
+                Chest.apply_plan(chest, plan)
+            else
+                chest = spawn_chest(plan, i)
+            end
             by_owner[plan.owner_id] = chest
-        end
-        if (chest.sr_chosen or 0) == 0
+        elseif (chest.sr_chosen or 0) == 0
         and (
             (chest.sr_owner_id or -1) ~= plan.owner_id
             or (chest.sr_choice_a or -1) < 0
@@ -210,33 +211,12 @@ local function schedule_reconcile()
     end
 end
 
-gm.post_script_hook(gm.constants.run_create, function()
-    Chest.register_for_all_stages()
-end)
-
-gm.pre_script_hook(gm.constants.stage_goto, function(self, other, result, args)
-    if gm._mod_net_isClient() then return end
-
-    Chest.register_for_all_stages()
-
-    local quota = collect_stage_plans()
-    Chest.set_spawn_weight(quota > 0 and CHEST_SPAWN_WEIGHT or 0)
-
-    if quota <= 0 then return end
-
-    local stage = Stage.wrap(args[1].value)
-    local added_points = quota * Chest.SPAWN_COST
-    stage.interactable_spawn_points = stage.interactable_spawn_points + added_points
-
-    Alarm.create(function()
-        stage.interactable_spawn_points = stage.interactable_spawn_points - added_points
-    end, 1)
-end)
-
 item:onStageStart(function()
     if gm._mod_net_isClient() then return end
-    if #stage_plans == 0 then
-        collect_stage_plans()
-    end
+
+    local frame = Global._current_frame or 0
+    if reconcile_scheduled_frame == frame then return end
+
+    collect_stage_plans()
     schedule_reconcile()
 end)

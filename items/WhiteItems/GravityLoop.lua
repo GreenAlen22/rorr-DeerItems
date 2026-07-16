@@ -22,6 +22,8 @@ item:set_loot_tags(Item.LOOT_TAG.category_healing)
 
 -- Обработка триггера при получении урона
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
+    if gm._mod_net_isClient() then return end
+
     -- Срабатывает, если текущее HP упало до 25% или ниже
     if actor.hp <= actor.maxhp * 0.35 then
         -- Лечение на 70% от максимального HP

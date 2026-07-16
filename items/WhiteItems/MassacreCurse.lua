@@ -27,6 +27,8 @@ end)
 
 -- При убийстве увеличиваем счётчик и выдаём бафф при достижении 3
 item:onKillProc(function(actor, victim, stack)
+    if not gm._mod_net_isHost() then return end
+
     massacreBuff = massacreBuff or Buff.find("DeerItems-MassacreCurse")
     local buff = massacreBuff
     local actorData = actor:get_data("MassacreCurse", GUID)

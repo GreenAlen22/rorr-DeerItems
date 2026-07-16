@@ -44,9 +44,14 @@ objShield:clear_callbacks()
 objShield:onCreate(function(self)
     self.parent      = -4
     self.image_alpha = SHIELD_ALPHA
+    self:projectile_sync(8)
 end)
 objShield:onStep(function(self)
-    if not Instance.exists(self.parent) then self:destroy(); return end
+    if not Instance.exists(self.parent) then
+        if gm._mod_net_isClient() then return end
+        self:destroy()
+        return
+    end
     self.x           = self.parent.x
     self.y           = self.parent.y
     self.depth       = self.parent.depth + 1   -- больше depth → рисуется ЗА игроком
@@ -54,6 +59,18 @@ objShield:onStep(function(self)
 end)
 
 -- Включить/выключить щит-объект у владельца (идемпотентно — можно звать каждый кадр)
+objShield:onDestroy(function(self)
+    self:instance_destroy_sync()
+end)
+
+objShield:onSerialize(function(self, buffer)
+    buffer:write_instance(self.parent)
+end)
+
+objShield:onDeserialize(function(self, buffer)
+    self.parent = buffer:read_instance()
+end)
+
 local function set_shield(actor, data, on)
     local sh = data.fj_shield
     if on then
@@ -78,6 +95,8 @@ end)
 
 -- Запоминаем кадр последнего полученного урона (это сбрасывает «вне опасности»)
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
+    if gm._mod_net_isClient() then return end
+
     -- Игнорируем урон от самого себя (чужие самоповреждающие эффекты не должны сбивать щит)
     if attacker and actor:same(attacker) then return end
     local data = actor:get_data("FacetedJade", GUID)
@@ -89,6 +108,8 @@ end)
 
 -- Пока «вне опасности» — даём броню (применяется при каждом пересчёте статов)
 item:onPostStatRecalc(function(actor, stack)
+    if gm._mod_net_isClient() then return end
+
     if stack <= 0 then return end
     if is_bonus_active(actor:get_data("FacetedJade", GUID)) then
         actor.armor = actor.armor + ARMOR_PER_STACK * stack
@@ -98,6 +119,8 @@ end)
 -- Каждый кадр ловим переход «опасно <-> безопасно»: порог завязан на ВРЕМЯ, а не на событие,
 -- поэтому форсим пересчёт статов вручную, чтобы +броня включалась/выключалась вовремя.
 item:onPostStep(function(actor, stack)
+    if gm._mod_net_isClient() then return end
+
     if stack <= 0 then return end
     local data = actor:get_data("FacetedJade", GUID)
     local active = is_bonus_active(data)
@@ -115,5 +138,7 @@ end)
 
 -- При потере предмета — убираем объект-щит (иначе остался бы висеть)
 item:onRemove(function(actor, stack)
+    if gm._mod_net_isClient() then return end
+
     set_shield(actor, actor:get_data("FacetedJade", GUID), false)
 end)

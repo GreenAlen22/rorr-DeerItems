@@ -17,6 +17,8 @@ item:set_loot_tags(Item.LOOT_TAG.category_utility)
 
 -- При начале стадии: воспроизведение звука и начисление золота
 item:onStageStart(function(actor, stack)
+    if not actor:same(Player.get_client()) then return end
+
     -- Воспроизводим звук с рандомизированным питчем
     actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
 

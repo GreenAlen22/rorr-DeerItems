@@ -217,11 +217,15 @@ end)
 
 -- Любое убийство при активном разломе продлевает его на 1с
 item:onKillProc(function(actor, victim, stack)
+    if gm._mod_net_isClient() then return end
+
     extend_zone(actor)
 end)
 
 -- Перезаряд в начале этапа
 item:onStageStart(function(actor, stack)
+    if gm._mod_net_isClient() then return end
+
     local data = actor:get_data("RiftBeacon", GUID)
     data.below_stack_gate = nil
     data.last_extend_frame = nil

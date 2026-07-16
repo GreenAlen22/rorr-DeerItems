@@ -23,6 +23,8 @@ local iceBuff
 item:clear_callbacks()
 -- При попадании атакой срабатывает шанс наложить замедляющий дебафф
 item:onHitProc(function(actor, victim, stack, hit_info)
+    if not gm._mod_net_isHost() then return end
+
     -- Шанс 7% (2+5) и + 5% за стак
 	if math.random() <= 0.02 + (0.05 * stack) then
         -- Звук на цели при наложении: всегда случайные громкость и интонация

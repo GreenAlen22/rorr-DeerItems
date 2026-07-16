@@ -22,10 +22,14 @@ local function extend_zone(actor)
 end
 
 item:onKillProc(function(actor, victim, stack)
+    if gm._mod_net_isClient() then return end
+
     extend_zone(actor)
 end)
 
 item:onStageStart(function(actor, stack)
+    if gm._mod_net_isClient() then return end
+
     active = active or Item.find("DeerItems-RiftBeacon")
 
     local data = actor:get_data("RiftBeacon", GUID)

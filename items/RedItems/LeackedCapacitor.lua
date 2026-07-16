@@ -86,6 +86,8 @@ item:onPostStep(function(actor, stack)
     end
 
     -- Период волны сокращается на 20% за стак (умножаем кадры на 0.8^(stack-1)), но не ниже пола.
+    if gm._mod_net_isClient() then return end
+
     local period = math.max(MIN_PERIOD, math.floor(BASE_PERIOD * (0.8 ^ (stack - 1))))
     local frame  = Global._current_frame
     if data.fc_next == nil then data.fc_next = frame + period end

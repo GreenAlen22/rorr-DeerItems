@@ -57,6 +57,8 @@ end
 -- Таймер ОБНОВЛЯЕТСЯ до полной длительности (не суммируется), как в RoR2:
 -- чтобы держать берсерк, нужно убивать элиту не реже, чем раз в длительность. Это естественный кэп аптайма.
 item:onKillProc(function(actor, victim, stack)
+    if gm._mod_net_isClient() then return end
+
     if not is_elite_or_boss(victim) then return end
     stack = stack or 1
     local data = actor:get_data(nil, GUID)
@@ -65,7 +67,7 @@ item:onKillProc(function(actor, victim, stack)
 end)
 
 local function is_berserk(actor)
-    return (actor:get_data(nil, GUID).berserk or 0) > 0
+    return actor:buff_stack_count(buff) > 0 or (actor:get_data(nil, GUID).berserk or 0) > 0
 end
 
 local function reduce_slot_cooldown(actor, slot)
@@ -105,6 +107,8 @@ end
 -- Каждый кадр у держателя: пока берсерк активен, поддерживаем таймер и визуальный бафф.
 -- Сокращение кулдаунов происходит только в onSecondaryUse/onUtilityUse/onSpecialUse.
 item:onPostStep(function(actor, stack)
+    if gm._mod_net_isClient() then return end
+
     local data = actor:get_data(nil, GUID)
     local t = data.berserk or 0
     if t <= 0 then return end

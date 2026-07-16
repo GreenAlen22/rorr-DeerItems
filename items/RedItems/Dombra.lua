@@ -12,6 +12,20 @@ local sprite     = Resources.sprite_load("DeerItems", "item/Dombra", PATH.."asse
 local wingSprite = Resources.sprite_load("DeerItems", "particle/DombraBerkutWings", PATH.."assets/sprites/particle/DombraBerkutWings.png", 1, 200, 64)
 local sound      = Resources.sfx_load("DeerItems", "sound/Dombra", PATH.."assets/sounds/BerkutDombra.ogg")
 
+-- Звук не синхронизируется движком вместе с actor:sound_play, поэтому хост
+-- отдельно сообщает клиентам о срабатывании, сохраняя одинаковые громкость и тон.
+local packet_sound = Packet.new()
+packet_sound:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local volume = message:read_float()
+    local pitch = message:read_float()
+    if Instance.exists(actor) then
+        actor:sound_play(sound, volume, pitch)
+    end
+end)
+
 -- guid мода выносим один раз — для per-actor кулдауна срабатывания
 local GUID = _ENV["!guid"]
 
@@ -38,6 +52,7 @@ oWing:onCreate(function(self)
     self.image_speed = WING_ANIM_SPD   -- проигрываем анимацию спрайта (на 1-кадровом — статичен)
     self.image_index = 0
     self.parent      = -4
+    self:projectile_sync(8)
 end)
 
 oWing:onStep(function(self)
@@ -67,6 +82,18 @@ end)
 -- ║  Предмет «Домбыра»                                                          ║
 -- ╚═══════════════════════════════════════════════════════════════════════════╝
 -- Привязка спрайта к предмету; тир: красный (легендарный); тег лута: усиление урона.
+oWing:onDestroy(function(self)
+    self:instance_destroy_sync()
+end)
+
+oWing:onSerialize(function(self, buffer)
+    buffer:write_instance(self.parent)
+end)
+
+oWing:onDeserialize(function(self, buffer)
+    self.parent = buffer:read_instance()
+end)
+
 local item = Item.new("DeerItems", "Dombra")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.rare)
@@ -77,6 +104,8 @@ item:clear_callbacks()
 
 -- При попадании атакой: шанс 20% призвать крылья беркута слева и справа
 item:onAttackHit(function(actor, victim, stack, attack_info)
+    if gm._mod_net_isClient() then return end
+
     -- Анти-наложение: onAttackHit зовётся на КАЖДОЕ попадание (многоцелевые/частые атаки за кадр
     -- дают пачку наложенных звуков). Не чаще одного срабатывания раз в PROC_COOLDOWN кадров.
     local data  = actor:get_data("DeerItems", GUID)
@@ -88,7 +117,17 @@ item:onAttackHit(function(actor, victim, stack, attack_info)
     data.dombra_last = frame
 
     -- Звук срабатывания: случайная громкость (0.8–1.2) и высота тона/интонация (0.8–1.3)
-    actor:sound_play(sound, 0.8 + math.random() * 0.4, 0.8 + math.random() * 0.5)
+    local sound_volume = 0.8 + math.random() * 0.4
+    local sound_pitch = 0.8 + math.random() * 0.5
+    actor:sound_play(sound, sound_volume, sound_pitch)
+
+    if gm._mod_net_isHost() then
+        local message = packet_sound:message_begin()
+        message:write_instance(actor)
+        message:write_float(sound_volume)
+        message:write_float(sound_pitch)
+        message:send_to_all()
+    end
 
     -- Визуал: одни большие крылья беркута распахиваются ЗА спиной игрока
     local wing = oWing:create(actor.x, actor.y - WING_Y_OFFSET)

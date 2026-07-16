@@ -10,7 +10,8 @@ local THRESHOLD = 30
 local OFFERINGS_PER_FRAME = 2
 local INDICATOR_MAX_FRAME = 14
 local LATE_MINUTE = 20
-local HUD_MARGIN = 8
+local HUD_SKILLBAR_DX = 224
+local HUD_Y = 56
 
 local function truthy(v)
     return v ~= nil and v ~= false and v ~= 0
@@ -94,7 +95,21 @@ item:onStageStart(function(actor, stack)
     actor:get_data("IngrownIdol", GUID).beast = nil
 end)
 
+local g_bar = { x = 0, frame = -1 }
+pcall(function()
+    if not gm.constants.hud_draw_skills then return end
+    gm.pre_script_hook(gm.constants.hud_draw_skills, function(self, other, result, args)
+        local ok, x = pcall(function() return args[2].value end)
+        if ok and type(x) == "number" then
+            g_bar.x = x
+            g_bar.frame = Global._current_frame or 0
+        end
+    end)
+end)
+
 gm.post_script_hook(gm.constants.draw_hud, function()
+    if g_bar.frame ~= (Global._current_frame or 0) then return end
+
     local player = Player.get_client()
     if not actor_exists(player) then return end
     if (player:item_stack_count(item, Item.STACK_KIND.any) or 0) <= 0 then return end
@@ -107,7 +122,5 @@ gm.post_script_hook(gm.constants.draw_hud, function()
     end
     local frame = beast_alive(beast) and INDICATOR_MAX_FRAME
         or math.min(INDICATOR_MAX_FRAME, math.floor(fed / OFFERINGS_PER_FRAME))
-    local x = gm.display_get_gui_width() - 32 - HUD_MARGIN
-
-    gm.draw_sprite(indicatorSprite, frame, x, HUD_MARGIN)
+    gm.draw_sprite(indicatorSprite, frame, g_bar.x + HUD_SKILLBAR_DX, HUD_Y)
 end)
