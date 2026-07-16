@@ -1,8 +1,8 @@
 ﻿{
 	"name": "DeerItems",
-	"version_number": "3.0.14",
+	"version_number": "3.0.15",
 	"website_url": "https://github.com/GreenAlen22/rorr-DeerItems.git",
-	"description": "A mod with additional items. It currently contains 24 white items, 17 green items, 14 red items, and 5 equipments.",
+	"description": "A mod with additional content. Adds new items, equipment, and more.",
 	"dependencies": [
 		"ReturnOfModding-ReturnOfModding-1.0.74",
 		"ReturnsAPI-ReturnsAPI-0.1.58",
