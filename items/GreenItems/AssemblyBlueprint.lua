@@ -66,7 +66,16 @@ local function same_instance(a, b)
 end
 
 local function drone_owner(drone)
-    return as_existing_instance(drone.parent) or as_existing_instance(drone.owner)
+    local master = as_existing_instance(drone.master)
+    if master and master.object_index == oP then return master end
+
+    local parent = as_existing_instance(drone.parent)
+    if parent and parent.object_index == oP then return parent end
+
+    local owner = as_existing_instance(drone.owner)
+    if owner and owner.object_index == oP then return owner end
+
+    return nil
 end
 
 local function is_not_drone(char)
@@ -121,6 +130,7 @@ local function spawn_drone_copy(src, x, y, owner, hp_frac, lineage)
 
     -- Привязка к владельцу (паттерн из примера турели тулкита)
     inst.parent = owner
+    inst.master = owner
     inst.team   = owner.team
     if owner.level then inst.level = owner.level end
 
@@ -159,12 +169,10 @@ item:onRemove(function(actor, stack)
 end)
 
 -- Поллинг покупок: ищем новых союзных дронов и катим дублирование.
-item:onPostStep(function(actor, stack)
+local function poll_owner_drones(actor, stack)
     if stack <= 0 then return end
 
     -- Спавн — только на хосте
-    if gm._mod_net_isClient() then return end
-
     local state = g_owner_state[actor.id]
     if not state then
         state = { known = {}, started = false, last_poll = -1 }
@@ -201,6 +209,16 @@ item:onPostStep(function(actor, stack)
 
     state.known = seen          -- заменяем набор, отсеивая исчезнувшие id
     state.started = true
+end
+
+Callback.add(Callback.TYPE.onStep, "DeerItems-AssemblyBlueprint-poll", function()
+    if gm._mod_net_isClient() then return end
+
+    for _, actor in ipairs(Instance.find_all(oP)) do
+        if Instance.exists(actor) then
+            poll_owner_drones(actor, actor:item_stack_count(item) or 0)
+        end
+    end
 end)
 
 --==================================================================================================

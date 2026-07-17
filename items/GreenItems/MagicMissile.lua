@@ -135,11 +135,11 @@ item:onPrimaryUse(function(actor, stack, active_skill)
 
     data.charges = data.charges - 1
 
+    actor:sound_play(MagicMissileLaunch, 1.0, 0.9 + math.random() * 0.4)
     local dir = aim_direction(actor)
     local missile = arrow:create(actor.x + gm.lengthdir_x(10, dir), actor.y - 12 + gm.lengthdir_y(10, dir))
     missile.parent = actor
     missile.team = actor.team
     missile.dmg_coef = ARROW_BASE + ARROW_STACK * (stack - 1)
     missile.direction = dir
-    actor:sound_play(MagicMissileLaunch, 1.0, 0.9 + math.random() * 0.4)
 end)

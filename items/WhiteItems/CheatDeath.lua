@@ -60,9 +60,19 @@ local function add_delayed_damage(actor, total)
     table.insert(data.cd_ticks, {
         damage = total / DOT_TICKS,
         ticks = DOT_TICKS,
-        timer = 0,
+        timer = DOT_RATE,
     })
 end
+
+local function clear_delayed_damage(actor)
+    if not actor or not Instance.exists(actor) then return end
+    actor:get_data("CheatDeath", GUID).cd_ticks = nil
+end
+
+-- A remote player's HP is applied by that player's client. Once it dies, the
+-- host must discard its remaining debt too; otherwise a later tick can kill
+-- only the revived client while the host still considers that player alive.
+DeerItemsPlayerDeath.on_host(clear_delayed_damage)
 
 local function is_invincible(actor)
     local invincible = actor.invincible
@@ -76,14 +86,53 @@ local function spawn_damage_text(actor, amount)
 end
 
 local function deal_internal_damage(actor, amount)
-    if gm._mod_net_isClient() or amount <= 0 or actor.hp <= 0 then return end
-    if is_invincible(actor) then return end
+    if amount <= 0 or actor.hp <= 0 or is_invincible(actor) then return false end
 
     actor.hp = actor.hp - amount
     if actor.hp <= 0 then
         actor.hp = -1000000
     end
     spawn_damage_text(actor, amount)
+    return true
+end
+
+-- HP удалённого игрока принадлежит его клиенту. Хост лишь ведёт общий таймер debt и
+-- передаёт владельцу итог первого восстановления и каждый последующий тик.
+local packet_restore = Packet.new()
+local packet_tick = Packet.new()
+
+packet_restore:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local hp = message:read_float()
+    if not Instance.exists(actor) or not actor:same(Player.get_client()) then return end
+    actor.hp = math.min(actor.maxhp, hp)
+end)
+
+packet_tick:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local amount = message:read_float()
+    if not Instance.exists(actor) or not actor:same(Player.get_client()) then return end
+    deal_internal_damage(actor, amount)
+end)
+
+local function send_restore(actor)
+    if not Net.is_host() then return end
+    local message = packet_restore:message_begin()
+    message:write_instance(actor)
+    message:write_float(actor.hp)
+    message:send_to_all()
+end
+
+local function send_tick(actor, amount)
+    if not Net.is_host() then return end
+    local message = packet_tick:message_begin()
+    message:write_instance(actor)
+    message:write_float(amount)
+    message:send_to_all()
 end
 
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
@@ -99,13 +148,25 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
     local frac = math.min(1.0, BASE_FRAC + FRAC_PER_STACK * (stack - 1))
     local total = dmg * frac
 
-    -- Возвращаем отложенную часть HP (удар уже прошёл полностью)...
-    actor:heal(total)
+    local is_client = gm._mod_net_isClient()
+    if is_client and not actor:same(Player.get_client()) then return end
+
+    -- Возвращаем отложенную часть HP в том же кадре. actor:heal() применяется сетевым
+    -- событием позднее, поэтому клиент успевал увидеть полный исходный урон.
+    actor.hp = math.min(actor.maxhp, actor.hp + total)
+
+    -- Локальный игрок получает мгновенную предикцию; сам debt и последующие тики
+    -- рассчитывает только хост.
+    if is_client then return end
+
+    if not actor:same(Player.get_client()) then send_restore(actor) end
     -- ...и списываем её как HP-only debt: это не новый damage event и не прокает on-damaged предметы.
     add_delayed_damage(actor, total)
 end)
 
 Actor:onPostStep("DeerItems-CheatDeathTicks", function(actor)
+    if gm._mod_net_isClient() then return end
+
     local data = actor:get_data("CheatDeath", GUID)
     local ticks = data.cd_ticks
     if not ticks then return end
@@ -114,7 +175,11 @@ Actor:onPostStep("DeerItems-CheatDeathTicks", function(actor)
         local tick = ticks[i]
         tick.timer = tick.timer - 1
         if tick.timer <= 0 then
-            deal_internal_damage(actor, tick.damage)
+            if actor:same(Player.get_client()) then
+                deal_internal_damage(actor, tick.damage)
+            else
+                send_tick(actor, tick.damage)
+            end
             tick.ticks = tick.ticks - 1
             if tick.ticks <= 0 then
                 table.remove(ticks, i)

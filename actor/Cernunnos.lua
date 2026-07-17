@@ -47,6 +47,7 @@ local SIGHT_RANGE = 520
 local FOLLOW_RANGE = 480
 local ATTACK_COOLDOWN = 22
 local ATTACK_FRAME = 3
+local STATE_RESYNC_PERIOD = 30
 local CENTER_Y = -48
 local TAUNT_RANGE = FOLLOW_RANGE / 3
 local TIMER_RING_Y = -150
@@ -140,6 +141,20 @@ local function enter_state(actor, state)
         GM.actor_set_state(actor.value or actor, state.value or state)
     end
 end
+
+local packet_attack = Packet.new()
+local packet_state = Packet.new()
+local sync_network_state
+packet_attack:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local facing = message:read_byte() == 1 and 1 or -1
+    if not actor_exists(actor) then return end
+
+    actor.image_xscale = facing
+    enter_state(actor, statePrimary)
+end)
 
 local function set_targettable(actor, enabled)
     actor.is_targettable = enabled
@@ -346,6 +361,12 @@ cernunnos:onStep(function(actor)
         return
     end
 
+    data.state_resync = (data.state_resync or 0) + 1
+    if data.state_resync >= STATE_RESYNC_PERIOD then
+        data.state_resync = 0
+        if Net.is_host() and sync_network_state then sync_network_state(actor) end
+    end
+
     update_taunted_enemies(actor, data)
     if actor.actor_state_current_id ~= -1 then return end
 
@@ -356,6 +377,12 @@ cernunnos:onStep(function(actor)
         if dist <= ATTACK_RANGE and (data.attack_cd or 0) <= 0 then
             enter_state(actor, statePrimary)
             data.attack_cd = math.max(1, math.floor(ATTACK_COOLDOWN / math.max(0.1, actor.attack_speed or 1)))
+            if Net.is_host() then
+                local message = packet_attack:message_begin()
+                message:write_instance(actor)
+                message:write_byte(actor.image_xscale >= 0 and 1 or 0)
+                message:send_to_all()
+            end
         end
     else
         local owner = data.owner
@@ -404,6 +431,11 @@ statePrimary:onStep(function(actor, data)
     actor:skill_util_fix_hspeed()
     actor:actor_animation_set(sprite_shoot1, 0.22 * math.max(0.1, actor.attack_speed or 1))
 
+    if gm._mod_net_isClient() then
+        actor:skill_util_exit_state_on_anim_end()
+        return
+    end
+
     local target = actor.target
     if actor_exists(target) then
         face(actor, target)
@@ -418,31 +450,68 @@ statePrimary:onStep(function(actor, data)
     actor:skill_util_exit_state_on_anim_end()
 end)
 
-local function configure(inst, owner, stack)
+local function apply_network_config(inst, owner, stack, life)
     local data = data_of(inst)
-    if not actor_exists(data.owner) then
-        data.owner = owner
-    end
+    data.owner = owner
     data.stack = stack or 1
-    data.life = LIFE_FRAMES
+    data.life = life or LIFE_FRAMES
     data[NOT_DRONE_KEY] = true
 
-    inst.parent = data.owner
-    inst.team = owner.team
-    if owner.level then inst.level = owner.level end
+    if actor_exists(owner) then
+        inst.parent = owner
+        inst.team = owner.team
+        if owner.level then inst.level = owner.level end
+    end
 
-    local damage_scale = data.damage_scale or 1
-    local damage_owner = data.owner or owner
-    inst.damage = (damage_owner.damage or 1) * damage_coef(stack) * damage_scale
-    inst.damage_base = inst.damage
     inst.pHmax_base = BASE_SPEED
     inst.pHmax = BASE_SPEED
     inst.can_drop = false
     inst.exp_worth = 0
     inst.gold = 0
-    release_taunted_enemies(inst, data)
     set_targettable(inst, false)
 end
+
+local function configure(inst, owner, stack)
+    local data = data_of(inst)
+    if not actor_exists(data.owner) then data.owner = owner end
+    apply_network_config(inst, data.owner, stack, LIFE_FRAMES)
+
+    local damage_scale = data.damage_scale or 1
+    local damage_owner = data.owner
+    inst.damage = (damage_owner.damage or 1) * damage_coef(stack) * damage_scale
+    inst.damage_base = inst.damage
+    release_taunted_enemies(inst, data)
+end
+
+-- enemyClassic instances already replicate themselves. Only the custom state
+-- needs a packet; manually syncing the whole instance creates a second client
+-- copy of the ally.
+sync_network_state = function(actor)
+    if not Net.is_host() or not actor_exists(actor) then return end
+
+    local data = data_of(actor)
+    if not actor_exists(data.owner) then return end
+
+    local message = packet_state:message_begin()
+    message:write_instance(actor)
+    message:write_instance(data.owner)
+    message:write_ushort(data.stack or 1)
+    message:write_int(data.life or LIFE_FRAMES)
+    message:send_to_all()
+end
+
+packet_state:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local owner = message:read_instance()
+    local stack = message:read_ushort()
+    local life = message:read_int()
+    if not actor_exists(actor) or not actor_exists(owner) then return end
+
+    apply_network_config(actor, owner, stack, life)
+    owner:get_data("IngrownIdol", GUID).beast = actor
+end)
 
 local function alive(inst)
     return actor_exists(inst) and (inst.hp == nil or inst.hp > 0)
@@ -454,12 +523,18 @@ local function spawn(owner, stack)
     local existing = team_beasts[owner.team]
     if alive(existing) then
         configure(existing, owner, stack)
+        sync_network_state(existing)
         return existing
     end
 
     local inst = cernunnos:create(owner.x, owner.y - 16)
     configure(inst, owner, stack)
     team_beasts[owner.team] = inst
+    if Net.is_host() then
+        Alarm.create(function()
+            if alive(inst) then sync_network_state(inst) end
+        end, 1)
+    end
     owner:sound_play(snd, 1.0, 0.8)
     return inst
 end
