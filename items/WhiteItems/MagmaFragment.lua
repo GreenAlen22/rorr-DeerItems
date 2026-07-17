@@ -88,6 +88,7 @@ end)
 Actor:onAttackHit("DeerItems-MagmaFragment-drone", function(drone, victim, hit_info)
     if gm._mod_net_isClient() then return end
     if not is_drone(drone) or not victim or not Instance.exists(victim) then return end
+    if gm.object_is_ancestor(victim.object_index, gm.constants.pActor) ~= 1.0 then return end
     if not hit_info or not hit_info.damage then return end
 
     refresh_team_state()

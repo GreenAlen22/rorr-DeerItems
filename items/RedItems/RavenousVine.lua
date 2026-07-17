@@ -14,6 +14,9 @@ local radiusSprite = Resources.sprite_load("DeerItems", "particle/RavenousVineRa
 
 local GUID = _ENV["!guid"]
 
+local packet_state = Packet.new()
+local packet_bloom = Packet.new()
+
 -- ── Баланс ──────────────────────────────────────────────────────────────────────
 local RADIUS_BASE  = 2 * 32     -- радиус при 1 стаке (2 метра = 64px)
 local RADIUS_STACK = 32   -- +1 метра радиуса за каждый доп. стак (+32px)
@@ -86,6 +89,38 @@ oBloom:onStep(function(self)
     self.life = (self.life or 0) + 1
 end)
 
+local function create_bloom(actor)
+    local bloom = oBloom:create(actor.x, actor.y)
+    bloom.parent = actor
+    bloom.depth = actor.depth + 1
+end
+
+packet_state:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local essence = message:read_float()
+    if Instance.exists(actor) then
+        actor:get_data("RavenousVine", GUID).ess = essence
+    end
+end)
+
+packet_bloom:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    if Instance.exists(actor) then create_bloom(actor) end
+end)
+
+local function sync_visual_state(actor, data)
+    if not Net.is_host() then return end
+
+    local message = packet_state:message_begin()
+    message:write_instance(actor)
+    message:write_float(data.ess or 0)
+    message:send_to_all()
+end
+
 local item = Item.new("DeerItems", "RavenousVine")
 item:set_sprite(sprite)
 item:set_tier(Item.TIER.rare)
@@ -150,9 +185,17 @@ item:onPostStep(function(actor, stack)
         actor:heal(actor.maxhp * heal_frac)
 
         -- Визуальная нова цветения
-        local bloom = oBloom:create(actor.x, actor.y)
-        bloom.parent = actor
-        bloom.depth = actor.depth + 1
+        create_bloom(actor)
+        if Net.is_host() then
+            local message = packet_bloom:message_begin()
+            message:write_instance(actor)
+            message:send_to_all()
+        end
+    end
+
+    if (data.rv_visual_sync or 0) <= frame then
+        data.rv_visual_sync = frame + COUNT_PERIOD
+        sync_visual_state(actor, data)
     end
 end)
 
@@ -164,6 +207,7 @@ item:onRemove(function(actor, stack)
         data.rv_count = 0
         data.rv_next  = nil
         data.rv_damage_next = nil
+        data.rv_visual_sync = nil
     end
 end)
 

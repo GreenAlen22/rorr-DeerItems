@@ -11,6 +11,12 @@ local sound     = Resources.sfx_load("DeerItems", "CascadeFailure/detonate", PAT
 
 local GUID = _ENV["!guid"]
 
+-- Gameplay runs on the host, while item data is local to each peer. Relay the
+-- host's visual state and the detonation cosmetics so remote players can draw
+-- the same infected targets, pool amount, effects, and sound.
+local packet_state = Packet.new()
+local packet_release = Packet.new()
+
 -- ── Баланс ────────────────────────────────────────────────────────────────────
 local CAP_BASE       = 4      -- максимум заражённых при 1 стаке
 local CAP_STACK      = 2      -- +2 заражённых за стак
@@ -39,6 +45,68 @@ local function is_infected_actor(actor)
         and actor.buff_stack ~= nil
         and actor:buff_stack_count(infectBuff) > 0
 end
+
+local function sync_visual_state(actor, data)
+    if not Net.is_host() then return end
+
+    local infected = {}
+    for vid, victim in pairs(data.infected or {}) do
+        if is_infected_actor(victim) then
+            infected[#infected + 1] = victim
+        else
+            data.infected[vid] = nil
+        end
+    end
+
+    data.cf_synced_count = #infected
+    local message = packet_state:message_begin()
+    message:write_instance(actor)
+    message:write_float(data.pool or 0)
+    message:write_ushort(#infected)
+    for _, victim in ipairs(infected) do
+        message:write_instance(victim)
+    end
+    message:send_to_all()
+end
+
+packet_state:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local pool = message:read_float()
+    local count = message:read_ushort()
+    local victims = {}
+    for i = 1, count do
+        victims[i] = message:read_instance()
+    end
+    if not Instance.exists(actor) then return end
+
+    local data = actor:get_data("CascadeFailure", GUID)
+    data.infected = {}
+    data.pool = pool
+    for _, victim in ipairs(victims) do
+        if Instance.exists(victim) then
+            data.infected[victim.id] = victim
+        end
+    end
+end)
+
+packet_release:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local pitch = message:read_float()
+    local count = message:read_ushort()
+    for _ = 1, count do
+        local x = message:read_float()
+        local y = message:read_float()
+        local ef = gm.instance_create(x, y, gm.constants.oEfExplosion)
+        ef.sprite_index = explosive
+    end
+    if Instance.exists(actor) then
+        actor:sound_play(sound, 1.0, pitch)
+    end
+end)
 
 local item = Item.new("DeerItems", "CascadeFailure")
 item:set_sprite(sprite)
@@ -85,6 +153,8 @@ item:onHitProc(function(actor, victim, stack, hit_info)
         local d = hit_info and (hit_info.damage or 0) or 0
         if d > 0 then data.pool = data.pool + d * CAPTURE_FRAC end
     end
+
+    sync_visual_state(actor, data)
 end)
 
 -- Каждые 3 сек выливаем весь пул во всех заражённых. Всё на хосте.
@@ -95,6 +165,10 @@ item:onPostStep(function(actor, stack)
     local data = actor:get_data("CascadeFailure", GUID)
     data.infected = data.infected or {}
     data.pool     = data.pool or 0
+
+    if prune_count(data) ~= (data.cf_synced_count or 0) then
+        sync_visual_state(actor, data)
+    end
 
     data.cf_t = (data.cf_t or 0) + 1
     if data.cf_t < RELEASE_PERIOD then return end
@@ -109,6 +183,7 @@ item:onPostStep(function(actor, stack)
     local coef   = capped / base
 
     local fired = false
+    local positions = {}
     for vid, v in pairs(data.infected) do
         if is_infected_actor(v) then
             -- proc=false/без крита ОБЯЗАТЕЛЬНО: иначе детонация снова попадёт в onHitProc и зациклится.
@@ -118,14 +193,31 @@ item:onPostStep(function(actor, stack)
                 atk.attack_info:set_critical(false)
             end
             gm.instance_create(v.x, v.y, gm.constants.oEfExplosion).sprite_index = explosive
+            positions[#positions + 1] = { x = v.x, y = v.y }
             fired = true
         else
             data.infected[vid] = nil
         end
     end
 
-    if fired then actor:sound_play(sound, 1.0, 0.9 + math.random() * 0.3) end
+    if fired then
+        local sound_pitch = 0.9 + math.random() * 0.3
+        actor:sound_play(sound, 1.0, sound_pitch)
+
+        if Net.is_host() then
+            local message = packet_release:message_begin()
+            message:write_instance(actor)
+            message:write_float(sound_pitch)
+            message:write_ushort(#positions)
+            for _, position in ipairs(positions) do
+                message:write_float(position.x)
+                message:write_float(position.y)
+            end
+            message:send_to_all()
+        end
+    end
     data.pool = 0
+    sync_visual_state(actor, data)
 end)
 
 -- При полной потере предмета снимаем заражение с уцелевших врагов.
@@ -139,6 +231,8 @@ item:onRemove(function(actor, stack)
         end
     end
     data.infected = {}
+    data.pool = 0
+    sync_visual_state(actor, data)
 end)
 
 -- Внешний вид заражённых: маркер над врагом встроенной отрисовкой (ассет не нужен).
@@ -147,7 +241,7 @@ item:onPostDraw(function(actor, stack)
     if not data.infected then return end
     local pool_text = string.format("%d", round_pool(data.pool))
     for vid, v in pairs(data.infected) do
-        if is_infected_actor(v) then
+        if Instance.exists(v) and (gm._mod_net_isClient() or is_infected_actor(v)) then
             gm.draw_sprite(mark, 0, v.x, v.y - 14)
             gm.draw_set_colour(POOL_TEXT_COLOR)
             gm.draw_text(v.x - (#pool_text * 3) - 9, v.y + 2, pool_text)

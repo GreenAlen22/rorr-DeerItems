@@ -11,6 +11,21 @@ local GravityLoopBreack = Resources.sprite_load("DeerItems", "particle/GravityLo
 -- ленивый кэш ссылки на сломанную версию (на загрузке может быть ещё не зарегистрирована)
 local deactivate
 
+-- `sound_play` and vanilla effect instances are local-only. The host therefore
+-- explicitly relays the cosmetic trigger to connected clients.
+local packet_trigger = Packet.new()
+packet_trigger:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local pitch = message:read_float()
+    if not Instance.exists(actor) then return end
+
+    actor:sound_play(sound, 2.0, pitch)
+    local ef = gm.instance_create(actor.x, actor.y, gm.constants.oEfSparks)
+    ef.sprite_index = GravityLoopBreack
+end)
+
 -- Создание нового предмета с названием "GravityLoop" в категории "DeerItems"
 -- Привязка спрайта к предмету
 -- Установка тира предмета: белый (обычный)
@@ -30,11 +45,19 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
         actor:heal(actor.maxhp * 0.7)
 
         -- Воспроизводим звуковой эффект
-        actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
+        local sound_pitch = 0.9 + math.random() * 0.5
+        actor:sound_play(sound, 2.0, sound_pitch)
 
         -- Эффект искр с кастомным спрайтом
         local ef = gm.instance_create(actor.x, actor.y, gm.constants.oEfSparks)
         ef.sprite_index = GravityLoopBreack
+
+        if Net.is_host() then
+            local message = packet_trigger:message_begin()
+            message:write_instance(actor)
+            message:write_float(sound_pitch)
+            message:send_to_all()
+        end
 
         -- Получаем ссылку на предмет, заменяющий использованный стак
         deactivate = deactivate or Item.find("DeerItems-GravityLoopDeactivate")

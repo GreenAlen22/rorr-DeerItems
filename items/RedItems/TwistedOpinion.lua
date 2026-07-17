@@ -17,6 +17,8 @@ local sndImpact   = Resources.sfx_load("DeerItems", "TwistedOpinion/impact", PAT
 -- guid мода: ускоряет get_data (без обхода debug-стека на каждом кадре)
 local GUID = _ENV["!guid"]
 
+local packet_soul = Packet.new()
+
 local HUD_FILL_X    = 4
 local HUD_FILL_Y    = 8
 local HUD_FILL_W    = 50
@@ -141,6 +143,26 @@ oSkull:onDeserialize(function(self, buffer)
     self.direction = gm.read_direction()
 end)
 
+packet_soul:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    local soul = message:read_float()
+    if Instance.exists(actor) then
+        actor:get_data("TwistedOpinion", GUID).soul = soul
+    end
+end)
+
+local function sync_soul(actor, data)
+    if not Net.is_host() or data.tw_synced_soul == data.soul then return end
+
+    data.tw_synced_soul = data.soul
+    local message = packet_soul:message_begin()
+    message:write_instance(actor)
+    message:write_float(data.soul or 0)
+    message:send_to_all()
+end
+
 -- ╔═══════════════════════════════════════════════════════════════════════════╗
 -- ║  Предмет «Мёртвая вода»                                                     ║
 -- ╚═══════════════════════════════════════════════════════════════════════════╝
@@ -213,6 +235,7 @@ item:onPostStep(function(actor, stack)
 
     data.dw_prevHp  = actor.hp
     data.dw_prevMax = maxhp
+    sync_soul(actor, data)
 end)
 
 -- Визуал: индикатор накопления энергии души над персонажем

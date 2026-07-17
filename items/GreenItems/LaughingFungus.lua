@@ -115,13 +115,29 @@ objMushroom:onCreate(function(self)
     self.speed = 1
     self.direction = 270 + gm.irandom_range(-18, 18)
     self:projectile_sync(8)
+
+    -- The server is authoritative for collisions. Letting a replicated
+    -- mushroom simulate gravity locally makes it fall through client maps
+    -- between projectile-sync updates.
+    if gm._mod_net_isClient() then
+        self.gravity = 0
+        self.speed = 0
+        self.hspeed = 0
+        self.vspeed = 0
+    end
 end)
 
 objMushroom:onStep(function(self)
     self.life = (self.life or 0) + 1
     self.image_index = mushroom_frame_for(self.variant, self.life)
 
-    if gm._mod_net_isClient() then return end
+    if gm._mod_net_isClient() then
+        self.gravity = 0
+        self.speed = 0
+        self.hspeed = 0
+        self.vspeed = 0
+        return
+    end
     if not Instance.exists(self.zone) then self:destroy(); return end
 
     local hit_ground = false
