@@ -728,7 +728,22 @@
         "Droneman": {
             "name": "Droneman",
             "pickup": "Artifact of Droneman",
-            "description": "When a survivor becomes a drone, it inherits that survivor's items."
+            "description": "When survivors become drones, they inherits their items"
+        },
+        "Victory": {
+            "name": "Victory",
+            "pickup": "Artifact of Victory",
+            "description": "Defeating the teleporter boss revives fallen players at full health."
+        },
+        "Stagnation": {
+            "name": "Stagnation",
+            "pickup": "Artifact of Stagnation",
+            "description": "The difficulty timer is disabled. During a teleporter event, the timer grows x5 faster."
+        },
+        "Storm": {
+            "name": "Storm",
+            "pickup": "Artifact of Storm",
+            "description": "Lightning strikes near the players. Lightning strikes take away 5% of your maximum health. Items enhance the storm."
         }
     }
 }

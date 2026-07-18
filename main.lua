@@ -60,8 +60,8 @@ end
 Initialize(function()
     require_folder(PATH.."Interactables")
     require_folder(PATH.."actor")
+    require_folder(PATH.."helpers")
     require_folder(PATH.."artifacts")
-
     require_items()
 
     item_config.reload()
