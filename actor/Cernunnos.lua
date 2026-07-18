@@ -1,7 +1,7 @@
 -- DeerItems-Cernunnos
 -- Summoned ally actor for Ingrown Idol. Spawned only by the item, never by stage cards.
 
-local SPRITE_PATH = PATH.."assets/sprites/actor/cernunnos/"
+local SPRITE_PATH = PATH.."assets/sprites/actor/sCernunnos/"
 local GUID = _ENV["!guid"]
 
 local sprite_mask      = Resources.sprite_load("DeerItems", "actor/CernunnosMask", SPRITE_PATH.."cernunnos.png", 1, 64, 128)
