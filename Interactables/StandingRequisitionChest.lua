@@ -10,11 +10,6 @@ local PAID_CHOICE_BASE_COST = 200
 local CAPSULE_A_X = 31
 local CAPSULE_B_X = 62
 local CAPSULE_Y = 21
-local PRICE_TEXT_Y = -54
-local PRICE_TEXT_SCALE = 2.5
-local PRICE_HINT_X_RADIUS = 64
-local PRICE_HINT_TOP = 72
-local PRICE_HINT_BOTTOM = 32
 local CHEST_ORIGIN_X = 45
 local CHEST_ORIGIN_Y = 40
 local ITEM_ICON_SCALE = 1.0
@@ -32,6 +27,21 @@ chest_obj:set_depth(90)
 chest_obj:clear_callbacks()
 
 local packet_select = Packet.new()
+local packet_interact = Packet.new()
+local packet_contents = Packet.new()
+local creation_plan
+
+local function play_interaction_sound(inst)
+    inst:sound_play_at(gm.constants.wChest1, 1, 1, inst.x, inst.y)
+end
+
+local function is_requisition_object(inst)
+    local object_index = inst.__object_index or inst.object_index
+    if object_index == nil and inst.get_object_index then
+        object_index = inst:get_object_index()
+    end
+    return object_index == chest_obj.value
+end
 
 packet_select:onReceived(function(message)
     if not Net.is_host() then return end
@@ -45,6 +55,40 @@ packet_select:onReceived(function(message)
         inst.selection = selection
     end
 end)
+
+packet_interact:onReceived(function(message)
+    local inst = message:read_instance()
+    if not Instance.exists(inst) then return end
+
+    if is_requisition_object(inst) then
+        play_interaction_sound(inst)
+    end
+end)
+
+packet_contents:onReceived(function(message)
+    local inst = message:read_instance()
+    local count = message:read_ushort()
+    if not inst or not Instance.exists(inst) or not is_requisition_object(inst) then
+        for _ = 1, count do message:read_int() end
+        return
+    end
+
+    local contents = Array.new()
+    for _ = 1, count do
+        contents:push(message:read_int())
+    end
+    inst.contents = contents
+end)
+
+local function sync_interaction_sound(inst)
+    play_interaction_sound(inst)
+
+    if Net.is_host() and not Net.is_single() then
+        local message = packet_interact:message_begin()
+        message:write_instance(inst)
+        message:send_to_all()
+    end
+end
 
 local function item_from_contents(inst, index)
     if not inst.contents then return nil end
@@ -68,9 +112,24 @@ end
 
 local function sync_contents_later(inst)
     if Net.is_host() then
-        Alarm.create(function()
-            if Instance.exists(inst) then Helper.sync_crate_contents(inst) end
-        end, 1)
+        for _, delay in ipairs({ 1, 8 }) do
+            Alarm.create(function()
+                if not Instance.exists(inst) or not inst.contents then return end
+
+                local contents = {}
+                for _, object_id in ipairs(inst.contents) do
+                    contents[#contents + 1] = object_id
+                end
+
+                local message = packet_contents:message_begin()
+                message:write_instance(inst)
+                message:write_ushort(#contents)
+                for _, object_id in ipairs(contents) do
+                    message:write_int(object_id)
+                end
+                message:send_to_all()
+            end, delay)
+        end
     end
 end
 
@@ -132,6 +191,8 @@ local function set_paid_contents(inst)
 end
 
 local function refresh_contents_for_phase(inst)
+    if Net.is_client() then return end
+
     local chosen = inst.sr_chosen or 0
     if chosen == 0 then
         set_initial_contents(inst)
@@ -147,42 +208,37 @@ local function actor_can_pay(actor, cost)
     return actor and Instance.exists(actor) and ((actor.gold or 0) >= cost)
 end
 
-local function draw_price_hint(inst)
-    if (inst.sr_chosen or 0) ~= 1 then return end
+local function charge_actor(actor, cost)
+    if not actor_can_pay(actor, cost) then return false end
 
-    local data = inst:get_data("DeerItems", GUID)
-    local frame = Global._current_frame or 0
-    if (frame - (data.price_hint_frame or -9999)) > 1 then return end
-
-    local text = "$"..tostring(inst.cost or 0)
-    local x = inst.x - (#text * 3 * PRICE_TEXT_SCALE)
-    local y = inst.y + PRICE_TEXT_Y
-    gm.draw_text_transformed_color(x, y, text, PRICE_TEXT_SCALE, PRICE_TEXT_SCALE, 0, Color.TEXT_YELLOW, Color.TEXT_YELLOW, Color.TEXT_YELLOW, Color.TEXT_YELLOW, 1)
+    actor.gold = actor.gold - cost
+    actor:instance_resync()
+    if actor.is_local then
+        gm._mod_game_getHUD().gold = actor.gold
+    end
+    return true
 end
 
-local function update_price_hint(inst)
+local function restore_pending_payment(inst)
     local data = inst:get_data("DeerItems", GUID)
-    if (inst.sr_chosen or 0) ~= 1 then
-        data.price_hint_frame = nil
-        return
-    end
+    local actor_id = data.pending_payer_id
+    local gold_before = data.pending_gold
+    local cost = data.pending_cost
+    data.pending_payer_id = nil
+    data.pending_gold = nil
+    data.pending_cost = nil
 
-    local players = Instance.find_all(gm.constants.oP)
-    for _, actor in ipairs(players) do
-        if Instance.exists(actor)
-        and actor.is_local
-        and actor.x >= inst.x - PRICE_HINT_X_RADIUS
-        and actor.x <= inst.x + PRICE_HINT_X_RADIUS
-        and actor.y >= inst.y - PRICE_HINT_TOP
-        and actor.y <= inst.y + PRICE_HINT_BOTTOM
-        then
-            data.price_hint_frame = Global._current_frame or 0
-            data.price_hint_can_pay = actor_can_pay(actor, inst.cost or 0)
-            return
+    if not actor_id or not gold_before or not cost then return nil end
+
+    local actor = Instance.wrap(actor_id)
+    if Instance.exists(actor) and actor.gold < gold_before then
+        actor.gold = math.min(gold_before, actor.gold + cost)
+        actor:instance_resync()
+        if actor.is_local then
+            gm._mod_game_getHUD().gold = actor.gold
         end
     end
-
-    data.price_hint_frame = nil
+    return actor
 end
 
 local function release_activator(inst)
@@ -253,17 +309,18 @@ function M.get_instances()
     return live
 end
 
+function M.is_creation_authority()
+    local host = Player.get_host()
+    return Instance.exists(host) and Helper.is_true(host.is_local)
+end
+
 function M.create_at(x, y, plan)
     if not plan then error("StandingRequisitionChest.create_at requires a plan") end
+    if not M.is_creation_authority() then return nil end
 
+    creation_plan = plan
     local inst = chest_obj:create(x, y)
-    configure_plan(inst, plan)
-
-    -- The initial packet must contain the plan. Syncing from onCreate sends the
-    -- default -1 choices and leaves clients with an empty, unusable chest.
-    if not Net.is_client() then
-        inst:instance_sync()
-    end
+    creation_plan = nil
 
     return inst
 end
@@ -288,11 +345,28 @@ chest_obj:onCreate(function(self)
     self.sr_paid_slot = 1
     self.sr_exclude_item = -1
     self.sr_chosen = 0
+
+    if creation_plan then
+        configure_plan(self, creation_plan)
+        self:instance_sync()
+    end
 end)
 
 chest_obj:onDestroy(function(self)
     if not Net.is_client() then
         self:instance_destroy_sync()
+    end
+end)
+
+Hook.add_pre(gm.constants.interactable_pay_cost, function(self, other, result, args)
+    if not is_requisition_object(self) or (self.sr_chosen or 0) ~= 1 then return end
+
+    -- The crate UI charges when it opens. The paid requisition must charge
+    -- only after a real choice has been confirmed.
+    local cost = self.cost or 0
+    self.cost = 0
+    for _, argument in ipairs(args or {}) do
+        if argument.value == cost then argument.value = 0 end
     end
 end)
 
@@ -304,12 +378,22 @@ chest_obj:onCheckCost(function(self, actor)
         return (self.sr_choice_a or -1) >= 0 and (self.sr_choice_b or -1) >= 0
     end
 
-    return #paid_choice_ids(self) > 0 and actor_can_pay(actor, self.cost or 0)
+    if Net.is_client() then
+        return item_from_contents(self, 0) ~= nil
+    end
+
+    local can_use = #paid_choice_ids(self) > 0 and actor_can_pay(actor, self.cost or 0)
+    if can_use then
+        local data = self:get_data("DeerItems", GUID)
+        data.pending_payer_id = actor.id
+        data.pending_gold = actor.gold
+        data.pending_cost = self.cost or 0
+    end
+    return can_use
 end)
 
 chest_obj:onStep(function(self)
     refresh_cost(self)
-    update_price_hint(self)
 
     if self.sr_chosen >= 2 then
         if self.active ~= 9 then
@@ -337,12 +421,15 @@ chest_obj:onStep(function(self)
 
     if self.active == 0 then
         local data = self:get_data("DeerItems", GUID)
+        if (self.sr_chosen or 0) == 1 then
+            restore_pending_payment(self)
+        end
         data.contents_phase = nil
         data.prev_selection = nil
     elseif self.active == 1 then
         local data = self:get_data("DeerItems", GUID)
         local phase = self.sr_chosen or 0
-        if data.contents_phase ~= phase then
+        if not Net.is_client() and data.contents_phase ~= phase then
             if phase == 0 then
                 set_initial_contents(self)
             elseif phase == 1 then
@@ -352,8 +439,7 @@ chest_obj:onStep(function(self)
         end
 
         if Net.is_client() and self.activator and Instance.exists(self.activator) and self.activator.is_local then
-            data.prev_selection = data.prev_selection or 0
-            if data.prev_selection ~= self.selection then
+            if data.prev_selection == nil or data.prev_selection ~= self.selection then
                 data.prev_selection = self.selection
                 local message = packet_select:message_begin()
                 message:write_instance(self)
@@ -366,21 +452,37 @@ chest_obj:onStep(function(self)
     if self.active == 3 then
         release_activator(self)
 
-        if gm._mod_net_isClient() then
+        if Net.is_client() then
             self.active = 100
             return
         end
 
         refresh_contents_for_phase(self)
 
-        local selected_index = math.floor(self.selection or 0)
+        local selected_index = math.max(0, math.floor(self.selection or 1) - 1)
         local selected = item_from_contents(self, selected_index)
         if not selected then
             self.active = 0
             return
         end
 
+        local payer = self.activator
+        if self.sr_chosen == 1 then
+            payer = restore_pending_payment(self) or payer
+        end
+        if self.sr_chosen == 1 and not actor_can_pay(payer, paid_choice_cost()) then
+            self.active = 0
+            refresh_cost(self)
+            return
+        end
+
         selected:create(self.x, self.y - 16, self)
+
+        if self.sr_chosen == 1 then
+            charge_actor(payer, paid_choice_cost())
+        end
+
+        sync_interaction_sound(self)
 
         local remaining_index = selected_index == 0 and 1 or 0
         if self.sr_chosen == 0 then
@@ -412,7 +514,6 @@ chest_obj:onDraw(function(self)
     if self.sr_chosen >= 2 then return end
     if self.sr_chosen == 1 then
         draw_choice_prompt(self, (self.sr_paid_slot or 1) == 0 and CAPSULE_A_X or CAPSULE_B_X)
-        draw_price_hint(self)
         return
     end
 
@@ -438,11 +539,9 @@ chest_obj:onDeserialize(function(self, buffer)
     self.sr_exclude_item = buffer:read_int()
     self.sr_paid_slot = buffer:read_byte()
     self.sr_chosen = buffer:read_byte()
-    refresh_contents_for_phase(self)
-
-    -- A remote activation parks the client at active=100 while the host
-    -- resolves the choice. The synchronized phase is authoritative and must
-    -- release that waiting state so the chest can be used again.
+    if not Net.is_client() then
+        refresh_contents_for_phase(self)
+    end
     release_activator(self)
     if self.sr_chosen >= 2 then
         self.active = 4

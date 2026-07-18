@@ -19,6 +19,51 @@ local HIT_DMG_FRAC  = 0.05   -- урон выстрела = 5% урона игр
 local PROC_CHANCE   = 0.20
 local SHIELD_PER_DRONE = 0.05
 local DRONE_FIND_RADIUS = 100000
+local packet_shot = Packet.new()
+local packet_facing = Packet.new()
+
+local function instance_exists(inst)
+    return inst ~= nil and Instance.exists(inst)
+end
+
+local function create_shot_effect(source_x, source_y, target_x, target_y, facing)
+    local efLineTracer = Object.find("ror-efLineTracer")
+    local efSparks = Object.find("ror-efSparks")
+
+    if efLineTracer then
+        local tracer = efLineTracer:create(source_x + facing, source_y)
+        tracer.xend = target_x
+        tracer.yend = target_y
+        tracer.bm = 1
+        tracer.rate = 0.1
+        tracer.width = 1.5
+        tracer.image_blend = BLEND
+    end
+
+    if efSparks then
+        local sparks = efSparks:create(target_x, target_y)
+        sparks.sprite_index = gm.constants.sSparks1
+        sparks.image_blend = BLEND
+    end
+end
+
+packet_shot:onReceived(function(message)
+    if not gm._mod_net_isClient() then return end
+
+    create_shot_effect(
+        message:read_float(), message:read_float(),
+        message:read_float(), message:read_float(),
+        message:read_byte() == 1 and 1 or -1
+    )
+end)
+
+packet_facing:onReceived(function(message)
+    if gm._mod_net_isClient() then return end
+
+    local actor = message:read_instance()
+    if not instance_exists(actor) then return end
+    actor:get_data("DeerItems", GUID).bosco_facing = message:read_byte() == 1 and 1 or -1
+end)
 
 local function is_not_drone(char)
     return DeerItemsCernunnos and DeerItemsCernunnos.is_not_drone and DeerItemsCernunnos.is_not_drone(char)
@@ -89,10 +134,10 @@ obj:onStep(function(self)
 
     local data = self:get_data(nil, GUID)
     local parent = self.parent
-    if not parent or not parent:exists() then parent = data.parent end
+    if not instance_exists(parent) then parent = data.parent end
 
     -- Уничтожаем дрона, если владелец исчез
-    if not parent or not parent:exists() then
+    if not instance_exists(parent) then
         self:destroy()
         return
     end
@@ -104,8 +149,11 @@ obj:onStep(function(self)
 
     -- По умолчанию дрон смотрит туда же, куда повёрнут игрок (направление прицела).
     -- Если ниже найдётся цель — ориентация переопределится на неё.
-    if parent.image_xscale ~= 0 then
-        self.image_xscale = parent.image_xscale
+    local owner_data = parent:get_data("DeerItems", GUID)
+    local facing = owner_data.bosco_facing or parent.image_xscale
+    if facing and facing ~= 0 and self.image_xscale ~= facing then
+        self.image_xscale = facing
+        self:instance_resync()
     end
 
     -- Зарядка атаки по времени, зависящему от скорости атаки владельца.
@@ -153,19 +201,19 @@ obj:onStep(function(self)
 
         -- Ориентация дрона
         self.image_xscale = (target.x < self.x) and -1 or 1
+        self:instance_resync()
 
         -- Визуальные эффекты: луч + искры
-        local tracer = efLineTracer:create(self.x + self.image_xscale, self.y)
-        tracer.xend = target.x
-        tracer.yend = target.y
-        tracer.bm = 1
-        tracer.rate = 0.1
-        tracer.width = 1.5
-        tracer.image_blend = BLEND
-
-        local sparks = efSparks:create(target.x, target.y)
-        sparks.sprite_index = gm.constants.sSparks1
-        sparks.image_blend = BLEND
+        create_shot_effect(self.x, self.y, target.x, target.y, self.image_xscale)
+        if Net.is_host() then
+            local message = packet_shot:message_begin()
+            message:write_float(self.x)
+            message:write_float(self.y)
+            message:write_float(target.x)
+            message:write_float(target.y)
+            message:write_byte(self.image_xscale >= 0 and 1 or 0)
+            message:send_to_all()
+        end
 
         -- Наносим урон напрямую цели. damage у fire_direct — КОЭФФИЦИЕНТ (×урон игрока),
         -- поэтому передаём долю напрямую: 0.05 = 5% урона игрока (раньше тут ошибочно
@@ -189,10 +237,12 @@ end)
 
 obj:onSerialize(function(self, buffer)
     buffer:write_instance(self.parent)
+    buffer:write_byte(self.image_xscale >= 0 and 1 or 0)
 end)
 
 obj:onDeserialize(function(self, buffer)
     self.parent = buffer:read_instance()
+    self.image_xscale = buffer:read_byte() == 1 and 1 or -1
     self:get_data(nil, GUID).parent = self.parent
 end)
 
@@ -201,7 +251,7 @@ item:onAcquire(function(actor, stack)
     if gm._mod_net_isClient() then return end
 
     local data = actor:get_data("DeerItems", GUID)
-    if not data.inst then
+    if not instance_exists(data.inst) then
         local inst = obj:create(actor.x, actor.y)
         inst.parent = actor
         inst:get_data(nil, GUID).parent = actor
@@ -213,6 +263,20 @@ item:onPostStep(function(actor, stack)
     if stack <= 0 then return end
 
     local data = actor:get_data("DeerItems", GUID)
+    if gm._mod_net_isClient() then
+        if actor.is_local then
+            local facing = actor.image_xscale >= 0 and 1 or -1
+            if data.bosco_facing ~= facing then
+                data.bosco_facing = facing
+                local message = packet_facing:message_begin()
+                message:write_instance(actor)
+                message:write_byte(facing == 1 and 1 or 0)
+                message:send_to_host()
+            end
+        end
+        return
+    end
+
     data.bosco_count_tick = (data.bosco_count_tick or 0) + 1
     if data.bosco_count_tick < 15 then return end
     data.bosco_count_tick = 0
@@ -229,7 +293,7 @@ item:onRemove(function(actor, stack)
     if gm._mod_net_isClient() then return end
 
     local data = actor:get_data("DeerItems", GUID)
-    if stack <= 1 and data.inst and data.inst:exists() then
+    if stack <= 1 and instance_exists(data.inst) then
         data.inst:destroy()
         data.inst = nil
     end

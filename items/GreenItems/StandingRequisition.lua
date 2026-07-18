@@ -2,7 +2,7 @@
 
 local sprite = Resources.sprite_load("DeerItems", "item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 18, 18)
 
-local CHEST_RECONCILE_DELAYS = { 8, 60 }
+local CHEST_RECONCILE_DELAYS = { 8, 120 }
 
 local item = Item.new("DeerItems", "StandingRequisition")
 item:set_sprite(sprite)
@@ -13,6 +13,13 @@ item:clear_callbacks()
 local stage_plans = {}
 local reconcile_scheduled_frame = -1
 local chest_api
+local packet_stage_ready = Packet.new()
+local pending_stage_ready = {}
+local active_stage_key
+local expected_stage_players = {}
+local ready_stage_players = {}
+local stage_reconcile_started = false
+local schedule_reconcile
 
 local function load_chest_api()
     if chest_api then return chest_api end
@@ -46,6 +53,77 @@ local Chest = setmetatable({}, {
     end
 })
 
+local function is_chest_authority()
+    return Chest.is_creation_authority()
+end
+
+local function make_stage_key(level, stage_id)
+    return tostring(level)..":"..tostring(stage_id)
+end
+
+local function try_schedule_reconcile()
+    if stage_reconcile_started or not active_stage_key then return end
+
+    for player_id in pairs(expected_stage_players) do
+        if not ready_stage_players[player_id] then return end
+    end
+
+    stage_reconcile_started = true
+    schedule_reconcile()
+end
+
+local function begin_stage_ready_barrier(level, stage_id)
+    if not is_chest_authority() then return end
+
+    local key = make_stage_key(level, stage_id)
+    active_stage_key = key
+    expected_stage_players = {}
+    ready_stage_players = pending_stage_ready[key] or {}
+    pending_stage_ready = { [key] = ready_stage_players }
+    stage_reconcile_started = false
+
+    for _, player in ipairs(Instance.find_all(gm.constants.oP)) do
+        if Instance.exists(player) then
+            expected_stage_players[player.m_id] = true
+        end
+    end
+
+    local host = Player.get_host()
+    if Instance.exists(host) then
+        ready_stage_players[host.m_id] = true
+    end
+
+    try_schedule_reconcile()
+end
+
+local function send_stage_ready(level, stage_id)
+    if not Net.is_client() then return end
+
+    local message = packet_stage_ready:message_begin()
+    message:write_int(level)
+    message:write_int(stage_id)
+    message:send_to_host()
+end
+
+packet_stage_ready:onReceived(function(message, player)
+    local level = message:read_int()
+    local stage_id = message:read_int()
+    if not is_chest_authority() or not Instance.exists(player) then return end
+
+    local key = make_stage_key(level, stage_id)
+    local ready = pending_stage_ready[key]
+    if not ready then
+        ready = {}
+        pending_stage_ready[key] = ready
+    end
+    ready[player.m_id] = true
+
+    if key == active_stage_key then
+        ready_stage_players[player.m_id] = true
+        try_schedule_reconcile()
+    end
+end)
+
 local function roll_tier(stack)
     local n = math.max(1, stack or 1)
     local common_weight = 0.79
@@ -70,16 +148,15 @@ local function is_excluded(value, exclude)
 end
 
 local function pick_item(tier, exclude)
-    local items = Item.find_all(tier, Item.ARRAY.tier)
-    local n = #items
-    if n == 0 then return nil end
-    for _ = 1, 25 do
-        local it = items[gm.irandom_range(1, n)]
+    local candidates = {}
+    for _, it in ipairs(Item.find_all(tier, Item.ARRAY.tier)) do
         if it and it:is_loot() and it:is_unlocked() and not is_excluded(it.value, exclude) then
-            return it
+            candidates[#candidates + 1] = it
         end
     end
-    return nil
+
+    if #candidates == 0 then return nil end
+    return candidates[gm.irandom_range(1, #candidates)]
 end
 
 local function pick_item_with_fallback(tier, exclude)
@@ -132,22 +209,43 @@ local function collect_stage_plans()
     return #stage_plans
 end
 
+local function find_chest_position()
+    local director = gm._mod_game_getDirector()
+    local width = gm._mod_room_get_current_width()
+    local height = gm._mod_room_get_current_height()
+    if not director or not width or not height then return nil end
+
+    for _ = 1, 20 do
+        local ground = director:ground_nearest(
+            gm.irandom_range(0, width),
+            gm.irandom_range(0, height)
+        )
+        if ground and ground.width_box and ground.height_box then
+            local x = ground.x + gm.irandom_range(0, math.max(0, ground.width_box * 32 - 32))
+            local y = ground.y - ground.height_box * 32
+            return x, y
+        end
+    end
+
+    return nil
+end
+
 local function spawn_chest(plan, index)
-    local owner = Instance.wrap(plan.owner_id)
-    local x, y
-    if Instance.exists(owner) then
-        x = owner.x + gm.irandom_range(-160, 160)
-        y = owner.y
-    else
-        x = 0 + index * 48
-        y = 0
+    local x, y = find_chest_position()
+    if not x then
+        local owner = Instance.wrap(plan.owner_id)
+        if Instance.exists(owner) then
+            x, y = owner.x, owner.y
+        else
+            x, y = index * 48, 0
+        end
     end
 
     return Chest.create_at(x, y, plan)
 end
 
 local function reconcile_chests()
-    if gm._mod_net_isClient() then return end
+    if not is_chest_authority() then return end
 
     if #stage_plans == 0 then
         collect_stage_plans()
@@ -178,7 +276,7 @@ local function reconcile_chests()
                 chest = spawn_chest(plan, i)
             end
             by_owner[plan.owner_id] = chest
-        elseif (chest.sr_chosen or 0) == 0
+        elseif chest and (chest.sr_chosen or 0) == 0
         and (
             (chest.sr_owner_id or -1) ~= plan.owner_id
             or (chest.sr_choice_a or -1) < 0
@@ -202,7 +300,7 @@ local function reconcile_chests()
     end
 end
 
-local function schedule_reconcile()
+schedule_reconcile = function()
     local frame = Global._current_frame or 0
     if reconcile_scheduled_frame == frame then return end
     reconcile_scheduled_frame = frame
@@ -211,12 +309,18 @@ local function schedule_reconcile()
     end
 end
 
-item:onStageStart(function()
-    if gm._mod_net_isClient() then return end
+Callback.add(Callback.TYPE.onStageStart, "DeerItems-StandingRequisition-stageReady", function()
+    local level = math.floor(Global.stage_current_level or -1)
+    local stage_id = math.floor(Global.stage_id or -1)
 
-    local frame = Global._current_frame or 0
-    if reconcile_scheduled_frame == frame then return end
+    if Net.is_client() then
+        for _, delay in ipairs({ 1, 30 }) do
+            Alarm.create(function()
+                send_stage_ready(level, stage_id)
+            end, delay)
+        end
+        return
+    end
 
-    collect_stage_plans()
-    schedule_reconcile()
+    begin_stage_ready_barrier(level, stage_id)
 end)
