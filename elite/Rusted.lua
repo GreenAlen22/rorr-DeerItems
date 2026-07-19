@@ -40,7 +40,7 @@ local palette = Resources.sprite_load(
 local icon = Resources.sprite_load(
     "DeerItems",
     "elite/RustedIcon",
-    PATH.."assets/sprites/elites/sRusted/Iconusted.png",
+    PATH.."assets/sprites/elites/sRusted/IconRusted.png",
     1,
     10.5,
     9

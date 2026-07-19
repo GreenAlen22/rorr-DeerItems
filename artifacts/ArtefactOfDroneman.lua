@@ -3,7 +3,7 @@
 local sprite = Resources.sprite_load(
     "DeerItems",
     "artifact/Droneman",
-    PATH.."assets/sprites/artifacts/ArtefactOfDroneman.png",
+    PATH.."assets/sprites/artifacts/ArtifactOfDroneman.png",
     3,
     16,
     16
