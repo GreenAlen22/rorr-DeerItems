@@ -6,7 +6,7 @@
 local sprite = Resources.sprite_load("DeerItems", "equipment/OneArmyMan", PATH.."assets/sprites/items/sEquipments/OneArmyMan.png", 1, 18, 18)
 local music  = Resources.sfx_load("DeerItems", "sound/BFG", PATH.."assets/sounds/BFG.ogg")
 
--- ── НАСТРОЙКИ (тюнятся на тестах) ──
+-- Настройки баланса для тестов
 local BUFF_DURATION  = 22 * 60   -- усиление атаки/урона/вампиризма, кадры (1/60 сек)
 local SPAWN_DURATION = 30 * 60   -- доспавн = вся длина трека → 8-секундный «хвост» без баффов
 local MUSIC_DURATION = 30 * 60   -- трек жёстко глушится на 30-й секунде

@@ -1,5 +1,6 @@
 -- DeerItems-IngrownIdol
--- Kills feed the idol. At the threshold it summons or refreshes one team Cernunnos.
+-- Убийства питают идол. Когда накоплен порог, он призывает или обновляет одного
+-- Цернунна для команды.
 
 local sprite = Resources.sprite_load("DeerItems", "item/IngrownIdol", PATH.."assets/sprites/items/sRedItems/IngrownIdol.png", 1, 16, 16)
 local indicatorSprite = Resources.sprite_load("DeerItems", "particle/IngrownIdolIndicator", PATH.."assets/sprites/particle/IngrownIdolIndicator.png", 15, 0, 0)

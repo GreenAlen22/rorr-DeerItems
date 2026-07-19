@@ -15,7 +15,7 @@ local GUID  = _ENV["!guid"]
 local oP    = gm.constants.oP
 local BLACK = Color(0x000000)
 
--- ── Настройки баланса ──
+-- Настройки баланса
 local LIFETIME    = 800       -- время жизни клона, кадры (~13.3 сек; было 20 сек, уменьшено в 1.5 раза)
 local COOLDOWN    = 100       -- кулдаун, секунды (set_cooldown сам умножает на 60 — передаём 100)
 local DMG_COEF    = 2.33      -- урон удара = 133% урона игрока (было 200%, уменьшено в 1.5 раза)
@@ -25,7 +25,7 @@ local SHOW_TIME   = 42        -- кадров клон виден в фазе у
 local HIDE_TIME   = 30        -- кадров невидим между ударами (~0.5 сек)
 local RETRY_TIME  = 18        -- короткая пауза, если врага рядом нет
 
--- ── Объект-клон ──
+-- Объект-клон
 local obj = Object.new("DeerItems", "SoulJarClone")
 obj:set_sprite(cloneSprite)
 obj:set_depth(1)
@@ -72,7 +72,7 @@ obj:onStep(function(self)
         return
     end
 
-    -- ── ХОСТ: вся логика только здесь ──
+    -- Логику выполняет только хост.
     -- Уходит вместе с владельцем / по таймеру
     if not Instance.exists(self.parent) then self:destroy(); return end
     self.life = self.life - 1
@@ -89,7 +89,7 @@ obj:onStep(function(self)
     self.phase = self.phase - 1
 
     if self.state == 0 then
-        -- ── Скрыт: невидим, держимся у игрока ──
+        -- Скрыт: невидим и держится у игрока.
         self.image_alpha = 0
         self.show = 0
         self.x = parent.x
@@ -120,7 +120,7 @@ obj:onStep(function(self)
         end
         if Instance.exists(parent) then parent:sound_play(sndHit, 0.6, 1.1 + math.random() * 0.3) end
     else
-        -- ── Виден (фаза удара): стоим на месте видимыми ──
+        -- Видим во время удара: стоит на месте.
         self.image_alpha = 1
         self.show = 1
         if self.phase > 0 then return end
@@ -151,7 +151,7 @@ obj:onDeserialize(function(self, buffer)
     if Instance.exists(self.parent) then self.team = self.parent.team end
 end)
 
--- ── Снаряжение ──
+-- Снаряжение
 local equip = Equipment.new("DeerItems", "SoulJar")
 equip:set_sprite(sprite)
 equip:set_loot_tags(Item.LOOT_TAG.category_damage)

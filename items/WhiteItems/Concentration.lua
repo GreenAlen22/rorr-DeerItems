@@ -1,6 +1,6 @@
 -- DeerItems-Concentration
--- Charges after SAFE_FRAMES; incoming damage does not reset it.
--- The charge is spent only when the actor deals positive hit damage.
+-- Заряжается через SAFE_FRAMES кадров. Полученный урон таймер не сбрасывает.
+-- Заряд тратится только при попадании, которое нанесло положительный урон.
 
 -- Спрайт предмета
 -- Партикл готовности усиленного удара

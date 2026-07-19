@@ -69,9 +69,9 @@ local function clear_delayed_damage(actor)
     actor:get_data("CheatDeath", GUID).cd_ticks = nil
 end
 
--- A remote player's HP is applied by that player's client. Once it dies, the
--- host must discard its remaining debt too; otherwise a later tick can kill
--- only the revived client while the host still considers that player alive.
+-- HP удалённого игрока меняет его клиент. После смерти хост тоже обязан убрать
+-- оставшийся отложенный урон, иначе следующий тик убьёт уже воскрешённого игрока,
+-- хотя хост всё ещё будет считать его живым.
 DeerItemsPlayerDeath.on_host(clear_delayed_damage)
 
 local function is_invincible(actor)

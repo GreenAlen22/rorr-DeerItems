@@ -8,7 +8,7 @@ local turretSprite = Resources.sprite_load("DeerItems", "object/Golemshot", PATH
 local GUID  = _ENV["!guid"]
 local BLEND = Color(0x7fd5a0)
 
--- ── Баланс ──
+-- Настройки баланса
 local LIFE      = 30 * 60   -- время жизни турели 30с
 local FIRE_RATE = 45        -- выстрел раз в 0.75с
 local RANGE     = 250       -- радиус поражения

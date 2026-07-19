@@ -1,4 +1,4 @@
--- Artifact of Droneman: player-controlled drones inherit their own master's items.
+-- Артефакт дроновода: дроны под управлением игрока наследуют предметы своего владельца.
 
 local sprite = Resources.sprite_load(
     "DeerItems",
@@ -61,8 +61,8 @@ local function give_item(drone, item_id, count, stack_kind)
 end
 
 local function inherit_master_items(drone)
-    -- Item inventory is authoritative on the host; client-side item_give calls
-    -- are ignored and do not synchronize the player drone's inventory.
+    -- Инвентарь предметов считает хост. Вызовы item_give на клиенте игнорируются
+    -- и не синхронизируют инвентарь дрона игрока.
     if gm._mod_net_isClient() or not artifact.active
     or drone.object_index ~= PLAYER_DRONE then
         return
@@ -81,8 +81,8 @@ gm.post_script_hook(gm.constants.init_drone, function(self, other, result, args)
     inherit_master_items(self)
 end)
 
--- A client death notification can arrive after init_drone has run on the
--- host. Retrying the already-created player drone closes that race.
+-- Сообщение клиента о смерти может прийти после того, как хост уже вызвал
+-- init_drone. Повторная проверка существующего дрона закрывает эту гонку.
 Callback.add(Callback.TYPE.postStep, "DeerItems-Droneman-inheritLateDeathInventory", function()
     if gm._mod_net_isClient() or not artifact.active then return end
 
@@ -91,9 +91,9 @@ Callback.add(Callback.TYPE.postStep, "DeerItems-Droneman-inheritLateDeathInvento
     end
 end)
 
--- Pickups and other grants are applied to the retained oP. Mirror only the
--- new stack to that player's active oPDrone; copying the full inventory here
--- would duplicate items already inherited on death.
+-- Подобранные и выданные предметы получает сохранённый oP. Передаём активному
+-- oPDrone только новый стак: копирование всего инвентаря задублирует предметы,
+-- уже унаследованные при смерти.
 gm.post_script_hook(gm.constants.item_give_internal, function(self, other, result, args)
     if gm._mod_net_isClient() or not artifact.active then return end
 
@@ -108,7 +108,7 @@ gm.post_script_hook(gm.constants.item_give_internal, function(self, other, resul
     if drone then give_item(drone, item_id, count, stack_kind) end
 end)
 
--- Player drones may inherit a skin that is not valid for a drone actor.
+-- Дрон игрока может унаследовать скин, который не подходит для дрона.
 gm.pre_script_hook(gm.constants.actor_skin_skinnable_set_skin, function(self, other, result, args)
     if not artifact.active then return end
 

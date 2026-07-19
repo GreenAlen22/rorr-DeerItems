@@ -21,6 +21,7 @@ Artifact of Victory - Defeating the teleporter boss revives fallen players at fu
 Artifact of Stagnation - The difficulty timer is disabled. During a teleporter event, the timer grows x5 faster.
 ![artifacts](https://github.com/GreenAlen22/rorr-DeerItems/blob/main/artifacts.png?raw=true)
 
+
 Added mod options to enable or disable the existence of certain items in the run. Go to Game settings > Mods tab to configurate.
 
 ---

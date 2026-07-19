@@ -12,7 +12,7 @@ local deactivate
 
 local function truthy(v) return v ~= nil and v ~= false and v ~= 0 end
 
--- ── Баланс ──
+-- Настройки баланса
 local HP_THRESHOLD = 0.25
 local BARRIER_FRAC = 0.25
 local LIFE_BASE    = 8 * 60

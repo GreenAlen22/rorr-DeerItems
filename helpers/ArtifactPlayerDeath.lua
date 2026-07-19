@@ -1,4 +1,4 @@
--- Routes client-owned player deaths to the host for artifacts with host-side state.
+-- Передаёт хосту смерть игрока, принадлежащего клиенту, для артефактов с логикой на хосте.
 
 local M = {}
 local listeners = {}

@@ -42,7 +42,7 @@ item:onKillProc(function(actor, victim, stack)
     data.kills = (data.kills or 0) + 1
 end)
 
--- Every skin owns its timer, so newer skins never refresh or consume older ones.
+-- У каждой кожи свой таймер: новая кожа не обновляет и не тратит старые.
 item:onPostStep(function(actor, stack)
     if gm._mod_net_isClient() then return end
 
@@ -73,7 +73,7 @@ item:onPostStep(function(actor, stack)
         actor:buff_apply(buff, 1, 1)
     end
 
-    -- Do not reserve complete skin stacks beyond the cap; keep only partial kill progress.
+    -- После лимита не копим готовые кожи: сохраняем только неполный прогресс убийств.
     if #timers >= cap then
         data.kills = data.kills % KILLS_PER_SKIN
     end

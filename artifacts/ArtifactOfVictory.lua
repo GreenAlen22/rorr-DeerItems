@@ -1,4 +1,4 @@
--- Artifact of Victory: revive players once the teleporter boss phase ends.
+-- Артефакт победы: воскрешает игроков после окончания фазы босса у телепорта.
 
 local sprite = Resources.sprite_load(
     "DeerItems",
@@ -42,8 +42,8 @@ local function reset_event_state()
 end
 
 local function restore_player(player)
-    -- The player instance is retained by the game's death/checkpoint flow.
-    -- Restoring this state preserves its controller, inventory and network ID.
+    -- Игра сохраняет экземпляр игрока для смерти и контрольных точек. Возвращаем
+    -- это состояние, чтобы не потерять управление, инвентарь и сетевой ID.
     if not player or not Instance.exists(player) then return false end
 
     player.dead = false
@@ -65,8 +65,7 @@ local function restore_player(player)
         player.dead_body:destroy()
     end
 
-    -- oPDrone is the dead player's temporary avatar. m_id is the stable link
-    -- between that avatar and the restored oP.
+    -- oPDrone — временный аватар мёртвого игрока. m_id связывает его с восстановленным oP.
     local player_m_id = player.m_id
     if player_m_id then
         for _, drone in ipairs(Instance.find_all(PLAYER_DRONE_OBJECT)) do

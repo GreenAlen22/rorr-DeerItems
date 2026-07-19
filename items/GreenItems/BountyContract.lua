@@ -7,7 +7,7 @@ local sprite = Resources.sprite_load("DeerItems", "item/BountyContract", PATH.."
 
 local GUID = _ENV["!guid"]
 
--- ── Баланс ──
+-- Настройки баланса
 local THRESH_STACK = 0.12   -- гиперболический вклад каждого стака в порог казни
 local GOLD_BASE    = 15     -- золото за убийство элиты (×множитель цен)
 local GOLD_STACK   = 15     -- +20 за шт.

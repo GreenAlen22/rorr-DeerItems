@@ -11,7 +11,7 @@ local sprite = Resources.sprite_load("DeerItems", "equipment/Hunger", PATH.."ass
 local radiusSprite = Resources.sprite_load("DeerItems", "particle/HungerRadius", PATH.."assets/sprites/particle/HungerRadius.png", 36, 100, 100)
 local HungerSpawn = Resources.sfx_load("DeerItems", "Hunger/hum", PATH.."assets/sounds/HungerSpawn.ogg")
 
--- ── Настройки баланса ──
+-- Настройки баланса
 local COOLDOWN    = 60          -- кулдаун, секунды
 local LIFE        = 10 * 60     -- время жизни дыры, кадры (10 сек)
 local PULL_RADIUS = 6 * 32      -- радиус притяжения, px (6 метров ≈ 192px)
@@ -56,7 +56,7 @@ local function visual_frame_for(age)
     return LOOP_FRAME_FIRST + (math.floor(loop_age / ANIM_TICK) % LOOP_LENGTH)
 end
 
--- ── Объект «чёрная дыра» ──
+-- Объект «чёрная дыра»
 local obj = Object.new("DeerItems", "HungerHole")
 obj:set_sprite(radiusSprite)
 obj:set_depth(VISUAL_DEPTH)
@@ -127,7 +127,7 @@ obj:onDestroy(function(self)
     self:instance_destroy_sync()
 end)
 
--- ── Снаряжение ──
+-- Снаряжение
 local equip = Equipment.new("DeerItems", "Hunger")
 equip:set_sprite(sprite)
 equip:set_loot_tags(Item.LOOT_TAG.category_utility)

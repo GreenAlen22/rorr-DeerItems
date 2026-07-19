@@ -1,3 +1,4 @@
+-- Читает настройки доступности предметов, создаёт пункты меню и меняет таблицы лута.
 local manifest = DeerItemsItemManifest
 
 local M = {}
@@ -9,10 +10,12 @@ if not manifest then error("DeerItems item config requires ItemManifest") end
 local file = TOML.new("item_config")
 local settings = file:read() or {}
 
+-- Формирует имя настройки одного предмета в TOML-файле.
 local function setting_key(category_key, item_id)
     return "item_"..category_key.."_"..item_id
 end
 
+-- Приводит значения из TOML и интерфейса к булеву типу. Некорректное значение заменяет default.
 local function to_bool(value, default)
     if value == nil then return default end
     if value == true then return true end
@@ -27,6 +30,7 @@ local function to_bool(value, default)
     return default
 end
 
+-- Добавляет в файл настроек отсутствующие поля, сохраняя значения из старого формата.
 local function ensure_defaults()
     local changed = false
 
@@ -59,6 +63,7 @@ local function ensure_defaults()
     end
 end
 
+-- Глобальное отключение предметов имеет приоритет над настройкой отдельного предмета.
 local function is_enabled(category_key, item_id)
     if not to_bool(settings.allItemsEnabled, true) then return false end
     return to_bool(settings[setting_key(category_key, item_id)], true)
@@ -87,6 +92,7 @@ local function set_every_item_enabled(value)
     file:write(settings)
 end
 
+-- Снаряжение и обычные предметы регистрируются разными API-вызовами.
 local function find_registered_item(category_key, item_id)
     if category_key == "Equipments" then
         return Equipment.find("DeerItems", item_id)
@@ -95,6 +101,7 @@ local function find_registered_item(category_key, item_id)
     return Item.find("DeerItems", item_id)
 end
 
+-- Применяет настройки к уже зарегистрированным предметам и скрывает служебные зависимости из лута.
 local function apply_item_availability()
     local enabled_count = 0
     local disabled_count = 0
@@ -126,6 +133,7 @@ local function apply_item_availability()
     return enabled_count, disabled_count
 end
 
+-- Создаёт элементы меню настроек: общий переключатель, массовые действия и один флажок на предмет.
 local function add_options()
     local options = ModOptions.new()
 

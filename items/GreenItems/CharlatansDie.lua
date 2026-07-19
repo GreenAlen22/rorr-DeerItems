@@ -7,7 +7,7 @@ local sprite = Resources.sprite_load("DeerItems", "item/CharlatansDie", PATH.."a
 
 local GUID = _ENV["!guid"]
 
--- ── Баланс ──
+-- Настройки баланса
 local CHANCE_BASE = 0.35
 local CHANCE_STACK = 0.20
 local EXTRA_STEP  = 0.05

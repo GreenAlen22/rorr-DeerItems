@@ -1,5 +1,5 @@
 -- DeerItems-Rusted
--- A Monsoon-only elite that creates two-stage rust spikes beneath distant players.
+-- Элитный враг только для «Муссона»: создаёт под дальними игроками двухэтапные ржавые шипы.
 
 local GUID = _ENV["!guid"]
 
@@ -109,9 +109,9 @@ local function remove_rusted_from_card(card)
     end
 end
 
--- Elite types have no independent director price in the exposed API. Restricting
--- Rusted to the most expensive monster cards keeps its director budget high and
--- makes it substantially rarer than normal elite affixes.
+-- В доступном API у элит нет отдельной цены директора. Поэтому Rusted добавлен
+-- только к самым дорогим картам монстров: так он требует большой бюджет директора
+-- и появляется заметно реже обычных элит.
 local function update_card_availability()
     local cards = MonsterCard.find_all()
     local costs = {}
@@ -210,7 +210,7 @@ Actor:onAttackHit("DeerItems-Rusted-applyDebuff", function(actor, victim, hit_in
     if not gm._mod_net_isHost() then return end
     if not is_rusted(actor) or not is_player(victim) then return end
 
-    -- Replace rather than add so the four-second effect cannot stack and always refreshes.
+    -- Сначала снимаем эффект, чтобы четыре секунды не складывались, а обновлялись.
     if victim:buff_stack_count(rust) > 0 then victim:buff_remove(rust) end
     victim:buff_apply(rust, RUST_DURATION, 1)
 end)
@@ -223,7 +223,7 @@ pcall(function()
 
         local victim = Instance.wrap(raw_victim)
         if not exists(victim) then return end
-        -- Damage calculation also receives crates, map objects, and other non-actors.
+        -- Расчёт урона приходит и для ящиков, объектов карты и прочих не-актёров.
         if gm.object_is_ancestor(victim.object_index, gm.constants.pActor) ~= 1.0 then return end
         if victim:buff_stack_count(rust) <= 0 then return end
 

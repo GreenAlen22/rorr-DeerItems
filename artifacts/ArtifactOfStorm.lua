@@ -1,4 +1,4 @@
--- Artifact of Storm: item-rich teams attract more frequent lightning strikes.
+-- Артефакт бури: чем больше предметов у команды, тем чаще в неё бьют молнии.
 
 local sprite = Resources.sprite_load(
     "DeerItems",
@@ -32,7 +32,7 @@ local STRIKE_RANGE = 8 * 32
 local STRIKE_RADIUS = 2 * 32
 local MAX_HP_DAMAGE = 0.05
 local TELEGRAPH_DURATION = 60
--- The warning covers frames 1-4. Frame 5 begins the impact animation.
+-- Предупреждение занимает кадры 1–4. На пятом кадре начинается анимация удара.
 local TELEGRAPH_END_FRAME = 4
 
 local TIER_WEIGHTS = {

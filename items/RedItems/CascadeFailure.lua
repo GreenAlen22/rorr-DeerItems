@@ -11,20 +11,19 @@ local sound     = Resources.sfx_load("DeerItems", "CascadeFailure/detonate", PAT
 
 local GUID = _ENV["!guid"]
 
--- Gameplay runs on the host, while item data is local to each peer. Relay the
--- host's visual state and the detonation cosmetics so remote players can draw
--- the same infected targets, pool amount, effects, and sound.
+-- Логику считает хост, а данные предмета у каждого игрока локальные. Передаём
+-- клиентам состояние для отрисовки: заражённые цели, размер пула, эффект и звук
+-- взрыва должны выглядеть одинаково у всех.
 local packet_state = Packet.new()
 local packet_release = Packet.new()
 
--- ── Баланс ────────────────────────────────────────────────────────────────────
+-- Настройки баланса
 local CAP_BASE       = 4      -- максимум заражённых при 1 стаке
 local CAP_STACK      = 2      -- +2 заражённых за стак
 local CAPTURE_FRAC   = 0.5    -- 50% наносимого заражённым урона уходит в пул
 local RELEASE_PERIOD = 180    -- детонация каждые 3 сек
 local POOL_CAP_COEF  = 25     -- кап детонации: не больше 2500% урона игрока на одну цель (анти-runaway)
 local POOL_TEXT_COLOR = Color(0x6a2cff)
--- ──────────────────────────────────────────────────────────────────────────────
 
 -- Метка заражения: постоянная (is_timed=false), служит только индикатором — статов не меняет.
 -- Внешний вид заражённых рисуем сами встроенной графикой (см. onPostDraw), иконку не показываем.

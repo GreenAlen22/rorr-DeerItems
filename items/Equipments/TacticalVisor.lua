@@ -4,7 +4,7 @@
 -- Иконка снаряжения (заглушка-шаблон — замени текстуру по этому пути)
 local sprite = Resources.sprite_load("DeerItems", "equipment/TacticalVisor", PATH.."assets/sprites/items/sEquipments/TacticalVisor.png", 1, 18, 18)
 
--- ── Настройки баланса ──
+-- Настройки баланса
 local BUFF_DURATION = 8 * 60   -- длительность баффа, кадры (8 сек)
 local COOLDOWN      = 60       -- кулдаун, секунды
 local CRIT_BONUS    = 100      -- +100% к шансу крита

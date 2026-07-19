@@ -17,7 +17,7 @@ local GUID = _ENV["!guid"]
 local packet_state = Packet.new()
 local packet_bloom = Packet.new()
 
--- ── Баланс ──────────────────────────────────────────────────────────────────────
+-- Настройки баланса
 local RADIUS_BASE  = 2 * 32     -- радиус при 1 стаке (2 метра = 64px)
 local RADIUS_STACK = 32   -- +1 метра радиуса за каждый доп. стак (+32px)
 local COUNT_PERIOD = 15     -- как часто пересчитываем врагов рядом, кадров (4 раза/сек)
@@ -32,7 +32,6 @@ local BURST_DMG_BASE  = 4.0   -- урон взрыва цветения: 400% у
 local BURST_DMG_STACK = 2.0   -- ...+200% за каждый доп. стак
 local HEAL_BASE    = 0.12  -- лечение цветения: 12% макс. HP...
 local HEAL_STACK   = 0.06  -- ...+6% за каждый доп. стак
--- ──────────────────────────────────────────────────────────────────────────────
 
 local VINE_COLOR = Color(0x577147)
 local RADIUS_STAGE_FRAMES = 4

@@ -46,7 +46,7 @@ item:onKillProc(function(actor, victim, stack)
     end
 end)
 
--- Buff: MassacreCurse
+-- Бафф предмета MassacreCurse.
 -- Долгосрочный бафф, усиливающий урон и броню, стаки удаляются по истечению времени
 
 -- Загружаем спрайт баффа

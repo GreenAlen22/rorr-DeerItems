@@ -1,4 +1,6 @@
 -- DeerItems-StandingRequisitionChest
+-- Ящик для предмета StandingRequisition: показывает два бесплатных выбора и один платный.
+-- Создаётся и заполняется хостом, а клиентам передаются выбор и содержимое.
 
 local GUID = _ENV["!guid"]
 
@@ -361,8 +363,8 @@ end)
 Hook.add_pre(gm.constants.interactable_pay_cost, function(self, other, result, args)
     if not is_requisition_object(self) or (self.sr_chosen or 0) ~= 1 then return end
 
-    -- The crate UI charges when it opens. The paid requisition must charge
-    -- only after a real choice has been confirmed.
+    -- Интерфейс ящика берёт цену при открытии. Платное требование списываем
+    -- только после того, как игрок действительно подтвердил выбор.
     local cost = self.cost or 0
     self.cost = 0
     for _, argument in ipairs(args or {}) do

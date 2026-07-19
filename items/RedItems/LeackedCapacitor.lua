@@ -12,7 +12,7 @@ local sound       = Resources.sfx_load("DeerItems", "LeackedCapacitor/pulse", PA
 local GUID = _ENV["!guid"]
 local oP   = gm.constants.oP
 
--- ── Баланс (как в оригинале + авторская добавка про дронов) ─────────────────────
+-- Настройки баланса: оригинальные значения и отдельный бонус для дронов.
 local BASE_PERIOD  = 15 * 60   -- базовый период волны: 15 сек
 local MIN_PERIOD   = 240       -- пол периода (4 сек), чтобы на высоких стаках не стало статичной аурой
 local DURATION     = 7 * 60    -- длительность заряда: 7 сек
@@ -21,7 +21,6 @@ local MOVE_PCT     = 0.30      -- +30% скорости передвижения
 local RADIUS       = 500       -- радиус волны
 local DRONE_AS_STACK  = 0.15   -- +15% attack speed per stack
 local DRONE_RADIUS = 100000    -- радиус поиска дронов (вся арена)
--- ──────────────────────────────────────────────────────────────────────────────
 
 -- Бафф «заряжен»: +скорость атаки и передвижения, пока активен.
 local energize = Buff.new("DeerItems", "Energize")

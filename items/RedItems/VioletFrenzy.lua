@@ -9,7 +9,7 @@ local sprite = Resources.sprite_load("DeerItems", "item/VioletFrenzy", PATH.."as
 -- guid мода: ускоряет get_data (без обхода debug-стека на каждом кадре)
 local GUID = _ENV["!guid"]
 
--- ── НАСТРОЙКИ ──
+-- Настройки баланса
 local BASE_SECONDS = 8
 local STACK_SECONDS = 6
 local SPEED_MULT  = 1.3

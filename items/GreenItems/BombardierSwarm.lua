@@ -15,7 +15,7 @@ local boom        = Resources.sfx_load("DeerItems", "sound/boom", PATH.."assets/
 
 local GUID = _ENV["!guid"]
 
--- ── Баланс ──
+-- Настройки баланса
 local INTERVAL   = 10 * 60   -- бомбардировка раз в 10с
 local DMG_BASE   = 2.5       -- 250% урона
 local DMG_STACK  = 1.25      -- +125% за стак

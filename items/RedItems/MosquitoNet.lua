@@ -12,7 +12,7 @@ local GUID  = _ENV["!guid"]
 local oP    = gm.constants.oP
 local BLEND = Color(0x88ccff)   -- холодный «технический» оттенок трассера/искр (как у Боско)
 
--- ── Баланс ────────────────────────────────────────────────────────────────────
+-- Настройки баланса
 local BASE_PERIOD = 30    -- 0.5 сек при скорости атаки 1.0 (перехват снарядов)
 local MIN_PERIOD  = 8     -- пол перезарядки перехвата
 local RADIUS      = 160   -- ~5 м (в моде 32 px = 1 м)
@@ -24,7 +24,6 @@ local CORNER_LEN      = 48    -- длина уголков индикатора 
 local BLOCK_BASE = 7 * 60          -- КД блока удара: 7 сек при 1 стаке
 local BLOCK_REDUCTION = 0.10       -- -10% КД за стак гиперболически
 local BLOCK_DAMAGE_FRAC = 0.10     -- блокирует только удары больше 10% текущего HP
--- ──────────────────────────────────────────────────────────────────────────────
 
 local function block_cooldown(stack)
     return math.ceil(BLOCK_BASE / (1 + BLOCK_REDUCTION * math.max(0, stack - 1)))

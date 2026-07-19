@@ -11,8 +11,8 @@ local GravityLoopBreack = Resources.sprite_load("DeerItems", "particle/GravityLo
 -- ленивый кэш ссылки на сломанную версию (на загрузке может быть ещё не зарегистрирована)
 local deactivate
 
--- `sound_play` and vanilla effect instances are local-only. The host therefore
--- explicitly relays the cosmetic trigger to connected clients.
+-- `sound_play` и ванильные эффекты видны только на локальной машине. Поэтому
+-- хост отдельно передаёт клиентам сигнал для звука и визуального эффекта.
 local packet_trigger = Packet.new()
 packet_trigger:onReceived(function(message)
     if not gm._mod_net_isClient() then return end

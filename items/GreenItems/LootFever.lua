@@ -9,7 +9,7 @@ local buff_sprite = Resources.sprite_load("DeerItems", "buff/LootFever", PATH.."
 -- guid мода: ускоряет get_data
 local GUID = _ENV["!guid"]
 
--- ── Баланс ──
+-- Настройки баланса
 local DURATION     = 20 * 60   -- каждый стак живёт 20 секунд
 local DURATION_STACK = 20 * 60 -- +20 секунд за шт.
 local CAP_PER_ITEM = 0.15      -- макс. бонус к характеристикам за шт.

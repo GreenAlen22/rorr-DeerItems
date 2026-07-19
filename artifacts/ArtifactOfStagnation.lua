@@ -1,4 +1,4 @@
--- Artifact of Stagnation: the difficulty clock advances only during teleporter events.
+-- Артефакт стагнации: таймер сложности идёт только во время события телепорта.
 
 local sprite = Resources.sprite_load(
     "DeerItems",
@@ -44,9 +44,8 @@ Callback.add(Callback.TYPE.postStep, "DeerItems-Stagnation-updateDifficultyTimer
 
     local teleporter = DeerItemsTeleporter.find_active()
     if not teleporter then
-        -- Alarm 0 drives the canonical difficulty/run timer. Resetting it after
-        -- its normal frame tick freezes that timer without advancing any other
-        -- game systems.
+        -- Alarm 0 ведёт таймер сложности и забега. Сбрасываем его после обычного
+        -- тика кадра, чтобы остановить только этот таймер, не затрагивая другие системы.
         set_difficulty_alarm(director, DIFFICULTY_TICK_FRAMES)
         return
     end
@@ -54,7 +53,7 @@ Callback.add(Callback.TYPE.postStep, "DeerItems-Stagnation-updateDifficultyTimer
     local alarm = get_difficulty_alarm(director)
     if not alarm or alarm <= 0 then return end
 
-    -- The normal Step already consumed one frame. Consume four more so the
-    -- canonical timer advances at exactly five times normal speed.
+    -- Обычный Step уже списал один кадр. Списываем ещё четыре, чтобы таймер шёл
+    -- ровно в пять раз быстрее.
     set_difficulty_alarm(director, math.max(1, alarm - (EVENT_TIME_MULTIPLIER - 1)))
 end)

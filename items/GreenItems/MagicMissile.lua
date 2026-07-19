@@ -1,8 +1,7 @@
--- DeerItems-MagicMissile / "Magic Missile"
--- Using the primary skill spends one charge and fires a straight arrow in the owner's aim direction.
--- 120% damage (+60% per stack). 4 charges (+2 per stack), recharges 1 charge / 2.5s.
--- The arrow pierces up to 4 different enemies.
--- Arrow hits do not proc items and cannot trigger themselves.
+-- DeerItems-MagicMissile / «Магическая стрела» / "Magic Missile"
+-- Основное умение тратит один заряд и выпускает стрелу в направлении прицела владельца.
+-- Урон 120% (+60% за стак). Четыре заряда (+2 за стак), один восстанавливается за 2,5 секунды.
+-- Стрела пронзает до четырёх разных врагов. Её попадания не вызывают предметы и не могут запустить себя.
 
 local sprite = Resources.sprite_load("DeerItems", "item/MagicMissile", PATH.."assets/sprites/items/sGreenItems/MagicMissile.png", 1, 16, 16)
 local arrowSprite = Resources.sprite_load("DeerItems", "particle/MagicMissileArrow", PATH.."assets/sprites/particle/MagicMissile.png", 5, 16, 16)

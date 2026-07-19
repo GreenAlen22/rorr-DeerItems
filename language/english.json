@@ -190,7 +190,7 @@
         "RustMite": {
             "name": "Rust Mite",
             "pickup": "Hits make enemies <r>take more damage</c>.",
-            "description": "On hit, has a <y>100%</c> chance to apply <r>Rust</c>. Each stack of <r>Rust</c> permanently increases damage the target takes from <b>any source</c> by <r>+4%</c> <c_stack>(+4% per stack)</c>.",
+            "description": "On hit, has a <y>100%</c> chance to apply <r>Rust</c>. Each stack of <r>Rust</c> increases damage the target takes from <b>any source</c> by <r>+4%</c> <c_stack>(+4% per stack)</c> <r>permanently</c>.",
             "destination": "Cargo Container 7-C,\nMaintenance Log,\nUES Contact Light",
             "date": "03.05.2057",
             "story": "//--UES CONTACT LIGHT MAINTENANCE-LOG FRAGMENT --//\n\nLocal damage to the protective coating on cargo container 7-C detected.\n\nPrimary cause: corrosion.\nSecondary cause: movement of corrosion.\nTertiary cause: corrosion has legs.\n\nRecommendation: isolate the container.\n\nAddendum: container isolation failed.\nAddendum: isolation from the container also failed.\nAddendum: do not touch the orange dust.",
@@ -216,7 +216,7 @@
         },
         "LeackedCapacitor": {
             "name": "Leaking Capacitor",
-            "pickup": "Periodic <b>wave</c> that <y>energizes allies</c> and empowers <b>drones</c>.",
+            "pickup": "Periodic <b>wave</c> that <y>energizes allies</c> and empowers drones.",
             "description": "All drones gain <y>+15%</c> <c_stack>(+15% per stack)</c> attack speed. Every <b>15 seconds</c> <c_stack>(-20% per stack)</c>, releases a wave that <y>energizes allies</c> for <b>7 seconds</c>. Energizing grants <y>+30% attack and movement speed</c>.",
             "destination": "Cargo Bay 3-B,\nPower-Cell Depot,\nUES Contact Light",
             "date": "22.04.2057",
@@ -225,10 +225,11 @@
         },
         "RavenousVine": {
             "name": "Ravenous Vine",
-            "pickup": "Nearby enemies <g>feed the vine</c>; when ripe it <y>blooms</c>: area damage and <y>healing</c>.",
-            "description": "Enemies within <b>2 meters</c> <c_stack>(+1 meter per stack)</c> <g>feed the vine</c>. Every <b>0.5 seconds</c>, it deals <y>70%</c> <c_stack>(+30% per stack)</c> base damage to all nearby enemies. The more enemies are nearby, the faster the vine ripens. When ripe, it explodes for <y>400%</c> <c_stack>(+200% per stack)</c> base damage and heals for <y>12% maximum health</c> <c_stack>(+6% per stack)</c>.",
+            "pickup": "Nearby enemies <g>feed the vine</c>; when ripe, it <r>explodes</c> and <g>heals</c>.",
+            "description": "Enemies within <b>2 meters</c> <c_stack>(+1 meter per stack)</c> <g>feed the vine</c>. Every <b>0.5 seconds</c>, it deals <r>70% base damage</c> <c_stack>(+30% per stack)</c> to all nearby enemies. The more enemies are nearby, the faster the vine ripens. When ripe, it explodes for <r>400% base damage</c> <c_stack>(+200% per stack)</c> and heals for <g>12% maximum health</c> <c_stack>(+6% per stack)</c>.",
             "destination": "7887,\nRight Path,\nEarth",
             "date": "19.01.2056",
+            "story": "Your plant no longer needs expensive branded soil!\n\nThe new self-sustaining root system independently finds organic nutrients throughout the workspace.\n\nSimply place the pot in a busy area and enjoy improved morale, cleaner air, and a noticeable drop in sick-leave requests.",
             "priority": "<r>High Priority</c>"
         },
         "CascadeFailure": {
@@ -242,7 +243,7 @@
         },
         "ArmySurplus": {
             "name": "Army Surplus",
-            "pickup": "Gain a <b>combat drone</c> and reinforce your <b>drones</c>.",
+            "pickup": "Gain a <b>combat drone</c> and reinforce your drones.",
             "description": "Deploys a <b>combat drone</c>. Drones gain <y>60%</c> <c_stack>(+60% per stack)</c> damage. <g>25%</c> of the player's additional healing is passed to <b>drones</c>.",
             "destination": "Decommissioned Property Warehouse,\nCargo Bay,\nUES Contact Light",
             "date": "05.12.2057",
@@ -369,7 +370,7 @@
         "HeavyLungs": {
             "name": "Heavy Lungs",
             "pickup": "<g>Improves drone survivability</c>.",
-            "description": "Increases <b>drone</c> <g>maximum health</c> and <g>regeneration</c> by <g>15%</c> <c_stack>(+15% per stack)</c>.",
+            "description": "Increases <g>drone maximum health</c> and <g>regeneration</c> by <g>15%</c> <c_stack>(+15% per stack)</c>.",
             "destination": "Pulmonary Complex,\nLife-Support Bay,\nUES PRIME",
             "date": "02.09.2057",
             "story": "Heavy breathing bellows, cast from lead, work almost silently. Engineers fitted them to old drones to improve endurance and resistance to overloads.\n\nWe tested them on our own drones: under fire they held out longer, returned to service faster, and shut down far less often after critical overloads.\n\nThe report called them an \"auxiliary life-support circuit for autonomous machines.\" On the lower decks they put it more simply: even a tin can has an easier time surviving if it has something to breathe with.",
@@ -414,7 +415,7 @@
         "ReserveCapacitor": {
             "name": "Reserve Capacitor",
             "pickup": "Grants an <b>extra equipment charge</c>.",
-            "description": "Holds an <b>additional equipment charge</c> <c_stack>(+1 per stack)</c>. Each reserve charge recharges over <y>2x</c> the <b>equipment's cooldown</c>.",
+            "description": "Holds an <b>additional equipment charge</c> <c_stack>(+1 per stack)</c>. Each reserve charge recharges over <y>2x</c> the equipment's cooldown.",
             "destination": "Reserve Armory,\nPower-Cell Depot,\nNew Earth",
             "date": "22.04.2057",
             "story": "\"Fuel was never the final problem.\n\nHowever, after the transition to compact fuel cells, malfunctions began in related equipment. Research facilities, emergency anchors, shield generators, surgical drones, and coffee makers stopped working.\n\nEverything that required energy pulses proved vulnerable. If the crew showed patience, a properly installed module could be used again after the main cycle was complete.\"\n\n— A Brief History of Interplanetary Achievements, Volume 3",
@@ -440,8 +441,8 @@
         },
         "GlassMagnifier": {
             "name": "Glass Magnifier",
-            "pickup": "Increases <b>drone</c> <y>base damage</c>.",
-            "description": "Increases <b>drone</c> <y>base damage</c> by <y>4</c> <c_stack>(+3 per stack)</c>.",
+            "pickup": "Increases <y>drone damage</c>.",
+            "description": "Increases <y>drone base damage</c> by <y>4</c> <c_stack>(+3 per stack)</c>.",
             "destination": "Archive 7,\nDepartment of Optical Research,\n[CLASSIFIED]",
             "date": "14.04.2057",
             "story": "An old magnifier. The brass has darkened, but the glass is clean - as if polished only yesterday.\n\nLook through it and you don't see farther, or larger. You see where it will break. The hairline crack beneath a rivet, the tired grain in a steel beam, the very spot where a thing is already ready to split at a touch. One of our men, studying a lathe through it, muttered: \"It doesn't magnify. It passes sentence.\"\n\nLater he stopped looking at machines. His last notes are about people: whose armor ran thin, whose hand wavered, whose - as he put it - \"smile is hanging by a single thread.\" We put the magnifier away for good - after we found it aimed at a mirror, with him beside it.",
@@ -558,7 +559,7 @@
         "FearEyesDeactivate": {
             "name": "Dead Eyes",
             "pickup": "Slightly increases <y>damage</c>.",
-            "description": "Increases <y>base damage</c> by <y>1</c> <c_stack>(+1 per stack)</c>."
+            "description": "Increases <y>base damage</c> by <y>1 <c_stack>(+1 per stack)</c>."
         },
         "GravityLoopDeactivate": {
             "name": "Empty Container",
@@ -649,7 +650,7 @@
         "DeepcoreGK2": {
             "name": "Deepcore GK2",
             "pickup": "ROCK AND STONE!",
-            "description": "Grants <g>5%</c> shield for each <b>drone</c>. Gives <y>'Bosco'</c>, which periodically fires at enemies, dealing <y>5% damage</c> and <b>slowing</c> them. Number of targets: <y>2</c> <c_stack>(+2 per stack)</c>, target range: <b>10m</c> <c_stack>(+1m per stack)</c>. Bosco's fire rate depends on <y>attack speed</c>.",
+            "description": "Grants <b>5% shield</c> for each drone. Gives <y>'Bosco'</c>, which periodically fires at enemies, dealing <y>5% damage</c> and <b>slowing</c> them. Number of targets: <y>2</c> <c_stack>(+2 per stack)</c>, target range: <b>10m</c> <c_stack>(+1m per stack)</c>. Bosco's fire rate depends on <y>attack speed</c>.",
             "destination": "9834,\nCortical Fund,\nMars",
             "date": "08.03.2057",
             "story": "Yo, thanks for the drone parts - they fit my boys like a glove. In return I'm sending you a pretty rare piece - not exactly contraband, but getting it was a real pain. A GK-series assault rifle and a (slightly worn) Autonomous Support Drone (A.S.D.) - exclusive gear from the military-mining company in the Hoxxes system! You'll figure out the rifle yourself, you're no fool, but about the drone - damn, even worn-out, I'd have kept it for myself. Most of its functions are gone, but it still has its laser! Can't say for sure, but it's a patented technology that allows it to remain functional almost indefinitely without losing combat potential. Just make sure no one finds out you've got it - the dwarf who sold it to me went through hell to get it.",

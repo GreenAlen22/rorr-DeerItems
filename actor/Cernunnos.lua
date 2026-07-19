@@ -1,5 +1,5 @@
 -- DeerItems-Cernunnos
--- Summoned ally actor for Ingrown Idol. Spawned only by the item, never by stage cards.
+-- Призываемый союзник для Ingrown Idol. Создаётся только предметом, а не картами этапа.
 
 local SPRITE_PATH = PATH.."assets/sprites/actor/sCernunnos/"
 local GUID = _ENV["!guid"]
@@ -483,9 +483,9 @@ local function configure(inst, owner, stack)
     release_taunted_enemies(inst, data)
 end
 
--- enemyClassic instances already replicate themselves. Only the custom state
--- needs a packet; manually syncing the whole instance creates a second client
--- copy of the ally.
+-- Экземпляры enemyClassic уже синхронизируются сами. Пакет нужен только для
+-- дополнительного состояния: ручная синхронизация всего экземпляра создаст у клиента
+-- вторую копию союзника.
 sync_network_state = function(actor)
     if not Net.is_host() or not actor_exists(actor) then return end
 

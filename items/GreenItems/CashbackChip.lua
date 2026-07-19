@@ -7,7 +7,7 @@
 local sprite = Resources.sprite_load("DeerItems", "item/CashbackChip", PATH.."assets/sprites/items/sGreenItems/CashbackChip.png", 1, 18, 18)
 local sound = Resources.sfx_load("DeerItems", "sound/GoldBar", PATH.."assets/sounds/GoldBar.ogg")
 
--- ── Настройки баланса ──
+-- Настройки баланса
 local CASHBACK_BASE = 0.10
 local FREE_CHEST_BASE = 1
 local FREE_CHEST_STACK_CHANCE = 0.10

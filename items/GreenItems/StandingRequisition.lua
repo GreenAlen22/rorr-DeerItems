@@ -1,7 +1,10 @@
--- DeerItems-StandingRequisition / "Standing Requisition"
+-- DeerItems-StandingRequisition / «Постоянное снабжение» / "Standing Requisition"
+-- В начале этапа создаёт для каждого владельца ящик с двумя бесплатными вариантами и одним платным.
+-- Хост создаёт ящики после того, как все игроки подтвердили загрузку этапа.
 
 local sprite = Resources.sprite_load("DeerItems", "item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 18, 18)
 
+-- Проверяем ящики дважды: сразу после загрузки и ещё раз, когда сеть успеет создать все экземпляры.
 local CHEST_RECONCILE_DELAYS = { 8, 120 }
 
 local item = Item.new("DeerItems", "StandingRequisition")
@@ -21,6 +24,7 @@ local ready_stage_players = {}
 local stage_reconcile_started = false
 local schedule_reconcile
 
+-- Подключает API ящика. Оно может ещё не быть загружено, если порядок файлов изменился.
 local function load_chest_api()
     if chest_api then return chest_api end
 
@@ -47,6 +51,7 @@ local function load_chest_api()
     return chest_api
 end
 
+-- Прокси позволяет обращаться к API ящика как к таблице и подгружает его только при первом обращении.
 local Chest = setmetatable({}, {
     __index = function(_, key)
         return load_chest_api()[key]
@@ -61,6 +66,7 @@ local function make_stage_key(level, stage_id)
     return tostring(level)..":"..tostring(stage_id)
 end
 
+-- Создаём ящики только после готовности всех игроков, иначе клиент может получить дубликат.
 local function try_schedule_reconcile()
     if stage_reconcile_started or not active_stage_key then return end
 
@@ -72,6 +78,7 @@ local function try_schedule_reconcile()
     schedule_reconcile()
 end
 
+-- Хост начинает ожидание клиентов на новом этапе.
 local function begin_stage_ready_barrier(level, stage_id)
     if not is_chest_authority() then return end
 
@@ -96,6 +103,7 @@ local function begin_stage_ready_barrier(level, stage_id)
     try_schedule_reconcile()
 end
 
+-- Клиент сообщает хосту, что завершил загрузку этапа.
 local function send_stage_ready(level, stage_id)
     if not Net.is_client() then return end
 
@@ -124,6 +132,7 @@ packet_stage_ready:onReceived(function(message, player)
     end
 end)
 
+-- Больше стаков повышает вес необычных и редких предметов.
 local function roll_tier(stack)
     local n = math.max(1, stack or 1)
     local common_weight = 0.79
@@ -147,6 +156,7 @@ local function is_excluded(value, exclude)
     return false
 end
 
+-- Выбирает доступный и открытый предмет нужного тира, исключая указанные ID.
 local function pick_item(tier, exclude)
     local candidates = {}
     for _, it in ipairs(Item.find_all(tier, Item.ARRAY.tier)) do
@@ -173,6 +183,7 @@ local function pick_item_with_fallback(tier, exclude)
     return nil
 end
 
+-- Два варианта не могут повторяться и не могут быть самим StandingRequisition.
 local function pick_choices(stack)
     local a = pick_item_with_fallback(roll_tier(stack), { item.value })
     if not a then return nil end
@@ -183,6 +194,7 @@ local function pick_choices(stack)
     return a, b
 end
 
+-- Готовит по одному плану ящика на каждого игрока, у которого есть предмет.
 local function collect_stage_plans()
     stage_plans = {}
 
@@ -209,6 +221,7 @@ local function collect_stage_plans()
     return #stage_plans
 end
 
+-- Ищет случайную точку пола. Если не находит, ящик появится рядом с владельцем.
 local function find_chest_position()
     local director = gm._mod_game_getDirector()
     local width = gm._mod_room_get_current_width()
@@ -244,6 +257,7 @@ local function spawn_chest(plan, index)
     return Chest.create_at(x, y, plan)
 end
 
+-- Сверяет реальные ящики с планами этапа: создаёт недостающие и удаляет лишние.
 local function reconcile_chests()
     if not is_chest_authority() then return end
 
@@ -300,6 +314,7 @@ local function reconcile_chests()
     end
 end
 
+-- Откладывает сверку до двух моментов после загрузки этапа, но не ставит её дважды в один кадр.
 schedule_reconcile = function()
     local frame = Global._current_frame or 0
     if reconcile_scheduled_frame == frame then return end
@@ -309,6 +324,7 @@ schedule_reconcile = function()
     end
 end
 
+-- На новом этапе клиент отправляет подтверждение, а хост запускает ожидание всех игроков.
 Callback.add(Callback.TYPE.onStageStart, "DeerItems-StandingRequisition-stageReady", function()
     local level = math.floor(Global.stage_current_level or -1)
     local stage_id = math.floor(Global.stage_id or -1)

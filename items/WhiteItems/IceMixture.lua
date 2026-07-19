@@ -35,7 +35,7 @@ item:onHitProc(function(actor, victim, stack, hit_info)
     end
 end)
 
--- deBuff: IceMixture
+-- Дебафф предмета IceMixture.
 -- Дебафф, замедляющий передвижение и скорость атаки на 30% в течение 3 секунд
 
 -- Создание дебаффа

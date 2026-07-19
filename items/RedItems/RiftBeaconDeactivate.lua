@@ -1,5 +1,5 @@
 -- DeerItems-RiftBeaconDeactivate
--- Broken Rift Beacon: inert placeholder until the next stage.
+-- Сломанный маяк разлома: неактивная заглушка до следующего этапа.
 
 local sprite = Resources.sprite_load("DeerItems", "item/RiftBeaconDeactivate", PATH.."assets/sprites/items/sRedItems/RiftBeaconDeactivate.png", 1, 18, 18)
 

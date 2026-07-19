@@ -1,5 +1,5 @@
 -- DeerItems-GlassMagnifier
--- Increases drone base damage.
+-- Увеличивает базовый урон дронов.
 
 -- Загружаем спрайт предмета
 local sprite = Resources.sprite_load("DeerItems", "item/GlassMagnifier", PATH.."assets/sprites/items/sWhiteItems/GlassMagnifier.png", 1, 16, 16)
@@ -63,7 +63,7 @@ local function refresh_team_stacks()
     return changed
 end
 
--- Keep owner stacks available for drone stat recalculation.
+-- Количество стаков владельца нужно при пересчёте характеристик дрона.
 item:onStatRecalc(function(actor, stack)
     refresh_team_stacks()
 end)

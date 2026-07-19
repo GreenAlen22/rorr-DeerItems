@@ -18,12 +18,11 @@ local oP   = gm.constants.oP
 -- такой константы нет — откатываемся на надёжного базового oDrone1, чтобы предмет не «молчал».
 local DRONE_OBJ = gm.constants.oDrone10 or gm.constants.oDrone1
 
--- ── Баланс ────────────────────────────────────────────────────────────────────
+-- Настройки баланса
 local DRONE_DMG_STACK = 0.60    -- +60% drone damage per stack
 local HEAL_SHARE = 0.25
 local HEAL_BUFFER_DURATION = 3 * 60
 local DRONE_RADIUS = 100000
--- ──────────────────────────────────────────────────────────────────────────────
 
 local g_team_stack = {}   -- стаки предмета по командам — для хука усиления дронов
 

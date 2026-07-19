@@ -1,4 +1,4 @@
--- Artifact of the Technician: adds purchasable broken drones to the stage director.
+-- Артефакт техника: добавляет в директора этапа покупаемые сломанные дроны.
 
 local sprite = Resources.sprite_load(
     "DeerItems",
