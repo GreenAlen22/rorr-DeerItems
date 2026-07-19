@@ -329,6 +329,10 @@ Callback.add(Callback.TYPE.onStageStart, "DeerItems-StandingRequisition-stageRea
     local level = math.floor(Global.stage_current_level or -1)
     local stage_id = math.floor(Global.stage_id or -1)
 
+    -- The multiplayer chest is deferred until its synchronization is fixed.
+    -- toggle_loot affects normal drop pools only, not explicit item grants.
+    item:toggle_loot(Net.is_single())
+
     if Net.is_client() then
         for _, delay in ipairs({ 1, 30 }) do
             Alarm.create(function()
