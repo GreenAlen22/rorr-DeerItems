@@ -14,15 +14,13 @@ With the V3 update, new items, equipment, elites and a couple of new artifacts h
 
 ![new Items List](https://github.com/GreenAlen22/rorr-DeerItems/blob/main/newItemsList.png?raw=true)
 
-Artifact of the Technician - More drones appear in the stage. The more players there are, the more drones appear. 
-Artifact of Droneman - When a survivor becomes a drone, it inherits that survivor's items. 
-Artifact of Storm - Lightning strikes near the players. Lightning strikes take away 5% of your maximum health. Items enhance the storm. 
-Artifact of Victory - Defeating the teleporter boss revives fallen players at full health. 
-Artifact of Stagnation - The difficulty timer is disabled. During a teleporter event, the timer grows x5 faster. 
+Artifact of the Technician - More drones appear in the stage. The more players there are, the more drones appear.  
+Artifact of Droneman - When a survivor becomes a drone, it inherits that survivor's items.  
+Artifact of Storm - Lightning strikes near the players. Lightning strikes take away 5% of your maximum health. Items enhance the storm.  
+Artifact of Victory - Defeating the teleporter boss revives fallen players at full health.  
+Artifact of Stagnation - The difficulty timer is disabled. During a teleporter event, the timer grows x5 faster.  
 ![artifacts](https://github.com/GreenAlen22/rorr-DeerItems/blob/main/artifacts.png?raw=true)
 
-
-![elites](https://github.com/GreenAlen22/rorr-DeerItems/blob/main/elites.png?raw=true)
 Added mod options to enable or disable the existence of certain items in the run. Go to Game settings > Mods tab to configurate.
 
 ---
@@ -42,7 +40,7 @@ Added mod options to enable or disable the existence of certain items in the run
 * i7et5 - Ideas, Art, Log entries
 
 ## Contacts
-My discord: greenalen22
+My discord: greenalen22  
 The online mode is checked for compatibility. But if there are any errors, please report them to discord.
 
 ## Special thanks
