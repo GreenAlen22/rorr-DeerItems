@@ -333,6 +333,11 @@ Callback.add(Callback.TYPE.onStageStart, "DeerItems-StandingRequisition-stageRea
     -- toggle_loot affects normal drop pools only, not explicit item grants.
     item:toggle_loot(Net.is_single())
 
+    if Net.is_single() then
+        schedule_reconcile()
+        return
+    end
+
     if Net.is_client() then
         for _, delay in ipairs({ 1, 30 }) do
             Alarm.create(function()

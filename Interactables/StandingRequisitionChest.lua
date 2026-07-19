@@ -312,6 +312,8 @@ function M.get_instances()
 end
 
 function M.is_creation_authority()
+    if Net.is_single() then return true end
+
     local host = Player.get_host()
     return Instance.exists(host) and Helper.is_true(host.is_local)
 end
