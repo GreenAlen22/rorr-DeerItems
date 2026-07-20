@@ -35,7 +35,7 @@ item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 local ANTI_DOUBLE = 12
 
 -- При получении предмета — наполняем пул зарядов и сбрасываем очередь восстановления
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     local data = actor:get_data("DeerItems", GUID)
     data.rc_charges = stack      -- доступные запасные заряды
     data.rc_max     = stack      -- потолок пула
@@ -43,7 +43,7 @@ item:onAcquire(function(actor, stack)
 end)
 
 -- Каждый кадр: независимая перезарядка запасных зарядов (кулдаун самой активки НЕ трогаем)
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     local data = actor:get_data("DeerItems", GUID)
     data.rc_max = stack
     if data.rc_charges == nil then data.rc_charges = stack end
@@ -60,7 +60,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- При использовании активки: если в пуле есть заряд — расходуем его и быстро откатываем кулдаун
-item:onEquipmentUse(function(actor, stack)
+DeerItemsCallbacks.item_equipment_use(item, function(actor, stack)
     local data = actor:get_data("DeerItems", GUID)
     data.rc_timers = data.rc_timers or {}
     -- Движок только что выставил полный КД активки — это и есть «КД одного заряда»

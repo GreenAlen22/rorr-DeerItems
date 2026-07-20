@@ -21,7 +21,7 @@ item:set_tier(ItemTier.UNCOMMON)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Р’ РЅР°С‡Р°Р»Рµ СЌС‚Р°РїР° РґР°С‘С‚ РІСЂРµРјРµРЅРЅС‹Р№ Р±Р°С„С„
-item:onStageStart(function(actor, stack)
+DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
     if Net.client then return end
 
     actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
@@ -30,7 +30,7 @@ item:onStageStart(function(actor, stack)
 end)
 
 -- РџСЂРё СѓРґР°СЂРµ Р±Р°С„С„ РёСЃС‡РµР·Р°РµС‚ РїРѕР»РЅРѕСЃС‚СЊСЋ
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if Net.client then return end
 
     if actor:buff_count(buff) >= 1 then
@@ -76,12 +76,12 @@ local function draw_shadow(actor)
 end
 
 -- РћС‡РёСЃС‚РєР° РІСЃРµС… СЃС‚Р°СЂС‹С… РєРѕР»Р»Р±РµРєРѕРІ
-buff:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.buff_post_draw(buff, function(actor, stack)
     draw_shadow(actor)
 end)
 
 -- Р­С„С„РµРєС‚С‹ Р±Р°С„С„Р°: СЃРєРѕСЂРѕСЃС‚СЊ Рё Р±СЂРѕРЅСЏ
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     -- РЈРІРµР»РёС‡РµРЅРёРµ СЃРєРѕСЂРѕСЃС‚Рё РїРµСЂРµРґРІРёР¶РµРЅРёСЏ
     actor.pHmax = actor.pHmax + (0.28 + 0.27 * stack)
     -- РЈРІРµР»РёС‡РµРЅРёРµ Р±СЂРѕРЅРё

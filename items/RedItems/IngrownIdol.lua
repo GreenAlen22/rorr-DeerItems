@@ -63,12 +63,12 @@ local function total_team_stacks(team)
     return math.max(1, total)
 end
 
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     local data = actor:get_data("IngrownIdol", GUID)
     data.fed = (data.fed or 0) + offering_for(victim)
 end)
 
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
 
     local data = actor:get_data("IngrownIdol", GUID)
@@ -83,14 +83,14 @@ item:onPostStep(function(actor, stack)
     data.beast = DeerItemsCernunnos.spawn(actor, total_team_stacks(actor.team))
 end)
 
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if stack <= 1 then
         local data = actor:get_data("IngrownIdol", GUID)
         data.fed = 0
     end
 end)
 
-item:onStageStart(function(actor, stack)
+DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
     actor:get_data("IngrownIdol", GUID).beast = nil
 end)
 

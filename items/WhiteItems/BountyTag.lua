@@ -19,13 +19,13 @@ item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 -- Получение урона обнуляет серию
-item:onDamagedProc(function(actor, attacker, stack, hit_info)
+DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_info)
     if attacker and actor:same(attacker) then return end
     actor:get_data("BountyTag", GUID).bt_streak = 0
 end)
 
 -- Убийство: начисляем золото и наращиваем серию
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     -- Золото — только локальному игроку (HUD-золото клиентское)
     if not actor:same(Player.get_client()) then return end
 

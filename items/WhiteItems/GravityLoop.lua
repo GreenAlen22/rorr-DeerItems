@@ -39,7 +39,7 @@ item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
 -- РћР±СЂР°Р±РѕС‚РєР° С‚СЂРёРіРіРµСЂР° РїСЂРё РїРѕР»СѓС‡РµРЅРёРё СѓСЂРѕРЅР°
-item:onDamagedProc(function(actor, attacker, stack, hit_info)
+DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_info)
     if Net.client then return end
 
     -- РЎСЂР°Р±Р°С‚С‹РІР°РµС‚, РµСЃР»Рё С‚РµРєСѓС‰РµРµ HP СѓРїР°Р»Рѕ РґРѕ 25% РёР»Рё РЅРёР¶Рµ

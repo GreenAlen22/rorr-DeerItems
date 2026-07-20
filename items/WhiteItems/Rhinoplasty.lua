@@ -35,7 +35,7 @@ local function heal_per_skin(actor)
     return HEAL_PER_SKIN + HEAL_PER_EXTRA_ITEM * (item_stack_count(actor) - 1)
 end
 
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if Net.client then return end
 
     local data = actor:get_data("Rhinoplasty", GUID)
@@ -43,7 +43,7 @@ item:onKillProc(function(actor, victim, stack)
 end)
 
 -- РЈ РєР°Р¶РґРѕР№ РєРѕР¶Рё СЃРІРѕР№ С‚Р°Р№РјРµСЂ: РЅРѕРІР°СЏ РєРѕР¶Р° РЅРµ РѕР±РЅРѕРІР»СЏРµС‚ Рё РЅРµ С‚СЂР°С‚РёС‚ СЃС‚Р°СЂС‹Рµ.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if Net.client then return end
 
     local data = actor:get_data("Rhinoplasty", GUID)
@@ -79,7 +79,7 @@ item:onPostStep(function(actor, stack)
     end
 end)
 
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if Net.client or stack > 1 then return end
 
     local data = actor:get_data("Rhinoplasty", GUID)

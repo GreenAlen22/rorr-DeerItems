@@ -35,7 +35,7 @@ buff.is_timed = false
 buff.max_stack = 999
 
 -- РџСЂРё РїСЂРёРјРµРЅРµРЅРёРё Р±Р°С„С„Р° вЂ” СЃРѕР·РґР°С‘Рј С‚Р°Р№РјРµСЂ РµРіРѕ РґРµР№СЃС‚РІРёСЏ (8 СЃРµРєСѓРЅРґ)
-buff:onApply(function(actor, stack)
+DeerItemsCallbacks.buff_apply(buff, function(actor, stack)
     local data = actor:get_data("BloodyRelic", GUID)
     if not data.timers then
         data.timers = {}
@@ -44,7 +44,7 @@ buff:onApply(function(actor, stack)
 end)
 
 -- РљР°Р¶РґС‹Р№ РєР°РґСЂ: СѓРјРµРЅСЊС€Р°РµРј С‚Р°Р№РјРµСЂС‹, СѓРґР°Р»СЏРµРј РёСЃС‚С‘РєС€РёРµ, РѕРіСЂР°РЅРёС‡РёРІР°РµРј СЃС‚Р°РєРё
-buff:onPostStep(function(actor, stack)
+DeerItemsCallbacks.buff_post_step(buff, function(actor, stack)
     local data = actor:get_data("BloodyRelic", GUID)
     local maxAllowed = 5 + actor:item_count(item)
     if data.timers then
@@ -73,12 +73,12 @@ buff:onPostStep(function(actor, stack)
 end)
 
 -- Р‘Р°С„С„ СѓРІРµР»РёС‡РёРІР°РµС‚ СЃРєРѕСЂРѕСЃС‚СЊ Р°С‚Р°РєРё РЅР° 5% Р·Р° СЃС‚Р°Рє
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     actor.attack_speed = actor.attack_speed + ((actor.attack_speed * 0.05) * stack)
 end)
 
 -- РџСЂРё РїРѕРїР°РґР°РЅРёРё: 20% Р·Р° РїРµСЂРІС‹Р№ РїСЂРµРґРјРµС‚, Р·Р°С‚РµРј СѓР±С‹РІР°СЋС‰РёР№ РїСЂРёСЂРѕСЃС‚ С€Р°РЅСЃР°.
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
 
     if math.random() <= hyperbolic_chance(stack) then

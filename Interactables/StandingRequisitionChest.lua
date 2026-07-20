@@ -330,7 +330,7 @@ function M.create_at(x, y, plan)
     return inst
 end
 
-chest_obj:onCreate(function(self)
+Callback.add(chest_obj.on_create, function(self)
     self:interactable_init()
     self:interactable_init_name()
 
@@ -357,7 +357,7 @@ chest_obj:onCreate(function(self)
     end
 end)
 
-chest_obj:onDestroy(function(self)
+Callback.add(chest_obj.on_destroy, function(self)
     if not Net.client then
         self:instance_destroy_sync()
     end
@@ -375,16 +375,20 @@ Hook.add_pre(gm.constants.interactable_pay_cost, function(self, other, result, a
     end
 end)
 
-chest_obj:onCheckCost(function(self, actor)
+gm.post_script_hook(gm.constants.interactable_check_cost, function(self, other, result, args)
+    if not is_requisition_object(self) then return end
+    local actor = Instance.wrap(args[3].value)
     refresh_cost(self)
     local chosen = self.sr_chosen or 0
-    if chosen >= 2 then return false end
+    if chosen >= 2 then result.value = false return end
     if chosen == 0 then
-        return (self.sr_choice_a or -1) >= 0 and (self.sr_choice_b or -1) >= 0
+        result.value = (self.sr_choice_a or -1) >= 0 and (self.sr_choice_b or -1) >= 0
+        return
     end
 
     if Net.client then
-        return item_from_contents(self, 0) ~= nil
+        result.value = item_from_contents(self, 0) ~= nil
+        return
     end
 
     local can_use = #paid_choice_ids(self) > 0 and actor_can_pay(actor, self.cost or 0)
@@ -394,10 +398,10 @@ chest_obj:onCheckCost(function(self, actor)
         data.pending_gold = actor.gold
         data.pending_cost = self.cost or 0
     end
-    return can_use
+    result.value = can_use
 end)
 
-chest_obj:onStep(function(self)
+Callback.add(chest_obj.on_step, function(self)
     refresh_cost(self)
 
     if self.sr_chosen >= 2 then
@@ -512,7 +516,7 @@ chest_obj:onStep(function(self)
     end
 end)
 
-chest_obj:onDraw(function(self)
+Callback.add(chest_obj.on_draw, function(self)
     if self.sr_chosen >= 2 then return end
     if self.sr_chosen == 1 then
         draw_choice_prompt(self, (self.sr_paid_slot or 1) == 0 and CAPSULE_A_X or CAPSULE_B_X)

@@ -26,7 +26,7 @@ local icon = Sprite.new("elite/BrambleIcon",
 
 local bramble = Elite.new("Bramble")
 bramble:set_palette(palette, BRAMBLE_COLOR)
-bramble:set_healthbar_icon(icon)
+bramble.healthbar_icon = icon
 gm.elite_generate_palettes()
 
 local slow = Buff.new("BrambleSlow")
@@ -65,11 +65,11 @@ local function draw_slow_tint(actor)
     end
 end
 
-slow:onPostDraw(function(actor)
+DeerItemsCallbacks.buff_post_draw(slow, function(actor)
     draw_slow_tint(actor)
 end)
 
-slow:onStatRecalc(function(actor)
+DeerItemsCallbacks.buff_stat_recalc(slow, function(actor)
     actor.pHmax = actor.pHmax * SLOW_MULTIPLIER
 end)
 

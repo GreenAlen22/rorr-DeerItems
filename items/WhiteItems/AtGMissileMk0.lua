@@ -15,7 +15,7 @@ local missile = Sprite.new("particle/missile", PATH.."assets/sprites/particle/Mi
 local oMissile = Object.new("missile")
 oMissile:set_sprite(missile)
 -- РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°РєРµС‚С‹ РїСЂРё СЃРѕР·РґР°РЅРёРё
-oMissile:onCreate(function(self)
+Callback.add(oMissile.on_create, function(self)
     self.timer = 0
     self.mask_index = gm.constants.sSinglePixel
     self.speed = 15
@@ -27,7 +27,7 @@ oMissile:onCreate(function(self)
 end)
 
 -- Р›РѕРіРёРєР° РґРІРёР¶РµРЅРёСЏ Рё РЅР°РІРµРґРµРЅРёСЏ СЂР°РєРµС‚С‹
-oMissile:onStep(function(self)
+Callback.add(oMissile.on_step, function(self)
     -- РЈРґР°Р»СЏРµРј СЂР°РєРµС‚Сѓ, РµСЃР»Рё СЂРѕРґРёС‚РµР»СЊ РёСЃС‡РµР·
     if not Instance.exists(self.parent) then
         self:destroy()
@@ -84,7 +84,7 @@ oMissile:onStep(function(self)
 end)
 
 -- Р’Р·СЂС‹РІ Рё СѓРґР°Р»РµРЅРёРµ РїСЂРё СѓРЅРёС‡С‚РѕР¶РµРЅРёРё СЂР°РєРµС‚С‹
-oMissile:onDestroy(function(self)
+Callback.add(oMissile.on_destroy, function(self)
     self.parent:sound_play(boom, 1.0, 0.9 + math.random() * 0.4)
     -- Р’РёР·СѓР°Р»СЊРЅС‹Р№ СЌС„С„РµРєС‚ РІР·СЂС‹РІР°
     gm.instance_create(self.x, self.y, gm.constants.oEfExplosion).sprite_index = explosive
@@ -118,7 +118,7 @@ item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 -- onHitProc (Р° РЅРµ onAttackHit!) СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ РўРћР›Р¬РљРћ РЅР° Р°С‚Р°РєР°С… СЃ РІРєР»СЋС‡С‘РЅРЅС‹Рј proc.
 -- РџРѕРїР°РґР°РЅРёРµ СЃР°РјРѕР№ СЂР°РєРµС‚С‹ РїРѕРјРµС‡РµРЅРѕ proc=false (СЃРј. oMissile:onStep), РїРѕСЌС‚РѕРјСѓ РµС‘ СѓСЂРѕРЅ СЃСЋРґР°
 -- РЅРµ РїРѕРїР°РґР°РµС‚ Рё С†РµРїРѕС‡РєР° В«СЂР°РєРµС‚Р° в†’ СЂР°РєРµС‚Р° в†’ вЂ¦В» Р±РѕР»СЊС€Рµ РЅРµ Р·Р°С†РёРєР»РёРІР°РµС‚СЃСЏ.
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
     -- РЁР°РЅСЃ 7% Р·Р° СЃС‚Р°Рє
     if math.random() <= (0.07 * stack) then
@@ -132,6 +132,6 @@ item:onHitProc(function(actor, victim, stack, hit_info)
 end)
 
 -- РћС‚СЂРёСЃРѕРІРєР° РёРєРѕРЅРєРё РїСЂРµРґРјРµС‚Р° РЅР°Рґ РїРµСЂСЃРѕРЅР°Р¶РµРј
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     gm.draw_sprite(AtgActorSprite, 0, actor.x, actor.y)
 end)

@@ -15,7 +15,7 @@ item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 
 -- РћС‡РёСЃС‚РєР° СЃС‚Р°СЂС‹С… РєРѕР»Р»Р±РµРєРѕРІ
 -- РџСЂРё СѓР±РёР№СЃС‚РІРµ РІСЂР°РіР° СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ С€Р°РЅСЃ РЅР° СЃРѕР·РґР°РЅРёРµ РѕР±Р»Р°РєР°
-item:onKillProc(function(killer, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(killer, victim, stack)
     if not Net.host then return end
 
     if math.random() < 0.44 then

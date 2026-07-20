@@ -29,6 +29,7 @@ end
 -- These non-item modules have no availability configuration and are loaded in a
 -- deliberate order after vanilla content is ready.
 Initialize.add(function()
+    require("./helpers/ReturnsCallbacks")
     require("./Interactables/StandingRequisitionChest")
     require("./actor/Cernunnos")
     require("./elite/Bramble")

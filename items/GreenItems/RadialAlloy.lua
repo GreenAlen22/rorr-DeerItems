@@ -14,7 +14,7 @@ item:set_tier(ItemTier.UNCOMMON)
 item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
 -- РџСЂРё РїРѕР»СѓС‡РµРЅРёРё СѓСЂРѕРЅР°: Р»РµС‡РёРј С‡Р°СЃС‚СЊ РѕР±СЂР°С‚РЅРѕ
-item:onDamagedProc(function(actor, attacker, stack, hit_info)
+DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_info)
     if Net.client then return end
 
     if stack <= 0 then return end

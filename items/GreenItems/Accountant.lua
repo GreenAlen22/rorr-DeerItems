@@ -47,7 +47,7 @@ local function attack_speed_bonus(actor, equipment)
 end
 
 -- При использовании снаряжения — применяем бафф
-item:onEquipmentUse(function(actor, stack, equipment)
+DeerItemsCallbacks.item_equipment_use(item, function(actor, stack, equipment)
     actor:get_data("Accountant", GUID).attack_speed_bonus = attack_speed_bonus(actor, equipment)
     actor:buff_apply(buff, 60 * (6 + 3 * (stack - 1)), 1)
 
@@ -61,7 +61,7 @@ buff.is_debuff = false
 buff.max_stack = 1
 
 -- Очистка предыдущих коллбеков баффа
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     local data = actor:get_data("Accountant", GUID)
     actor.attack_speed = actor.attack_speed * (1 + (data.attack_speed_bonus or 0))
 end)

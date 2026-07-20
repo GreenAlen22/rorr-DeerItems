@@ -98,7 +98,7 @@ local function refresh_team_stacks()
 end
 
 -- Пересчёт статов владельца: запоминаем число дронов и стаки.
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     if stack <= 0 then return end
 
     -- Актуализируем стаки команды для усиления дронов (см. глобальный хук ниже)
@@ -109,14 +109,14 @@ item:onStatRecalc(function(actor, stack)
 end)
 
 -- При получении предмета (в т.ч. первого стака) сразу применяем усиление к уже существующим дронам.
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     refresh_team_stacks()
     recalc_drones(actor)
 end)
 
 -- Число дронов меняется само по себе (покупка/гибель), а статы так часто не пересчитываются.
 -- Поэтому раз в COUNT_PERIOD кадров сверяем число дронов и при изменении ставим пересчёт в очередь.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     local changed = refresh_team_stacks()
     if changed then
         recalc_drones(actor)
@@ -147,7 +147,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- При полной потере предмета убираем усиление дронов этой команды.
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     -- onRemove приходит со стаком ДО удаления: stack == 1 означает, что предмета не останется.
     pending_recalculate[actor.id] = actor
 end)

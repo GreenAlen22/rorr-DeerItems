@@ -38,7 +38,7 @@
 -- dyn:set_sprite(dynSprite)
 -- dyn:set_depth(-10)
 
--- dyn:onCreate(function(self)
+-- Callback.add(dyn.on_create, function(self)
 --     self.parent   = -4
 --     self.team     = 1
 --     self.timer    = 0
@@ -52,7 +52,7 @@
 --     self:projectile_sync(8)      -- Р В РЎвЂќР В Р’В»Р В РЎвЂР В Р’ВµР В Р вЂ¦Р РЋРІР‚С™Р РЋРІР‚в„– Р В Р вЂ Р В РЎвЂР В РўвЂР РЋР РЏР РЋРІР‚С™ Р В РЎвЂ”Р В Р’В°Р В РўвЂР В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ
 -- end)
 
--- dyn:onStep(function(self)
+-- Callback.add(dyn.on_step, function(self)
 --     self.image_angle = self.image_angle + 12     -- Р В РЎвЂќР РЋРЎвЂњР В Р вЂ Р РЋРІР‚в„–Р РЋР вЂљР В РЎвЂќР В Р’В°Р В Р вЂ¦Р В РЎвЂР В Р’Вµ Р РЋРІвЂљВ¬Р В Р’В°Р РЋРІвЂљВ¬Р В РЎвЂќР В РЎвЂ (Р В РЎвЂќР В РЎвЂўР РЋР С“Р В РЎВР В Р’ВµР РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В°, Р В Р вЂ¦Р В Р’В° Р В Р вЂ Р РЋР С“Р В Р’ВµР РЋРІР‚В¦ Р В РЎвЂќР В Р’В»Р В РЎвЂР В Р’ВµР В Р вЂ¦Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚В¦)
 
 --     -- Р В РІР‚СњР В Р’ВµР РЋРІР‚С™Р В РЎвЂўР В Р вЂ¦Р В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ host-Р В Р’В°Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В РЎвЂР РЋРІР‚С™Р В Р’ВµР РЋРІР‚С™Р В Р вЂ¦Р В Р’В°; Р В РЎвЂќР В Р’В»Р В РЎвЂР В Р’ВµР В Р вЂ¦Р РЋРІР‚С™Р РЋРІР‚в„– Р В РЎвЂ”Р В РЎвЂўР В Р’В»Р РЋРЎвЂњР РЋРІР‚РЋР В Р’В°Р РЋРІР‚С™ Р РЋРЎвЂњР В Р вЂ¦Р В РЎвЂР РЋРІР‚РЋР РЋРІР‚С™Р В РЎвЂўР В Р’В¶Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ Р РЋРІР‚РЋР В Р’ВµР РЋР вЂљР В Р’ВµР В Р’В· instance_destroy_sync.
@@ -83,7 +83,7 @@
 --     end
 -- end)
 
--- dyn:onDestroy(function(self)
+-- Callback.add(dyn.on_destroy, function(self)
 --     -- Р В РІР‚в„ўР В РЎвЂР В Р’В·Р РЋРЎвЂњР В Р’В°Р В Р’В» Р В Р вЂ Р В Р’В·Р РЋР вЂљР РЋРІР‚в„–Р В Р вЂ Р В Р’В° (Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р вЂ¦Р В РўвЂР В Р’В°Р РЋР вЂљР РЋРІР‚С™Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р РЋР РЉР РЋРІР‚С›Р РЋРІР‚С›Р В Р’ВµР В РЎвЂќР РЋРІР‚С™ Р В РўвЂР В Р вЂ Р В РЎвЂР В Р’В¶Р В РЎвЂќР В Р’В°) + Р В Р’В·Р В Р вЂ Р РЋРЎвЂњР В РЎвЂќ.
 --     local ef = gm.instance_create(self.x, self.y, gm.constants.oEfExplosion)
 --     if ef then
@@ -116,14 +116,14 @@
 -- obj:set_sprite(droneSprite)
 -- obj:set_depth(1)
 
--- obj:onCreate(function(self)
+-- Callback.add(obj.on_create, function(self)
 --     local data = self:get_data(nil, GUID)
 --     self.persistent  = true       -- Р В РЎвЂ”Р В Р’ВµР РЋР вЂљР В Р’ВµР В Р’В¶Р В РЎвЂР В Р вЂ Р В Р’В°Р В Р’ВµР РЋРІР‚С™ Р РЋР С“Р В РЎВР В Р’ВµР В Р вЂ¦Р РЋРЎвЂњ Р РЋР РЉР РЋРІР‚С™Р В Р’В°Р В РЎвЂ”Р В Р’В°
 --     self.image_speed = 0.25
 --     data.bob = gm.irandom_range(0, 359)
 -- end)
 
--- obj:onStep(function(self)
+-- Callback.add(obj.on_step, function(self)
 --     local data   = self:get_data(nil, GUID)
 --     local parent = data.parent
 --     -- Р В РЎСљР В Р’ВµР РЋРІР‚С™ Р В Р вЂ Р В Р’В»Р В Р’В°Р В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р РЋРІР‚В Р В Р’В° Р Р†Р вЂљРІР‚Сњ Р В РўвЂР РЋР вЂљР В РЎвЂўР В Р вЂ¦Р В Р’В° Р РЋРЎвЂњР В Р’В±Р В РЎвЂР РЋР вЂљР В Р’В°Р В Р’ВµР В РЎВ.
@@ -182,11 +182,11 @@
 --     return data
 -- end
 
--- item:onAcquire(function(actor, stack)
+-- DeerItemsCallbacks.item_acquired(item, function(actor, stack)
 --     ensure_drone(actor)
 -- end)
 
--- item:onRemove(function(actor, stack)
+-- DeerItemsCallbacks.item_removed(item, function(actor, stack)
 --     if stack <= 1 then
 --         local data = actor:get_data("BombardierSwarm", GUID)
 --         if data.inst and data.inst:exists() then data.inst:destroy() end
@@ -195,13 +195,13 @@
 -- end)
 
 -- -- Р В Р Р‹Р РЋРІР‚С™Р РЋР вЂљР В Р’В°Р РЋРІР‚В¦Р В РЎвЂўР В Р вЂ Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р В РЎвЂў Р В РўвЂР В Р’ВµР РЋР вЂљР В Р’В¶Р В РЎвЂР В РЎВ Р В Р’В±Р В РЎвЂўР В РЎВР В Р’В±Р В Р’В°Р РЋР вЂљР В РўвЂР В РЎвЂР РЋР вЂљР В Р’В° Р В Р’В¶Р В РЎвЂР В Р вЂ Р РЋРІР‚в„–Р В РЎВ (Р В Р вЂ¦Р В Р’В°Р В РЎвЂ”Р РЋР вЂљР В РЎвЂР В РЎВР В Р’ВµР РЋР вЂљ, Р В Р’ВµР РЋР С“Р В Р’В»Р В РЎвЂ Р РЋР С“Р В РЎВР В Р’ВµР В Р вЂ¦Р В Р’В° Р РЋР РЉР РЋРІР‚С™Р В Р’В°Р В РЎвЂ”Р В Р’В° Р РЋР С“Р В Р’В±Р РЋР вЂљР В РЎвЂўР РЋР С“Р В РЎвЂР В Р’В»Р В Р’В° Р В РЎвЂўР В Р’В±Р РЋР вЂ°Р В Р’ВµР В РЎвЂќР РЋРІР‚С™).
--- item:onPostStep(function(actor, stack)
+-- DeerItemsCallbacks.item_post_step(item, function(actor, stack)
 --     if stack <= 0 then return end
 --     ensure_drone(actor)
 -- end)
 
 -- -- Р В РЎС›Р В Р’В°Р В РІвЂћвЂ“Р В РЎВР В Р’ВµР РЋР вЂљ Р В Р’В±Р В РЎвЂўР В РЎВР В Р’В±Р В Р’В°Р РЋР вЂљР В РўвЂР В РЎвЂР РЋР вЂљР В РЎвЂўР В Р вЂ Р В РЎвЂќР В РЎвЂ Р Р†Р вЂљРІР‚Сњ host-Р В Р’В°Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В РЎвЂР РЋРІР‚С™Р В Р’ВµР РЋРІР‚С™Р В Р вЂ¦Р В РЎвЂў (Р В РЎвЂќР В Р’В°Р В РЎвЂќ Totemetry).
--- item:onPreStep(function(actor, stack)
+-- DeerItemsCallbacks.item_pre_step(item, function(actor, stack)
 --     if Net.client then return end
 --     local data = actor:get_data("BombardierSwarm", GUID)
 --     local now  = Global._current_frame

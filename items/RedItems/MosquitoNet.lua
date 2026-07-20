@@ -41,7 +41,7 @@ local item = Item.new("MosquitoNet")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.RARE)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
     local data  = actor:get_data("MosquitoNet", GUID)
     local frame = Global._current_frame
@@ -146,7 +146,7 @@ pcall(function()
 end)
 
 -- Р›С‘РіРєРёР№ РёРЅРґРёРєР°С‚РѕСЂ Р·РѕРЅС‹ Р·Р°С‰РёС‚С‹ РїРѕРґ РёРіСЂРѕРєРѕРј (РІСЃС‚СЂРѕРµРЅРЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР°, Р°СЃСЃРµС‚ РЅРµ РЅСѓР¶РµРЅ).
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     if stack <= 0 then return end
     local left   = actor.x - RADIUS
     local top    = actor.y - RADIUS

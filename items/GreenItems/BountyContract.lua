@@ -53,7 +53,7 @@ end
 -- (a) Р”РѕР±РёРІР°РЅРёРµ СЌР»РёС‚ РїРѕ РїРѕСЂРѕРіСѓ HP (РЅР° С…РѕСЃС‚Рµ вЂ” РѕРЅ РІР»Р°РґРµРµС‚ HP РІСЂР°РіРѕРІ).
 -- РќР°РіСЂР°РґСѓ РІС‹РґР°С‘Рј РџР РЇРњРћ Р·РґРµСЃСЊ (РјС‹ Р·РЅР°РµРј, С‡С‚Рѕ СЌС‚Рѕ СѓР±РёР№СЃС‚РІРѕ), РЅРµ РїРѕР»Р°РіР°СЏСЃСЊ РЅР° onKillProc РїРѕСЃР»Рµ
 -- РїСЂСЏРјРѕР№ Р·Р°РїРёСЃРё HP. Р‘РѕСЃСЃР° РЅРµ РґРѕР±РёРІР°РµРј.
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
     if not is_elite(victim) then return end
     if GM.actor_is_boss and truthy(GM.actor_is_boss(victim)) then return end
@@ -69,7 +69,7 @@ end)
 
 -- (b) РќР°РіСЂР°РґР° Р·Р° РѕР±С‹С‡РЅРѕРµ СѓР±РёР№СЃС‚РІРѕ СЌР»РёС‚С‹ (Р±РѕР»СЊС€РёРј СѓРґР°СЂРѕРј, Р±РµР· РґРѕР±РёРІР°РЅРёСЏ).
 -- paid[id] РЅРµ РґР°СЃС‚ Р·Р°РїР»Р°С‚РёС‚СЊ РґРІР°Р¶РґС‹ Р·Р° СѓР¶Рµ РґРѕР±РёС‚СѓСЋ СЌР»РёС‚Сѓ.
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if not is_elite(victim) then return end
     reward(actor, victim, stack)
 end)

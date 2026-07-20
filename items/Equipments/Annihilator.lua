@@ -26,7 +26,7 @@ local CONTACT_RADIUS = 32        -- РґРёСЃС‚Р°РЅС†РёСЏ В«�
 -- РћР±СЉРµРєС‚ В«Р·Р°СЂСЏРґВ»
 local oCharge = Object.new("AnnihilatorCharge")
 oCharge:set_sprite(chargeSprite)
-oCharge:onCreate(function(self)
+Callback.add(oCharge.on_create, function(self)
     self.timer = 0
     self.zap = 0
     self.mask_index = gm.constants.sSinglePixel
@@ -37,7 +37,7 @@ oCharge:onCreate(function(self)
     self:projectile_sync(10)
 end)
 
-oCharge:onStep(function(self)
+Callback.add(oCharge.on_step, function(self)
     -- Р—Р°СЂСЏРґ СЂР°СЃСЃС‡РёС‚С‹РІР°РµС‚ С…РѕСЃС‚. РљР»РёРµРЅС‚С‹ С‚РѕР»СЊРєРѕ СЂРёСЃСѓСЋС‚ СЃРЅР°СЂСЏРґ, СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅРЅС‹Р№ С‡РµСЂРµР·
     -- projectile_sync, Рё РЅРµ РґРІРёРіР°СЋС‚ РІС‚РѕСЂСѓСЋ Р»РѕРєР°Р»СЊРЅСѓСЋ РєРѕРїРёСЋ.
     if Net.client then return end
@@ -77,7 +77,7 @@ oCharge:onStep(function(self)
     if detonate then self:destroy() end
 end)
 
-oCharge:onDestroy(function(self)
+Callback.add(oCharge.on_destroy, function(self)
     if Instance.exists(self.parent) then
         self.parent:sound_play(sndBoom, 1.0, 0.8 + math.random() * 0.2)
         self.parent:screen_shake(8)
@@ -117,7 +117,7 @@ equip:set_sprite(sprite)
 equip.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 equip.cooldown = COOLDOWN * 60
 
-equip:onUse(function(actor)
+Callback.add(equip.on_use, function(actor)
     -- РљРѕР»Р»Р±РµРє СЃРЅР°СЂСЏР¶РµРЅРёСЏ РІС‹Р·С‹РІР°РµС‚СЃСЏ Сѓ РІСЃРµС…. РЎРѕР·РґР°С‘Рј Р·Р°СЂСЏРґ С‚РѕР»СЊРєРѕ РЅР° С…РѕСЃС‚Рµ, С‡С‚РѕР±С‹
     -- СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅРЅС‹Р№ projectile_sync Р±С‹Р» РµРґРёРЅСЃС‚РІРµРЅРЅРѕР№ РєРѕРїРёРµР№, РІРёРґРёРјРѕР№ РєР»РёРµРЅС‚Р°Рј.
     if not Net.host then return end

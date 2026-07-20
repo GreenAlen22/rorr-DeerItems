@@ -16,7 +16,7 @@ item:set_tier(ItemTier.RARE)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 
 -- При создании атаки: усиливаем критический урон
-item:onAttackCreate(function(actor, stack, attack_info)
+DeerItemsCallbacks.item_attack_create(item, function(actor, stack, attack_info)
     if attack_info.critical and stack and stack > 0 then
         -- Усиление: 1.5 базово + 1.0 за каждый последующий стак
         local extra = 1.5 + 1.0 * (stack - 1)
@@ -26,10 +26,10 @@ item:onAttackCreate(function(actor, stack, attack_info)
 end)
 
 -- Добавляем 10% критшанса
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     actor.critical_chance = actor.critical_chance + 10
 end)
 -- Отображение визуального индикатора у персонажа
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     gm.draw_sprite(DiamondIndictor, 0, actor.x - 30, actor.y + 50)
 end)

@@ -26,7 +26,7 @@ item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Очистка старых коллбеков
 -- При активации взаимодействий даёт бафф
-item:onInteractableActivate(function(actor, stack, interactable)
+DeerItemsCallbacks.item_interactable_activate(item, function(actor, stack, interactable)
     -- Применяем бафф на 10 секунд за стак
     actor:buff_apply(buff, 10 * 60, stack)
     -- Один раз за активацию выбираем, какой навык получит ускоренную перезарядку,
@@ -101,7 +101,7 @@ buff.max_stack = 9999
 
 -- Очистка старых коллбеков баффа
 -- Модификация статов под действием баффа
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     -- Увеличение максимальной горизонтальной скорости
     actor.pHmax = actor.pHmax + (0.19 + 0.22 * stack)
     -- Берём ЗАФИКСИРОВАННЫЙ при активации навык (а не новый рандом на каждом пересчёте)

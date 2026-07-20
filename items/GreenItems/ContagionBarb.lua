@@ -48,7 +48,7 @@ local function apply_bleed(actor, victim, source_damage)
 end
 
 -- РџСЂРё РїРѕРїР°РґР°РЅРёРё: С€Р°РЅСЃ РЅР°Р»РѕР¶РёС‚СЊ РєСЂРѕРІРѕС‚РµС‡РµРЅРёРµ
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
     if math.random() <= (CHANCE_BASE + CHANCE_STACK * (stack - 1)) then
         apply_bleed(actor, victim, hit_info and hit_info.damage)
@@ -56,7 +56,7 @@ item:onHitProc(function(actor, victim, stack, hit_info)
 end)
 
 -- РўРёРє РєСЂРѕРІРѕС‚РµС‡РµРЅРёСЏ РѕС‚ Р»РёС†Р° РёРіСЂРѕРєР° (СѓСЂРѕРЅ СЃРєРµР№Р»РёС‚СЃСЏ Рё Р·Р°СЃС‡РёС‚С‹РІР°РµС‚СЃСЏ РёРіСЂРѕРєСѓ)
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if Net.client then return end
     local data = actor:get_data("ContagionBarb", GUID)
     if not data.bleeds then return end
@@ -82,7 +82,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- РџСЂРё СѓР±РёР№СЃС‚РІРµ РєСЂРѕРІРѕС‚РѕС‡Р°С‰РµРіРѕ РІСЂР°РіР°: СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅСЏРµРј РєСЂРѕРІРѕС‚РµС‡РµРЅРёРµ РЅР° Р±Р»РёР¶Р°Р№С€РёС…
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if not Net.host then return end
     if not (victim and Instance.exists(victim)) then return end
     local data = actor:get_data("ContagionBarb", GUID)

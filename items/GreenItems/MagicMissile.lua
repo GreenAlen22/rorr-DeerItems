@@ -23,7 +23,7 @@ local PIERCE_TARGETS = 4
 
 local arrow = Object.new("MagicMissileArrow")
 arrow:set_sprite(arrowSprite)
-arrow:onCreate(function(self)
+Callback.add(arrow.on_create, function(self)
     self.timer = 0
     self.speed = ARROW_SPEED
     self.direction = 0
@@ -34,7 +34,7 @@ arrow:onCreate(function(self)
     self:projectile_sync(8)
 end)
 
-arrow:onStep(function(self)
+Callback.add(arrow.on_step, function(self)
     self.image_angle = self.direction
 
     if Net.client then return end
@@ -75,7 +75,7 @@ arrow:onStep(function(self)
     end
 end)
 
-arrow:onDestroy(function(self)
+Callback.add(arrow.on_destroy, function(self)
     if Instance.exists(self.parent) then
         self.parent:sound_play(MagicMissileHit, 1.0, 0.9 + math.random() * 0.4)
     end
@@ -102,7 +102,7 @@ local item = Item.new("MagicMissile")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.UNCOMMON)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     local data = actor:get_data("MagicMissile", GUID)
     local cap = CAP_BASE + CAP_STACK * (stack - 1)
     if data.charges == nil then data.charges = cap end
@@ -118,7 +118,7 @@ item:onPostStep(function(actor, stack)
     end
 end)
 
-item:onPrimaryUse(function(actor, stack, active_skill)
+DeerItemsCallbacks.item_primary_use(item, function(actor, stack, active_skill)
     if not Net.host then return end
     local data = actor:get_data("MagicMissile", GUID)
 

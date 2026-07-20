@@ -16,7 +16,7 @@ item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- При начале стадии: воспроизведение звука и начисление золота
-item:onStageStart(function(actor, stack)
+DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
     if not actor:same(Player.get_client()) then return end
 
     -- Воспроизводим звук с рандомизированным питчем

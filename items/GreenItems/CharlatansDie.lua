@@ -76,7 +76,7 @@ local function roll_extra_count(stack)
     return count
 end
 
-item:onInteractableActivate(function(actor, stack, interactable)
+DeerItemsCallbacks.item_interactable_activate(item, function(actor, stack, interactable)
     if Net.client then return end       -- СЃРїР°РІРЅ СЏС‰РёРєРѕРІ С‚РѕР»СЊРєРѕ РЅР° С…РѕСЃС‚Рµ
     if used_stage[actor.id] then return end
     if not is_chest(interactable) then return end
@@ -100,6 +100,6 @@ item:onInteractableActivate(function(actor, stack, interactable)
 end)
 
 -- РЎР±СЂРѕСЃ РЅР° РЅРѕРІРѕРј СЌС‚Р°РїРµ
-item:onStageStart(function(actor, stack)
+DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
     used_stage[actor.id] = nil
 end)

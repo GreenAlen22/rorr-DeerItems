@@ -21,7 +21,7 @@ local iceBuff
 
 -- РћС‡РёСЃС‚РєР° СЃС‚Р°СЂС‹С… РєРѕР»Р»Р±РµРєРѕРІ
 -- РџСЂРё РїРѕРїР°РґР°РЅРёРё Р°С‚Р°РєРѕР№ СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ С€Р°РЅСЃ РЅР°Р»РѕР¶РёС‚СЊ Р·Р°РјРµРґР»СЏСЋС‰РёР№ РґРµР±Р°С„С„
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
 
     -- РЁР°РЅСЃ 7% (2+5) Рё + 5% Р·Р° СЃС‚Р°Рє
@@ -46,7 +46,7 @@ buff.is_timed = false
 buff.is_debuff = true
 
 -- РџСЂРё РїСЂРёРјРµРЅРµРЅРёРё вЂ” Р·Р°РїСѓСЃРєР°РµРј С‚Р°Р№РјРµСЂ Рё РјРµРЅСЏРµРј РІРёР·СѓР°Р»
-buff:onApply(function(actor, stack)
+DeerItemsCallbacks.buff_apply(buff, function(actor, stack)
     local actorData = actor:get_data("IceMixture", GUID)
     if not actorData.timers then
         actorData.timers = {}
@@ -58,7 +58,7 @@ buff:onApply(function(actor, stack)
 end)
 
 -- РћР±РЅРѕРІР»РµРЅРёРµ С‚Р°Р№РјРµСЂРѕРІ РєР°Р¶РґРѕРіРѕ СЃС‚РµРєР°
-buff:onPostStep(function(actor, stack)
+DeerItemsCallbacks.buff_post_step(buff, function(actor, stack)
     local actorData = actor:get_data("IceMixture", GUID) or {}
     -- РћР±РЅРѕРІР»СЏРµРј С‚Р°Р№РјРµСЂС‹ Рё СѓРґР°Р»СЏРµРј РёСЃС‚РµРєС€РёРµ
     if actorData.timers then
@@ -78,12 +78,12 @@ buff:onPostStep(function(actor, stack)
 end)
 
 -- РџСЂРё СЃРЅСЏС‚РёРё РґРµР±Р°С„С„Р° вЂ” РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј С†РІРµС‚
-buff:onRemove(function(actor, stacks_removed)
+DeerItemsCallbacks.buff_remove(buff, function(actor, stacks_removed)
     actor.image_blend = Color(0xFFFFFF)
 end)
 
 -- РР·РјРµРЅРµРЅРёРµ СЃС‚Р°С‚РѕРІ РїРѕРґ РґРµР№СЃС‚РІРёРµРј РґРµР±Р°С„С„Р°
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     actor.pHmax = actor.pHmax * 0.70          -- РјРёРЅСѓСЃ 30% Рє СЃРєРѕСЂРѕСЃС‚Рё РїРµСЂРµРґРІРёР¶РµРЅРёСЏ
     actor.attack_speed = actor.attack_speed * 0.70 -- РјРёРЅСѓСЃ 30% Рє СЃРєРѕСЂРѕСЃС‚Рё Р°С‚Р°РєРё
 end)

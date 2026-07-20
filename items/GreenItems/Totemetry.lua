@@ -33,7 +33,7 @@ local objTotem = Object.new("EfHealingTotem")
 objTotem.obj_sprite = LevelTotem
 objTotem.obj_depth = 50
 -- РџСЂРё СЃРѕР·РґР°РЅРёРё С‚РѕС‚РµРјР°
-objTotem:onCreate(function(self)
+Callback.add(objTotem.on_create, function(self)
     self.life = TOTEM_LIFE
     self.radius = RADIUS_BASE
     self.stack = 1
@@ -41,7 +41,7 @@ objTotem:onCreate(function(self)
 end)
 
 -- РџРѕРІРµРґРµРЅРёРµ С‚РѕС‚РµРјР°: Р»РµС‡РµРЅРёРµ СЃРѕСЋР·РЅРёРєРѕРІ РІ СЂР°РґРёСѓСЃРµ СЂР°Р· РІ 3 СЃРµРєСѓРЅРґС‹
-objTotem:onStep(function(self)
+Callback.add(objTotem.on_step, function(self)
     if Net.client then return end
 
     self.life = self.life - 1
@@ -57,7 +57,7 @@ objTotem:onStep(function(self)
 end)
 
 -- Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ СЂР°РґРёСѓСЃР° С‚РѕС‚РµРјР°
-objTotem:onDraw(function(self)
+Callback.add(objTotem.on_draw, function(self)
     -- РљРѕРѕСЂРґРёРЅР°С‚С‹ Рё СЂР°РґРёСѓСЃ С‡РёС‚Р°РµРј РёР· РёРЅСЃС‚Р°РЅСЃР° РѕРґРёРЅ СЂР°Р· Р·Р° РєР°РґСЂ
     local x, y, r = self.x, self.y - 40, self.radius
     gm.draw_set_colour(TOTEM_COLOR)
@@ -68,7 +68,7 @@ objTotem:onDraw(function(self)
 end)
 
 -- РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РїСЂРё СѓРґР°Р»РµРЅРёРё
-objTotem:onDestroy(function(self)
+Callback.add(objTotem.on_destroy, function(self)
     self:instance_destroy_sync()
 end)
 
@@ -78,7 +78,7 @@ local as_buff_until    = {}   -- [actor.id] в†’ РґРѕ РєР°РєРѕР
 
 -- РћС‡РёСЃС‚РєР° РєРѕР»Р»Р±РµРєРѕРІ
 -- РџСЂРѕРІРµСЂРєР° РІСЂРµРјРµРЅРё Рё СЃРїР°РІРЅ С‚РѕС‚РµРјР° (РєР°Р¶РґС‹Рµ 2 РјРёРЅСѓС‚С‹)
-item:onPreStep(function(actor, stack)
+DeerItemsCallbacks.item_pre_step(item, function(actor, stack)
     if Net.client then return end
 
     local now = Global._current_frame
@@ -100,7 +100,7 @@ item:onPreStep(function(actor, stack)
 end)
 
 -- Р‘РѕРЅСѓСЃ Рє СЃРєРѕСЂРѕСЃС‚Рё Р°С‚Р°РєРё, РµСЃР»Рё Р°РєС‚РёРІРµРЅ СЌС„С„РµРєС‚
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     local until_frame = as_buff_until[actor.id]
     if until_frame and Global._current_frame < until_frame then
         actor.attack_speed = actor.attack_speed * 1.10

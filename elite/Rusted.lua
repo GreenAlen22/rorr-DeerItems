@@ -59,7 +59,7 @@ local spike_emerge_sound = Sound.new("elite/RustedSpikeEmerge",
 
 local rusted = Elite.new("Rusted")
 rusted:set_palette(palette, Color(0x9c4d26))
-rusted:set_healthbar_icon(icon)
+rusted.healthbar_icon = icon
 gm.elite_generate_palettes()
 
 local rust = Buff.new("RustedDebuff")
@@ -129,7 +129,7 @@ end
 
 Callback.add(Callback.ON_DIRECTOR_POPULATE_SPAWN_ARRAYS, update_card_availability)
 
-rusted:onApply(function(actor)
+Callback.add(rusted.on_apply, function(actor)
     if not Net.host then return end
     if not is_rusted(actor) then return end
 
@@ -194,7 +194,9 @@ local function fire_spike_attack(spike, width, height)
     end
 end
 
-Actor:onAttackHit("DeerItems-Rusted-applyDebuff", function(actor, victim, hit_info)
+Callback.add(Callback.ON_ATTACK_HIT, function(hit_info)
+    local actor = hit_info.inflictor
+    local victim = hit_info.target
     if not Net.host then return end
     if not is_rusted(actor) or not is_player(victim) then return end
 

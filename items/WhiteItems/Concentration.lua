@@ -25,14 +25,14 @@ local function is_ready(data)
     return (Global._current_frame - (data.cc_last_hit or -math.huge)) >= SAFE_FRAMES
 end
 
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     local data = actor:get_data("Concentration", GUID)
     data.cc_last_hit = Global._current_frame
     data.cc_was_ready = false
 end)
 
 -- РЈСЃРёР»РµРЅРЅС‹Р№ СѓРґР°СЂ: РїСЂРё РїРѕРїР°РґР°РЅРёРё, РµСЃР»Рё Р·Р°СЂСЏР¶РµРЅРѕ вЂ” РґРѕР±Р°РІР»СЏРµРј +60%/СЃС‚Р°Рє РѕС‚РґРµР»СЊРЅС‹Рј С…РёС‚РѕРј
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if stack <= 0 then return end
     local dmg = hit_info and (hit_info.damage or 0) or 0
     if dmg <= 0 then return end
@@ -56,7 +56,7 @@ item:onHitProc(function(actor, victim, stack, hit_info)
 end)
 
 -- Р—РІСѓРє СЂРѕРІРЅРѕ РІ РјРѕРјРµРЅС‚, РєРѕРіРґР° СѓРґР°СЂ СЃС‚Р°Р» РіРѕС‚РѕРІ (РїРµСЂРµС…РѕРґ В«РЅРµ РіРѕС‚РѕРІРѕ в†’ РіРѕС‚РѕРІРѕВ»)
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
     local data = actor:get_data("Concentration", GUID)
     local ready = is_ready(data)
@@ -67,7 +67,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- РџР°СЂС‚РёРєР» СЂРѕРІРЅРѕ РџРћР” РїРµСЂСЃРѕРЅР°Р¶РµРј, РїРѕРєР° СѓСЃРёР»РµРЅРЅС‹Р№ СѓРґР°СЂ РіРѕС‚РѕРІ
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     if stack <= 0 then return end
     if is_ready(actor:get_data("Concentration", GUID)) then
         gm.draw_sprite(critParticle, 0, actor.x, actor.y + 60)

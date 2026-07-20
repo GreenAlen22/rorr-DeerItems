@@ -21,19 +21,17 @@ item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 
 -- РћР±СЂР°Р±РѕС‚РєР° РїРµСЂРµСЃС‡С‘С‚Р° СЃС‚Р°С‚РёСЃС‚РёРєРё: РІСЂРµРјРµРЅРЅС‹Р№ Р±РѕРЅСѓСЃ Рє СѓСЂРѕРЅСѓ, Р·Р°РІРёСЃРёС‚ РѕС‚ СЃСѓРјРјР°СЂРЅС‹С… СЃС‚Р°РєРѕРІ
-if item.onStatRecalc then
-    item:onStatRecalc(function(actor, stack)
-        local normal = actor:item_count(item, Item.StackKind.NORMAL)
-        local temp   = actor:item_count(item, Item.StackKind.TEMPORARY_BLUE)
-        local stacks = normal + temp
-        if stacks > 0 then
-            actor.damage = actor.damage + (5 + 10 * stacks)
-        end
-    end)
-end
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
+    local normal = actor:item_count(item, Item.StackKind.NORMAL)
+    local temp   = actor:item_count(item, Item.StackKind.TEMPORARY_BLUE)
+    local stacks = normal + temp
+    if stacks > 0 then
+        actor.damage = actor.damage + (5 + 10 * stacks)
+    end
+end)
 
 -- РџСЂРё РїРѕР»СѓС‡РµРЅРёРё СѓСЂРѕРЅР° Рё СЃРЅРёР¶РµРЅРёРё HP РґРѕ 40%: РїСЂРµРѕР±СЂР°Р·СѓРµС‚ СЃС‚Р°РєРё РІ СЃР»РѕРјР°РЅРЅС‹Рµ
-item:onDamagedProc(function(actor, attacker, stack, hit_info)
+DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_info)
     if Net.client then return end
 
     if actor.hp <= actor.maxhp * 0.40 then
@@ -59,6 +57,6 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
 end)
 
 -- РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЌС„С„РµРєС‚Р° РїРѕРІРµСЂС… РїРµСЂСЃРѕРЅР°Р¶Р°
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     gm.draw_sprite(spike, 0, actor.x, actor.y)
 end)

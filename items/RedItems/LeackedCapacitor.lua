@@ -28,7 +28,7 @@ energize.icon_sprite = buffSprite
 energize.show_icon = true
 energize.is_debuff = false
 energize.max_stack = 1          -- РќР• -1; max_stack=1 в†’ РїРѕРІС‚РѕСЂРЅС‹Р№ РїСѓР»СЊСЃ РћР‘РќРћР’Р›РЇР•Рў РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ, РЅРµ СЃРєР»Р°РґС‹РІР°РµС‚
-energize:onStatRecalc(function(a, s)
+DeerItemsCallbacks.buff_stat_recalc(energize, function(a, s)
     a.attack_speed = a.attack_speed * (1 + ATK_PCT)
     a.pHmax        = a.pHmax        * (1 + MOVE_PCT)
 end)
@@ -55,21 +55,21 @@ local item = Item.new("LeackedCapacitor")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.RARE)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     if stack > 0 then g_team_stack[actor.team] = stack end
 end)
 
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     g_team_stack[actor.team] = stack
     recalc_drones(actor)
 end)
 
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if stack <= 1 then g_team_stack[actor.team] = nil end
 end)
 
 -- РџСѓР»СЊСЃ Р·Р°СЂСЏРґР° РїРѕ СЃРѕСЋР·РЅРёРєР°Рј + РїРѕРґРґРµСЂР¶Р°РЅРёРµ СЃС‚Р°РєРѕРІ РєРѕРјР°РЅРґС‹.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
     g_team_stack[actor.team] = stack
 

@@ -53,7 +53,7 @@ local function draw_prism_boundary(actor)
 end
 
 -- РџСЂРё РїРѕРїР°РґР°РЅРёРё: РµСЃР»Рё С†РµР»СЊ РґР°Р»СЊС€Рµ 8 РјРµС‚СЂРѕРІ вЂ” СѓСЃРёР»РёРІР°РµРј СѓСЂРѕРЅ РїРѕ РЅРµР№
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
 
     if stack <= 0 then return end
@@ -73,7 +73,7 @@ item:onHitProc(function(actor, victim, stack, hit_info)
 end)
 
 -- Р“СЂР°РЅС‘РЅР°СЏ РіСЂР°РЅРёС†Р° РѕС‚РјРµС‡Р°РµС‚ Р·РѕРЅСѓ, РІ РєРѕС‚РѕСЂРѕР№ Р±РѕРЅСѓСЃ Рє РґР°Р»СЊРЅРµРјСѓ СѓСЂРѕРЅСѓ РЅРµ РґРµР№СЃС‚РІСѓРµС‚.
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     if stack <= 0 then return end
     draw_prism_boundary(actor)
 end)

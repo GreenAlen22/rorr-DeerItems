@@ -69,14 +69,14 @@ end, function(buffer)
     if Instance.exists(actor) then actor:sound_play(sound, 1.0, pitch) end
 end)
 
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     local data = actor:get_data("OrbitalLens", GUID)
     data.pool    = data.pool or 0
     data.meteors = data.meteors or {}
 end)
 
 -- РќР°РєРѕРїРёС‚РµР»СЊ РЅР°РЅРµСЃС‘РЅРЅРѕРіРѕ СѓСЂРѕРЅР° + СЂРѕР»Р» РјРµС‚РµРѕСЂР° (РІСЃСЏ Р»РѕРіРёРєР° РЅР° С…РѕСЃС‚Рµ).
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if stack <= 0 then return end
     if not Net.host then return end
     if not (victim and Instance.exists(victim)) then return end
@@ -126,7 +126,7 @@ item:onHitProc(function(actor, victim, stack, hit_info)
 end)
 
 -- РџР°РґРµРЅРёРµ + РІР·СЂС‹РІ РјРµС‚РµРѕСЂРѕРІ Рё Р·Р°С‚СѓС…Р°РЅРёРµ РЅР°РєРѕРїРёС‚РµР»СЏ.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
     local data = actor:get_data("OrbitalLens", GUID)
     data.pool    = data.pool or 0
@@ -171,7 +171,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- Р’РёР·СѓР°Р»: РїР°РґР°СЋС‰РёР№ РјРµС‚РµРѕСЂ + РєРѕР»СЊС†Рѕ-С†РµР»СЊ (РІСЃС‚СЂРѕРµРЅРЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР°).
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     local data = actor:get_data("OrbitalLens", GUID)
     if not data.meteors then return end
     for _, m in ipairs(data.meteors) do

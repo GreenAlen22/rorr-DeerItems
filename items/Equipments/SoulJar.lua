@@ -45,7 +45,7 @@ local function puff(self, blend)
     end
 end
 
-obj:onCreate(function(self)
+Callback.add(obj.on_create, function(self)
     self.parent      = -4
     self.team        = 1
     self.life        = LIFETIME
@@ -58,7 +58,7 @@ obj:onCreate(function(self)
     self:projectile_sync(10)
 end)
 
-obj:onStep(function(self)
+Callback.add(obj.on_step, function(self)
     -- РќР° РєР»РёРµРЅС‚Рµ С‚РѕР»СЊРєРѕ Р РРЎРЈР•Рњ: РїРѕР·РёС†РёСЏ РїСЂРёС…РѕРґРёС‚ РёР· projectile_sync, РІРёРґРёРјРѕСЃС‚СЊ/РѕР±Р»РёРє вЂ” РёР·
     -- onDeserialize (self.show / self.parent). РњР°С€РёРЅСѓ СЃРѕСЃС‚РѕСЏРЅРёР№ РќР• РєСЂСѓС‚РёРј: РёРЅР°С‡Рµ РєР»РёРµРЅС‚ СЃР°Рј
     -- РІС‹Р±РёСЂР°РµС‚ РґСЂСѓРіСѓСЋ С†РµР»СЊ Рё РґРµСЂС‘С‚СЃСЏ СЃ СЃРёРЅРєРѕРј РїРѕР·РёС†РёРё (РјРёРіР°РЅРёРµ СѓС…РѕРґРёС‚ РЅРµ С‚СѓРґР°, FX РґСѓР±Р»РёСЂСѓСЋС‚СЃСЏ).
@@ -132,7 +132,7 @@ obj:onStep(function(self)
     end
 end)
 
-obj:onDestroy(function(self)
+Callback.add(obj.on_destroy, function(self)
     puff(self, nil)
     self:instance_destroy_sync()
 end)
@@ -153,7 +153,7 @@ equip:set_sprite(sprite)
 equip.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 equip.cooldown = COOLDOWN * 60
 
-equip:onUse(function(actor)
+Callback.add(equip.on_use, function(actor)
     actor:sound_play(sndSummon, 1.0, 0.8 + math.random() * 0.2)
     local c = obj:create(actor.x, actor.y - 6)
     c.parent      = actor

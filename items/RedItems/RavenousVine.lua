@@ -67,14 +67,14 @@ end
 
 local oBloom = Object.new("RavenousVineBloom")
 oBloom:set_sprite(bloomSprite)
-oBloom:onCreate(function(self)
+Callback.add(oBloom.on_create, function(self)
     self.parent = -4
     self.life = 0
     self.image_speed = 0
     self.image_index = 0
 end)
 
-oBloom:onStep(function(self)
+Callback.add(oBloom.on_step, function(self)
     if not Instance.exists(self.parent) then self:destroy(); return end
     self.x = self.parent.x
     self.y = self.parent.y
@@ -125,7 +125,7 @@ item:set_tier(ItemTier.RARE)
 item.loot_tags = Item.LootTag.CATEGORY_HEALING
 -- Р“Р»Р°РІРЅР°СЏ Р»РѕРіРёРєР° РЅР° С…РѕСЃС‚Рµ: РїРµСЂРµСЃС‡С‘С‚ РІСЂР°РіРѕРІ СЂСЏРґРѕРј, РЅР°РєРѕРїР»РµРЅРёРµ СЌСЃСЃРµРЅС†РёРё, В«С†РІРµС‚РµРЅРёРµВ».
 -- РЈСЂРѕРЅ/Р»РµС‡РµРЅРёРµ Р°РІС‚РѕСЂРёС‚РµС‚РЅС‹ РЅР° С…РѕСЃС‚Рµ (РєР°Рє RiftBeacon/TwistedOpinion); РєР»РёРµРЅС‚Р°Рј HP СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓРµС‚СЃСЏ.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if Net.client then return end
     if stack <= 0 then return end
 
@@ -194,7 +194,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- РџСЂРё РїРѕР»РЅРѕР№ РїРѕС‚РµСЂРµ РїСЂРµРґРјРµС‚Р° РѕР±РЅСѓР»СЏРµРј РЅР°РєРѕРїР»РµРЅРЅРѕРµ.
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if stack <= 1 then
         local data = actor:get_data("RavenousVine", GUID)
         data.ess      = 0
@@ -206,7 +206,7 @@ item:onRemove(function(actor, stack)
 end)
 
 -- Р’РёР·СѓР°Р»: РєРѕРЅС‚СѓСЂ СЂР°РґРёСѓСЃР° В«РїРёС‚Р°РЅРёСЏВ» РІРѕРєСЂСѓРі РёРіСЂРѕРєР° (Р±РµР· С…СѓРґР° РЅР°Рґ РіРѕР»РѕРІРѕР№).
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     if stack <= 0 then return end
     local data = actor:get_data("RavenousVine", GUID)
     local frame = radius_frame_for(data.ess)

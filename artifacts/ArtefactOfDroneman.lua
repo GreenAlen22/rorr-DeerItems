@@ -11,12 +11,11 @@ local PLAYER_DRONE = gm.constants.oPDrone
 local death_inventories = {}
 
 local artifact = Artifact.new("Droneman")
-artifact:set_sprites(sprite, sprite)
-artifact:set_text(
-    "artifact.Droneman.name",
-    "artifact.Droneman.pickup",
-    "artifact.Droneman.description"
-)
+artifact.sprite_loadout_id = sprite
+artifact.sprite_pickup_id = sprite
+artifact.token_name = "artifact.Droneman.name"
+artifact.token_pickup_name = "artifact.Droneman.pickup"
+artifact.token_description = "artifact.Droneman.description"
 
 local function copy_inventory(actor)
     local inventory = {}

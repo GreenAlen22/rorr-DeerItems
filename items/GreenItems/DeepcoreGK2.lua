@@ -103,11 +103,11 @@ local slowBuff = Buff.new("DeepcoreSlow")
 slowBuff.show_icon = false
 slowBuff.is_debuff = true
 slowBuff.max_stack = 1
-slowBuff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(slowBuff, function(actor, stack)
     actor.pHmax = actor.pHmax * SLOW_MULT
 end)
 
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     if stack > 0 then
         local n = count_drones(actor)
         actor:get_data("DeerItems", GUID).bosco_drones = n
@@ -122,7 +122,7 @@ local obj = Object.new("Bosco")
 obj:set_sprite(droneSprite)
 obj:set_depth(1)
 -- РџСЂРё СЃРѕР·РґР°РЅРёРё РґСЂРѕРЅР°: РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
-obj:onCreate(function(self)
+Callback.add(obj.on_create, function(self)
     local data = self:get_data(nil, GUID)
     self.persistent = true
     self.image_speed = 0.25
@@ -135,7 +135,7 @@ obj:onCreate(function(self)
 end)
 
 -- РџРѕРІРµРґРµРЅРёРµ РґСЂРѕРЅР° РєР°Р¶РґС‹Р№ РєР°РґСЂ
-obj:onStep(function(self)
+Callback.add(obj.on_step, function(self)
     if Net.client then return end
 
     local data = self:get_data(nil, GUID)
@@ -231,7 +231,7 @@ obj:onStep(function(self)
     end
 end)
 
-obj:onDestroy(function(self)
+Callback.add(obj.on_destroy, function(self)
     self:instance_destroy_sync()
 end)
 
@@ -245,7 +245,7 @@ end, function(self, buffer)
 end)
 
 -- РљРѕРіРґР° РёРіСЂРѕРє РїРѕР»СѓС‡Р°РµС‚ РїСЂРµРґРјРµС‚ вЂ” СЃРѕР·РґР°С‘Рј РґСЂРѕРЅР°, РµСЃР»Рё РµРіРѕ РµС‰С‘ РЅРµС‚
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     if Net.client then return end
 
     local data = actor:get_data("DeerItems", GUID)
@@ -257,7 +257,7 @@ item:onAcquire(function(actor, stack)
     end
 end)
 
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
 
     local data = actor:get_data("DeerItems", GUID)
@@ -284,7 +284,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- РљРѕРіРґР° РїСЂРµРґРјРµС‚ СѓРґР°Р»СЏРµС‚СЃСЏ вЂ” СѓРЅРёС‡С‚РѕР¶Р°РµРј РґСЂРѕРЅР°, РµСЃР»Рё РїСЂРµРґРјРµС‚Р° Р±РѕР»СЊС€Рµ РЅРµС‚
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if Net.client then return end
 
     local data = actor:get_data("DeerItems", GUID)

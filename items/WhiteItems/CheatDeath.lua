@@ -28,20 +28,20 @@ local DAMAGE_TEXT_LIFE = 45
 
 local objDamageText = Object.new("CheatDeathDamageText")
 objDamageText:set_depth(-1000)
-objDamageText:onCreate(function(self)
+Callback.add(objDamageText.on_create, function(self)
     self.amount = 0
     self.life = DAMAGE_TEXT_LIFE
     self.max_life = DAMAGE_TEXT_LIFE
     self.vx = 0
     self.vy = -0.45
 end)
-objDamageText:onStep(function(self)
+Callback.add(objDamageText.on_step, function(self)
     self.x = self.x + self.vx
     self.y = self.y + self.vy
     self.life = self.life - 1
     if self.life <= 0 then self:destroy() end
 end)
-objDamageText:onDraw(function(self)
+Callback.add(objDamageText.on_draw, function(self)
     local alpha = math.max(0, self.life / self.max_life)
     gm.draw_set_alpha(alpha)
     gm.draw_set_colour(Color.RED)
@@ -131,7 +131,7 @@ local function send_tick(actor, amount)
     packet_tick:send_to_all(actor, amount)
 end
 
-item:onDamagedProc(function(actor, attacker, stack, hit_info)
+DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_info)
     if stack <= 0 then return end
     -- РљР РРўРР§РќРћ: РїСЂРѕРїСѓСЃРєР°РµРј СѓСЂРѕРЅ РѕС‚ СЃР°РјРѕРіРѕ СЃРµР±СЏ. РРЅР°С‡Рµ С‚РёРєРё РќРђРЁР•Р“Рћ Р¶Рµ РєСЂРѕРІРѕС‚РµС‡РµРЅРёСЏ СЃРЅРѕРІР°
     -- Р·Р°С€Р»Рё Р±С‹ СЃСЋРґР° Рё РїР»РѕРґРёР»Рё РЅРѕРІС‹Рµ DoT (РЅР° 100% РґРѕР»Рµ вЂ” Р»Р°РІРёРЅРѕРѕР±СЂР°Р·РЅРѕ).
@@ -160,30 +160,32 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
     add_delayed_damage(actor, total)
 end)
 
-Actor:onPostStep("DeerItems-CheatDeathTicks", function(actor)
+Callback.add(Callback.POST_STEP, function()
     if Net.client then return end
 
-    local data = actor:get_data("CheatDeath", GUID)
-    local ticks = data.cd_ticks
-    if not ticks then return end
+    for _, actor in ipairs(Instance.find_all(gm.constants.pActor)) do
+        local data = actor:get_data("CheatDeath", GUID)
+        local ticks = data.cd_ticks
+        if ticks then
+            for i = #ticks, 1, -1 do
+                local tick = ticks[i]
+                tick.timer = tick.timer - 1
+                if tick.timer <= 0 then
+                    if actor:same(Player.get_client()) then
+                        deal_internal_damage(actor, tick.damage)
+                    else
+                        send_tick(actor, tick.damage)
+                    end
+                    tick.ticks = tick.ticks - 1
+                    if tick.ticks <= 0 then
+                        table.remove(ticks, i)
+                    else
+                        tick.timer = DOT_RATE
+                    end
+                end
+            end
 
-    for i = #ticks, 1, -1 do
-        local tick = ticks[i]
-        tick.timer = tick.timer - 1
-        if tick.timer <= 0 then
-            if actor:same(Player.get_client()) then
-                deal_internal_damage(actor, tick.damage)
-            else
-                send_tick(actor, tick.damage)
-            end
-            tick.ticks = tick.ticks - 1
-            if tick.ticks <= 0 then
-                table.remove(ticks, i)
-            else
-                tick.timer = DOT_RATE
-            end
+            if #ticks == 0 then data.cd_ticks = nil end
         end
     end
-
-    if #ticks == 0 then data.cd_ticks = nil end
 end)

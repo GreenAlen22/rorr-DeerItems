@@ -64,20 +64,20 @@ local function refresh_team_stacks()
 end
 
 -- Количество стаков владельца нужно при пересчёте характеристик дрона.
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     refresh_team_stacks()
 end)
 
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     refresh_team_stacks()
     recalc_drones(actor)
 end)
 
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     pending_recalculate[actor.id] = actor
 end)
 
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     local changed = refresh_team_stacks()
     if changed then
         recalc_drones(actor)

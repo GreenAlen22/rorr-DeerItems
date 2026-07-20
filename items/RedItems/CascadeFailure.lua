@@ -131,7 +131,7 @@ local function prune_count(data)
 end
 
 -- РџСЂРё РїРѕРїР°РґР°РЅРёРё: Р·Р°СЂР°Р¶Р°РµРј (РµСЃР»Рё РµСЃС‚СЊ СЃР»РѕС‚) Рё РєРѕРїРёРј 50% СѓСЂРѕРЅР° РїРѕ Р·Р°СЂР°Р¶С‘РЅРЅС‹Рј. Р’СЃС‘ РЅР° С…РѕСЃС‚Рµ.
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if stack <= 0 then return end
     if not Net.host then return end
     if not (victim and Instance.exists(victim)) then return end
@@ -161,7 +161,7 @@ item:onHitProc(function(actor, victim, stack, hit_info)
 end)
 
 -- РљР°Р¶РґС‹Рµ 3 СЃРµРє РІС‹Р»РёРІР°РµРј РІРµСЃСЊ РїСѓР» РІРѕ РІСЃРµС… Р·Р°СЂР°Р¶С‘РЅРЅС‹С…. Р’СЃС‘ РЅР° С…РѕСЃС‚Рµ.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
     if not Net.host then return end
 
@@ -216,7 +216,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- РџСЂРё РїРѕР»РЅРѕР№ РїРѕС‚РµСЂРµ РїСЂРµРґРјРµС‚Р° СЃРЅРёРјР°РµРј Р·Р°СЂР°Р¶РµРЅРёРµ СЃ СѓС†РµР»РµРІС€РёС… РІСЂР°РіРѕРІ.
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if stack > 1 then return end
     local data = actor:get_data("CascadeFailure", GUID)
     if not data.infected then return end
@@ -231,7 +231,7 @@ item:onRemove(function(actor, stack)
 end)
 
 -- Р’РЅРµС€РЅРёР№ РІРёРґ Р·Р°СЂР°Р¶С‘РЅРЅС‹С…: РјР°СЂРєРµСЂ РЅР°Рґ РІСЂР°РіРѕРј РІСЃС‚СЂРѕРµРЅРЅРѕР№ РѕС‚СЂРёСЃРѕРІРєРѕР№ (Р°СЃСЃРµС‚ РЅРµ РЅСѓР¶РµРЅ).
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     local data = actor:get_data("CascadeFailure", GUID)
     if not data.infected then return end
     local pool_text = string.format("%d", round_pool(data.pool))

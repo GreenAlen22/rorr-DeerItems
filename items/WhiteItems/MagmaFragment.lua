@@ -76,14 +76,16 @@ local function play_ignite_sound(victim)
     end
 end
 
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     refresh_team_state()
     if Net.host then active_dots(actor.team) end
 end)
 
 -- onHitProc РїСЂРѕРїСѓСЃРєР°РµС‚ Р°С‚Р°РєРё СЃ proc=false. Р“Р»РѕР±Р°Р»СЊРЅС‹Р№ onAttackHit РїРѕР»СѓС‡Р°РµС‚ РєР°Р¶РґРѕРµ
 -- РїРѕРїР°РґР°РЅРёРµ РґСЂРѕРЅР°, РІРєР»СЋС‡Р°СЏ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РІС‹СЃС‚СЂРµР» Gunner Drone.
-Actor:onAttackHit("DeerItems-MagmaFragment-drone", function(drone, victim, hit_info)
+Callback.add(Callback.ON_ATTACK_HIT, function(hit_info)
+    local drone = hit_info.inflictor
+    local victim = hit_info.target
     if Net.client then return end
     if not is_drone(drone) or not victim or not Instance.exists(victim) then return end
     if gm.object_is_ancestor(victim.object_index, gm.constants.pActor) ~= 1.0 then return end
@@ -126,7 +128,7 @@ Actor:onAttackHit("DeerItems-MagmaFragment-drone", function(drone, victim, hit_i
 end)
 
 -- РРЅРґРёРєР°С‚РѕСЂ РІРёРґРµРЅ РїРѕСЃС‚РѕСЏРЅРЅРѕ, РїРѕРєР° Сѓ РёРіСЂРѕРєР° РµСЃС‚СЊ РїСЂРµРґРјРµС‚, РЅР° РІСЃРµС… СЃРѕСЋР·РЅС‹С… РїРѕРєСѓРїР°РµРјС‹С… РґСЂРѕРЅР°С….
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     local drones = List.wrap(actor:find_characters_circle(actor.x, actor.y, DRONE_RADIUS, false, actor.team, true))
     local frame = math.floor((Global._current_frame or 0) / 4) % 8
     for _, drone in ipairs(drones) do

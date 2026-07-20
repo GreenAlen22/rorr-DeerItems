@@ -37,12 +37,12 @@ end
 local SHIELD_ALPHA = 0.35
 local objShield = Object.new("FacetedJadeShield")
 objShield:set_sprite(shieldSprite)
-objShield:onCreate(function(self)
+Callback.add(objShield.on_create, function(self)
     self.parent      = -4
     self.image_alpha = SHIELD_ALPHA
     self:projectile_sync(8)
 end)
-objShield:onStep(function(self)
+Callback.add(objShield.on_step, function(self)
     if not Instance.exists(self.parent) then
         if Net.client then return end
         self:destroy()
@@ -55,7 +55,7 @@ objShield:onStep(function(self)
 end)
 
 -- Р’РєР»СЋС‡РёС‚СЊ/РІС‹РєР»СЋС‡РёС‚СЊ С‰РёС‚-РѕР±СЉРµРєС‚ Сѓ РІР»Р°РґРµР»СЊС†Р° (РёРґРµРјРїРѕС‚РµРЅС‚РЅРѕ вЂ” РјРѕР¶РЅРѕ Р·РІР°С‚СЊ РєР°Р¶РґС‹Р№ РєР°РґСЂ)
-objShield:onDestroy(function(self)
+Callback.add(objShield.on_destroy, function(self)
     self:instance_destroy_sync()
 end)
 
@@ -80,7 +80,7 @@ local function set_shield(actor, data, on)
 end
 
 -- РџСЂРё РїРѕР»СѓС‡РµРЅРёРё РїСЂРµРґРјРµС‚Р° Р·Р°РїСѓСЃРєР°РµРј С‚Р°Р№РјРµСЂ РїРѕРєРѕСЏ (С‰РёС‚ Р·Р°СЂСЏРґРёС‚СЃСЏ С‡РµСЂРµР· 5 СЃРµРє РїРѕСЃР»Рµ РїРѕРґР±РѕСЂР°)
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     local data = actor:get_data("FacetedJade", GUID)
     data.fj_last_hit = Global._current_frame
     data.fj_was_active = false
@@ -88,7 +88,7 @@ item:onAcquire(function(actor, stack)
 end)
 
 -- Р—Р°РїРѕРјРёРЅР°РµРј РєР°РґСЂ РїРѕСЃР»РµРґРЅРµРіРѕ РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ СѓСЂРѕРЅР° (СЌС‚Рѕ СЃР±СЂР°СЃС‹РІР°РµС‚ В«РІРЅРµ РѕРїР°СЃРЅРѕСЃС‚РёВ»)
-item:onDamagedProc(function(actor, attacker, stack, hit_info)
+DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_info)
     if Net.client then return end
 
     -- РРіРЅРѕСЂРёСЂСѓРµРј СѓСЂРѕРЅ РѕС‚ СЃР°РјРѕРіРѕ СЃРµР±СЏ (С‡СѓР¶РёРµ СЃР°РјРѕРїРѕРІСЂРµР¶РґР°СЋС‰РёРµ СЌС„С„РµРєС‚С‹ РЅРµ РґРѕР»Р¶РЅС‹ СЃР±РёРІР°С‚СЊ С‰РёС‚)
@@ -101,7 +101,7 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
 end)
 
 -- РџРѕРєР° В«РІРЅРµ РѕРїР°СЃРЅРѕСЃС‚РёВ» вЂ” РґР°С‘Рј Р±СЂРѕРЅСЋ (РїСЂРёРјРµРЅСЏРµС‚СЃСЏ РїСЂРё РєР°Р¶РґРѕРј РїРµСЂРµСЃС‡С‘С‚Рµ СЃС‚Р°С‚РѕРІ)
-item:onPostStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_post_stat_recalc(item, function(actor, stack)
     if Net.client then return end
 
     if stack <= 0 then return end
@@ -112,7 +112,7 @@ end)
 
 -- РљР°Р¶РґС‹Р№ РєР°РґСЂ Р»РѕРІРёРј РїРµСЂРµС…РѕРґ В«РѕРїР°СЃРЅРѕ <-> Р±РµР·РѕРїР°СЃРЅРѕВ»: РїРѕСЂРѕРі Р·Р°РІСЏР·Р°РЅ РЅР° Р’Р Р•РњРЇ, Р° РЅРµ РЅР° СЃРѕР±С‹С‚РёРµ,
 -- РїРѕСЌС‚РѕРјСѓ С„РѕСЂСЃРёРј РїРµСЂРµСЃС‡С‘С‚ СЃС‚Р°С‚РѕРІ РІСЂСѓС‡РЅСѓСЋ, С‡С‚РѕР±С‹ +Р±СЂРѕРЅСЏ РІРєР»СЋС‡Р°Р»Р°СЃСЊ/РІС‹РєР»СЋС‡Р°Р»Р°СЃСЊ РІРѕРІСЂРµРјСЏ.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if Net.client then return end
 
     if stack <= 0 then return end
@@ -131,7 +131,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- РџСЂРё РїРѕС‚РµСЂРµ РїСЂРµРґРјРµС‚Р° вЂ” СѓР±РёСЂР°РµРј РѕР±СЉРµРєС‚-С‰РёС‚ (РёРЅР°С‡Рµ РѕСЃС‚Р°Р»СЃСЏ Р±С‹ РІРёСЃРµС‚СЊ)
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if Net.client then return end
 
     set_shield(actor, actor:get_data("FacetedJade", GUID), false)

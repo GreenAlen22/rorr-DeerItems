@@ -42,7 +42,7 @@ local FIRE_COOLDOWN  = 6     -- РјРёРЅ. РёРЅС‚РµСЂРІР°Р» 
 -- в•љв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ќ
 local oSkull = Object.new("TwistedOpinionSkull")
 oSkull:set_sprite(skullSprite)
-oSkull:onCreate(function(self)
+Callback.add(oSkull.on_create, function(self)
     self.timer = 0
     self.mask_index = gm.constants.sSinglePixel
     self.speed = 5
@@ -54,7 +54,7 @@ oSkull:onCreate(function(self)
     self:projectile_sync(10)
 end)
 
-oSkull:onStep(function(self)
+Callback.add(oSkull.on_step, function(self)
     -- РЈРґР°Р»СЏРµРј С‡РµСЂРµРї, РµСЃР»Рё РІР»Р°РґРµР»РµС† РёСЃС‡РµР·
     if not Instance.exists(self.parent) then
         self:destroy()
@@ -116,7 +116,7 @@ oSkull:onStep(function(self)
     self.image_angle = self.direction
 end)
 
-oSkull:onDestroy(function(self)
+Callback.add(oSkull.on_destroy, function(self)
     if Instance.exists(self.parent) then
         self.parent:sound_play(sndImpact, 1.0, 1.1 + math.random() * 0.3)
     end
@@ -172,7 +172,7 @@ item.loot_tags = Item.LootTag.CATEGORY_HEALING
 -- РћРіСЂР°РЅРёС‡РµРЅРёРµ РјРµС‚РѕРґР° вЂ” РѕРІРµСЂС…РёР» (Р»РµС‡РµРЅРёРµ В«РІ РїРѕС‚РѕР»РѕРєВ» РїСЂРё РїРѕР»РЅРѕРј HP) РЅРµ РІРёРґРµРЅ С‡РµСЂРµР· РґРµР»СЊС‚Сѓ;
 -- СѓСЃРёР»РµРЅРёРµ РїСЂРё СЌС‚РѕРј С‚РѕР¶Рµ С‚РµСЂСЏРµС‚СЃСЏ. РџРѕР»РЅС‹Р№ Р·Р°С…РІР°С‚ РѕРІРµСЂС…РёР»Р° РїРѕС‚СЂРµР±РѕРІР°Р» Р±С‹ С…СѓРєР° gml-С„СѓРЅРєС†РёРё
 -- Р»РµС‡РµРЅРёСЏ (РёРјСЏ РєРѕРЅСЃС‚Р°РЅС‚С‹ РЅСѓР¶РЅРѕ РїРѕРґС‚РІРµСЂРґРёС‚СЊ РІ РёРіСЂРµ) вЂ” СЃРј. Р·Р°РјРµС‚РєСѓ РІ РѕС‚РІРµС‚Рµ.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     -- Р›РѕРіРёРєР° вЂ” РЅР° С…РѕСЃС‚Рµ; РЅР° РєР»РёРµРЅС‚Р°С… HP СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓРµС‚СЃСЏ, С‡С‚РѕР±С‹ РЅРµ Р±С‹Р»Рѕ РґРІРѕР№РЅРѕРіРѕ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ.
     if Net.client then return end
 
@@ -232,7 +232,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- Р’РёР·СѓР°Р»: РёРЅРґРёРєР°С‚РѕСЂ РЅР°РєРѕРїР»РµРЅРёСЏ СЌРЅРµСЂРіРёРё РґСѓС€Рё РЅР°Рґ РїРµСЂСЃРѕРЅР°Р¶РµРј
---[[ item:onPostDraw(function(actor, stack)
+--[[ DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     if true then return end
     local data = actor:get_data("TwistedOpinion", GUID)
     local threshold = actor.maxhp * THRESHOLD_FRAC

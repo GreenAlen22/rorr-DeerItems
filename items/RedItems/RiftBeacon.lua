@@ -79,7 +79,7 @@ end
 -- РћР±СЉРµРєС‚ СЂР°Р·Р»РѕРјР° (С†РµРЅС‚СЂРёСЂСѓРµС‚СЃСЏ РЅР° РёРіСЂРѕРєРµ)
 local obj = Object.new("RiftZone")
 obj:set_depth(40)
-obj:onCreate(function(self)
+Callback.add(obj.on_create, function(self)
     self.life = LIFE_BASE
     self.age = 0
     self.end_age = nil
@@ -88,7 +88,7 @@ obj:onCreate(function(self)
     self:projectile_sync(4)   -- СЃРёРЅРєР°РµРј РїРѕР·РёС†РёСЋ РєР»РёРµРЅС‚Р°Рј (РѕР±СЉРµРєС‚ СЃР»РµРґСѓРµС‚ Р·Р° РёРіСЂРѕРєРѕРј РЅР° С…РѕСЃС‚Рµ)
 end)
 
-obj:onStep(function(self)
+Callback.add(obj.on_step, function(self)
     self.age = (self.age or 0) + 1
     self.radius_frame = radius_frame_for(self)
 
@@ -130,14 +130,14 @@ end, function(self, buffer)
     self.radius_frame = buffer:read_byte()
 end)
 
-obj:onDraw(function(self)
+Callback.add(obj.on_draw, function(self)
     gm.draw_set_colour(RIFT_COLOR)
     gm.draw_circle(self.x, self.y, RADIUS, true)
     gm.draw_sprite_ext(radiusSprite, self.radius_frame or radius_frame_for(self), self.x, self.y, RADIUS_SPRITE_SCALE, RADIUS_SPRITE_SCALE, 0, Color.WHITE, 1)
     gm.draw_set_colour(Color.WHITE)
 end)
 
-obj:onDestroy(function(self)
+Callback.add(obj.on_destroy, function(self)
     self:instance_destroy_sync()
 end)
 
@@ -182,7 +182,7 @@ local function extend_zone(actor)
 end
 
 -- РўСЂРёРіРіРµСЂ РїРѕ РЅРёР·РєРѕРјСѓ HP (СЂР°Р· Р·Р° СЌС‚Р°Рї)
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if Net.client then return end
     if stack <= 0 then return end
     local data = actor:get_data("RiftBeacon", GUID)
@@ -210,14 +210,14 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- Р›СЋР±РѕРµ СѓР±РёР№СЃС‚РІРѕ РїСЂРё Р°РєС‚РёРІРЅРѕРј СЂР°Р·Р»РѕРјРµ РїСЂРѕРґР»РµРІР°РµС‚ РµРіРѕ РЅР° 1СЃ
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if Net.client then return end
 
     extend_zone(actor)
 end)
 
 -- РџРµСЂРµР·Р°СЂСЏРґ РІ РЅР°С‡Р°Р»Рµ СЌС‚Р°РїР°
-item:onStageStart(function(actor, stack)
+DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
     if Net.client then return end
 
     local data = actor:get_data("RiftBeacon", GUID)

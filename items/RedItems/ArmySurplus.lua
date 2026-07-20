@@ -97,11 +97,11 @@ local function share_bonus_healing(actor)
     end
 end
 
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     if stack > 0 then g_team_stack[actor.team] = stack end
 end)
 
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     g_team_stack[actor.team] = stack
     ensure_drone(actor)
     local data = actor:get_data("ArmySurplus", GUID)
@@ -111,7 +111,7 @@ item:onAcquire(function(actor, stack)
     data.as_heal_buffer_timer = HEAL_BUFFER_DURATION
 end)
 
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if stack <= 1 then
         g_team_stack[actor.team] = nil
         if Net.client then return end
@@ -123,7 +123,7 @@ end)
 
 -- Р”РµСЂР¶РёРј СЃС‚Р°Рє СЃРІРµР¶РёРј + РїРµСЂРµСѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РґСЂРѕРЅР°, РµСЃР»Рё РёРіСЂР° РµРіРѕ СѓР±СЂР°Р»Р°. РљСѓРїР»РµРЅРЅС‹Рµ РґСЂРѕРЅС‹ РЅРµ
 -- РїРµСЂРµС…РѕРґСЏС‚ РјРµР¶РґСѓ СЌС‚Р°РїР°РјРё вЂ” РЅР° РЅРѕРІРѕР№ Р»РѕРєР°С†РёРё drone_alive РІРµСЂРЅС‘С‚ false Рё РјС‹ СЂР°Р·РІРµСЂРЅС‘Рј СЃРІРѕРµРіРѕ Р·Р°РЅРѕРІРѕ.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
     g_team_stack[actor.team] = stack
     ensure_drone(actor)

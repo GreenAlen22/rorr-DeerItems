@@ -11,7 +11,7 @@ item.is_hidden = true
 item:set_sprite(sprite)
 
 -- Обработка пересчёта статистики при получении предмета
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     -- Увеличение урона на 1 за каждый стак
     actor.damage = actor.damage + (1 * stack)
 end)

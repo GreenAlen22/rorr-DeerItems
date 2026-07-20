@@ -32,7 +32,7 @@ local buff = Buff.new("VioletFrenzy")
 buff.show_icon = false
 buff.is_debuff = false
 buff.max_stack = 1
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     actor.pHmax = actor.pHmax * SPEED_MULT
 end)
 
@@ -52,7 +52,7 @@ end
 -- РџСЂРё СѓР±РёР№СЃС‚РІРµ СЌР»РёС‚С‹ вЂ” РІС…РѕРґРёРј (РёР»Рё РїСЂРѕРґР»РµРІР°РµРј) Р±РµСЂСЃРµСЂРє.
 -- РўР°Р№РјРµСЂ РћР‘РќРћР’Р›РЇР•РўРЎРЇ РґРѕ РїРѕР»РЅРѕР№ РґР»РёС‚РµР»СЊРЅРѕСЃС‚Рё (РЅРµ СЃСѓРјРјРёСЂСѓРµС‚СЃСЏ), РєР°Рє РІ RoR2:
 -- С‡С‚РѕР±С‹ РґРµСЂР¶Р°С‚СЊ Р±РµСЂСЃРµСЂРє, РЅСѓР¶РЅРѕ СѓР±РёРІР°С‚СЊ СЌР»РёС‚Сѓ РЅРµ СЂРµР¶Рµ, С‡РµРј СЂР°Р· РІ РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ. Р­С‚Рѕ РµСЃС‚РµСЃС‚РІРµРЅРЅС‹Р№ РєСЌРї Р°РїС‚Р°Р№РјР°.
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if Net.client then return end
 
     if not is_elite_or_boss(victim) then return end
@@ -102,7 +102,7 @@ end
 
 -- РљР°Р¶РґС‹Р№ РєР°РґСЂ Сѓ РґРµСЂР¶Р°С‚РµР»СЏ: РїРѕРєР° Р±РµСЂСЃРµСЂРє Р°РєС‚РёРІРµРЅ, РїРѕРґРґРµСЂР¶РёРІР°РµРј С‚Р°Р№РјРµСЂ Рё РІРёР·СѓР°Р»СЊРЅС‹Р№ Р±Р°С„С„.
 -- РЎРѕРєСЂР°С‰РµРЅРёРµ РєСѓР»РґР°СѓРЅРѕРІ РїСЂРѕРёСЃС…РѕРґРёС‚ С‚РѕР»СЊРєРѕ РІ onSecondaryUse/onUtilityUse/onSpecialUse.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if Net.client then return end
 
     local data = actor:get_data(nil, GUID)
@@ -122,15 +122,15 @@ item:onPostStep(function(actor, stack)
     end
 end)
 
-item:onSecondaryUse(function(actor, stack, active_skill)
+DeerItemsCallbacks.item_secondary_use(item, function(actor, stack, active_skill)
     reduce_other_skills(actor, Skill.Slot.SECONDARY)
 end)
 
-item:onUtilityUse(function(actor, stack, active_skill)
+DeerItemsCallbacks.item_utility_use(item, function(actor, stack, active_skill)
     reduce_other_skills(actor, Skill.Slot.UTILITY)
 end)
 
-item:onSpecialUse(function(actor, stack, active_skill)
+DeerItemsCallbacks.item_special_use(item, function(actor, stack, active_skill)
     reduce_other_skills(actor, Skill.Slot.SPECIAL)
 end)
 

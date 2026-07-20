@@ -20,7 +20,7 @@ local item = Item.new("Tankbuster")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
     if stack <= 0 then return end
 

@@ -17,7 +17,7 @@ item:set_sprite(sprite)
 item:set_tier(ItemTier.UNCOMMON)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 -- Р СџРЎР‚Р С‘ Р С—Р С•Р С—Р В°Р Т‘Р В°Р Р…Р С‘Р С‘ Р В°РЎвЂљР В°Р С”Р С•Р в„– РІР‚вЂќ Р ВµРЎРѓР В»Р С‘ Р В±РЎвЂ№Р В» Р С”РЎР‚Р С‘РЎвЂљ, РЎРѓР С•Р В·Р Т‘Р В°РЎвЂРЎвЂљРЎРѓРЎРЏ Р Р†Р В·РЎР‚РЎвЂ№Р Р†
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
     local attack_info = hit_info and hit_info.attack_info
     if not attack_info then return end
@@ -44,11 +44,11 @@ item:onHitProc(function(actor, victim, stack, hit_info)
 end)
 
 -- Р СџРЎР‚Р С‘ Р С—Р ВµРЎР‚Р ВµРЎРѓРЎвЂЎРЎвЂРЎвЂљР Вµ РЎРѓРЎвЂљР В°РЎвЂљР С•Р Р† РІР‚вЂќ Р Т‘Р В°РЎвЂР С +5% Р С”РЎР‚Р С‘РЎвЂљР С‘РЎвЂЎР ВµРЎРѓР С”Р С•Р С–Р С• РЎв‚¬Р В°Р Р…РЎРѓР В°
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     actor.critical_chance = actor.critical_chance + 5
 end)
 
 -- Р С›РЎвЂљР С•Р В±РЎР‚Р В°Р В¶Р ВµР Р…Р С‘Р Вµ Р С‘Р Р…Р Т‘Р С‘Р С”Р В°РЎвЂљР С•РЎР‚Р В° Р С—РЎР‚Р ВµР Т‘Р СР ВµРЎвЂљР В° Р С—Р С•Р Р†Р ВµРЎР‚РЎвЂ¦ Р С—Р ВµРЎР‚РЎРѓР С•Р Р…Р В°Р В¶Р В°
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     gm.draw_sprite(CoolIndictor, 0, actor.x + 30, actor.y + 50)
 end)

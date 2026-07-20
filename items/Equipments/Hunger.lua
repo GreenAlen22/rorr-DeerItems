@@ -60,7 +60,7 @@ end
 local obj = Object.new("HungerHole")
 obj:set_sprite(radiusSprite)
 obj:set_depth(VISUAL_DEPTH)
-obj:onCreate(function(self)
+Callback.add(obj.on_create, function(self)
     self.life = LIFE
     self.age = 0
     self.radius = PULL_RADIUS
@@ -75,7 +75,7 @@ obj:onCreate(function(self)
     self:projectile_sync(10)         -- РґРІРёРіР°СЋС‰РёР№СЃСЏ РѕР±СЉРµРєС‚ в†’ СЃРёРЅРєР°РµРј РїРѕР·РёС†РёСЋ/РЅР°РїСЂР°РІР»РµРЅРёРµ
 end)
 
-obj:onStep(function(self)
+Callback.add(obj.on_step, function(self)
     self.depth = VISUAL_DEPTH
     self.image_index = visual_frame_for(self.age)
     self.age = (self.age or 0) + 1
@@ -119,7 +119,7 @@ end, function(self, buffer)
     self.speed = HOLE_SPEED
 end)
 
-obj:onDestroy(function(self)
+Callback.add(obj.on_destroy, function(self)
     self:instance_destroy_sync()
 end)
 
@@ -129,7 +129,7 @@ equip:set_sprite(sprite)
 equip.loot_tags = Item.LootTag.CATEGORY_UTILITY
 equip.cooldown = COOLDOWN * 60
 
-equip:onUse(function(actor)
+Callback.add(equip.on_use, function(actor)
     actor:sound_play(HungerSpawn, 1.0, 1.0)
     -- Р”С‹СЂР° РїРѕСЏРІР»СЏРµС‚СЃСЏ С‡СѓС‚СЊ РІРїРµСЂРµРґРё РёРіСЂРѕРєР° Рё РјРµРґР»РµРЅРЅРѕ Р»РµС‚РёС‚ РІРїРµСЂС‘Рґ РїРѕ РЅР°РїСЂР°РІР»РµРЅРёСЋ Р·Р°РїСѓСЃРєР°.
     local dir = (actor.image_xscale >= 0) and 0 or 180   -- РїРѕ РЅР°РїСЂР°РІР»РµРЅРёСЋ РІР·РіР»СЏРґР° РёРіСЂРѕРєР°

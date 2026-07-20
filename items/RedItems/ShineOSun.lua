@@ -28,7 +28,7 @@ item:set_tier(ItemTier.RARE)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 
 -- РџСЂРё СѓР±РёР№СЃС‚РІРµ СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ С€Р°РЅСЃ 22% СЃРѕР·РґР°С‚СЊ "СЃРѕР»РЅС†Рµ" РЅР°Рґ РІСЂР°РіРѕРј
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if not Net.host then return end
 
     if math.random() < 0.22 then
@@ -66,7 +66,7 @@ item:onKillProc(function(actor, victim, stack)
 end)
 
 -- РћР±СЂР°Р±РѕС‚РєР° РєР°Р¶РґРѕРіРѕ Р°РєС‚РёРІРЅРѕРіРѕ СЃРѕР»РЅС†Р°: СѓСЂРѕРЅ РїРѕ РѕР±Р»Р°СЃС‚Рё РєР°Р¶РґС‹Рµ 12 РєР°РґСЂРѕРІ
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if not Net.host then return end
 
     local data = actor:get_data(nil, GUID)
@@ -100,7 +100,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- Р’РёР·СѓР°Р»: РїРѕРєР°Р·С‹РІР°РµРј Р·РѕРЅСѓ РґРµР№СЃС‚РІРёСЏ РєР°Р¶РґРѕРіРѕ Р°РєС‚РёРІРЅРѕРіРѕ СЃРѕР»РЅС†Р°
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     local data = actor:get_data(nil, GUID)
     if not data.suns then return end
     gm.draw_set_colour(SUN_COLOR)

@@ -16,7 +16,7 @@ item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
 -- Пересчёт брони после базового расчёта статистики
-item:onPostStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_post_stat_recalc(item, function(actor, stack)
     -- Если текущее здоровье ≤ 50% от максимального — даём бонус к броне
     if actor.hp <= actor.maxhp * 0.50 then
         actor.armor = actor.armor + (20 * stack)
@@ -24,7 +24,7 @@ item:onPostStatRecalc(function(actor, stack)
 end)
 
 -- Отображение партикла над игроком, пока предмет активен (hp ≤ 50%)
-item:onPostDraw(function(actor, stack)
+DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     if actor.hp <= actor.maxhp * 0.50 then
         gm.draw_sprite(oberegParticle, 0, actor.x, actor.y - 30)
     end

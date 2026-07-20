@@ -18,7 +18,7 @@ local GUID = _ENV["!guid"]
 local massacreBuff
 
 -- РџСЂРё РїРѕР»СѓС‡РµРЅРёРё РїСЂРµРґРјРµС‚Р° РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СЃС‡С‘С‚С‡РёРє СѓР±РёР№СЃС‚РІ
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     local actorData = actor:get_data("MassacreCurse", GUID)
     if not actorData.count then
         actorData.count = 0
@@ -26,7 +26,7 @@ item:onAcquire(function(actor, stack)
 end)
 
 -- РџСЂРё СѓР±РёР№СЃС‚РІРµ СѓРІРµР»РёС‡РёРІР°РµРј СЃС‡С‘С‚С‡РёРє Рё РІС‹РґР°С‘Рј Р±Р°С„С„ РїСЂРё РґРѕСЃС‚РёР¶РµРЅРёРё 3
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if not Net.host then return end
 
     massacreBuff = massacreBuff or Buff.find("MassacreCurse", "DeerItems")
@@ -62,7 +62,7 @@ buff.max_stack = 999
 buff.is_timed = false
 
 -- РџСЂРё РґРѕР±Р°РІР»РµРЅРёРё СЃС‚Р°РєР° вЂ” РґРѕР±Р°РІР»СЏРµРј С‚Р°Р№РјРµСЂ РµРіРѕ РґРµР№СЃС‚РІРёСЏ
-buff:onApply(function(actor, stack)
+DeerItemsCallbacks.buff_apply(buff, function(actor, stack)
     local actorData = actor:get_data("MassacreCurse", GUID)
     if not actorData.timers then actorData.timers = {} end
     -- РљР°Р¶РґРѕРјСѓ СЃС‚Р°РєСѓ РґР°С‘С‚СЃСЏ РІСЂРµРјСЏ РґРµР№СЃС‚РІРёСЏ: 2.5 СЃРµРє * РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРµРґРјРµС‚РѕРІ
@@ -70,7 +70,7 @@ buff:onApply(function(actor, stack)
 end)
 
 -- РџРѕСЃС‚РѕР±РЅРѕРІР»РµРЅРёРµ: СѓРјРµРЅСЊС€Р°РµРј С‚Р°Р№РјРµСЂС‹, СѓРґР°Р»СЏРµРј СЃС‚РµРєРё, РµСЃР»Рё РёСЃС‚РµРєР»Рё
-buff:onPostStep(function(actor, stack)
+DeerItemsCallbacks.buff_post_step(buff, function(actor, stack)
     local actorData = actor:get_data("MassacreCurse", GUID)
     -- РћР±РЅРѕРІР»СЏРµРј РєР°Р¶РґС‹Р№ С‚Р°Р№РјРµСЂ
     for i, time in ipairs(actorData.timers) do
@@ -94,7 +94,7 @@ buff:onPostStep(function(actor, stack)
 end)
 
 -- РЈРІРµР»РёС‡РёРІР°РµРј СѓСЂРѕРЅ Рё Р±СЂРѕРЅСЋ РЅР° 3% Р·Р° СЃС‚Р°Рє
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     actor.damage = actor.damage + ((actor.damage * 0.03) * stack)
     actor.armor  = actor.armor  + ((actor.armor  * 0.03) * stack)
 end)

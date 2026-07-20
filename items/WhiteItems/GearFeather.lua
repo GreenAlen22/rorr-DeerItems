@@ -14,7 +14,7 @@ item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Обработка пересчёта статистики при получении предмета
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     -- Увеличение максимальной скорости (pVmax) на 7% за стак
     actor.pVmax = actor.pVmax + (actor.pVmax * (0.07 * stack))
 end)

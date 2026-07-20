@@ -20,7 +20,7 @@ item.loot_tags = Item.LootTag.CATEGORY_HEALING
 local bonus_items
 
 -- Перерасчёт брони
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     -- Список предметов, усиливающих бонус (ищем один раз и кэшируем)
     if not bonus_items then
         bonus_items = {

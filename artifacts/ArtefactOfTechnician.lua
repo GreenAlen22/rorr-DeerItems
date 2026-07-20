@@ -13,12 +13,11 @@ local MAX_SPAWN_ATTEMPTS = 24
 local DRONE_INTERACTABLE = gm.constants.pInteractableDrone
 
 local artifact = Artifact.new("Technician")
-artifact:set_sprites(sprite, sprite)
-artifact:set_text(
-    "artifact.Technician.name",
-    "artifact.Technician.pickup",
-    "artifact.Technician.description"
-)
+artifact.sprite_loadout_id = sprite
+artifact.sprite_pickup_id = sprite
+artifact.token_name = "artifact.Technician.name"
+artifact.token_pickup_name = "artifact.Technician.pickup"
+artifact.token_description = "artifact.Technician.description"
 
 local function find_drone_spawn_data()
     for _, card in ipairs(Class.INTERACTABLE_CARD) do
@@ -33,7 +32,7 @@ local function find_drone_spawn_data()
     return nil, nil
 end
 
-artifact:onStageStart(function()
+Callback.add(Callback.ON_STAGE_START, function()
     if Net.client or not artifact.active then return end
 
     local drone_object, required_tile_space = find_drone_spawn_data()

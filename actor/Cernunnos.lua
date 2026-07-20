@@ -311,7 +311,7 @@ local function draw_timer_ring(actor)
     gm.draw_set_alpha(1)
 end
 
-cernunnos:onCreate(function(actor)
+Callback.add(cernunnos.on_create, function(actor)
     actor.sprite_palette = sprite_palette
     actor.sprite_spawn = sprite_spawn
     actor.sprite_idle = sprite_idle
@@ -351,7 +351,7 @@ cernunnos:onCreate(function(actor)
     play_sound(actor, CernunnosSound.spawn, 1.0, 1.0)
 end)
 
-cernunnos:onStep(function(actor)
+Callback.add(cernunnos.on_step, function(actor)
     local data = data_of(actor)
     data[NOT_DRONE_KEY] = true
 
@@ -403,7 +403,7 @@ cernunnos:onStep(function(actor)
     sync_move(actor)
 end)
 
-cernunnos:onDestroy(function(actor)
+Callback.add(cernunnos.on_destroy, function(actor)
     play_sound(actor, CernunnosSound.death, 1.0, 0.9 + math.random() * 0.2)
     local data = data_of(actor)
     release_taunted_enemies(actor, data)
@@ -419,17 +419,17 @@ cernunnos:onDestroy(function(actor)
     end
 end)
 
-cernunnos:onDraw(function(actor)
+Callback.add(cernunnos.on_draw, function(actor)
     draw_timer_ring(actor)
 end)
 
-statePrimary:onEnter(function(actor, data)
+Callback.add(statePrimary.on_enter, function(actor, data)
     actor.image_index = 0
     data.fired = false
     actor:sound_play(snd, 0.8, 0.9 + math.random() * 0.2)
 end)
 
-statePrimary:onStep(function(actor, data)
+Callback.add(statePrimary.on_step, function(actor, data)
     actor:skill_util_fix_hspeed()
     actor:actor_animation_set(sprite_shoot1, 0.22 * math.max(0.1, actor.attack_speed or 1))
 

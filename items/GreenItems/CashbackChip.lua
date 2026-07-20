@@ -62,7 +62,7 @@ end
 
 -- Возврат денег при покупке. onInteractableActivate (тип 37) срабатывает ТОЛЬКО у держателей
 -- предмета и передаёт (actor, stack, interactable). Деньги пишем только локальному игроку.
-item:onInteractableActivate(function(actor, stack, interactable)
+DeerItemsCallbacks.item_interactable_activate(item, function(actor, stack, interactable)
     if not interactable or not Instance.exists(interactable) then return end
 
     -- Кредитуем только HUD локального игрока (в сетевой игре чужие покупки не трогаем)
@@ -86,6 +86,6 @@ item:onInteractableActivate(function(actor, stack, interactable)
 end)
 
 -- Сброс счётчика бесплатных сундуков на новом этапе
-item:onStageStart(function(actor, stack)
+DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
     free_used[actor.id] = 0
 end)

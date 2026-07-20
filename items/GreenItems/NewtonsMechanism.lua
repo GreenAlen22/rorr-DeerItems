@@ -32,7 +32,7 @@ item:set_sprite(sprite)
 item:set_tier(ItemTier.UNCOMMON)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 -- РџРѕРєР° Сѓ РёРіСЂРѕРєР° РµСЃС‚СЊ С‰РёС‚ РёР· Р»СЋР±РѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР°, РґР°С‘Рј Р±СЂРѕРЅСЋ.
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     if stack <= 0 then return end
     -- Р‘СЂРѕРЅСЏ вЂ” С‚РѕР»СЊРєРѕ РїРѕРєР° Сѓ РёРіСЂРѕРєР° СЂРµР°Р»СЊРЅРѕ РµСЃС‚СЊ С‰РёС‚.
     if (actor.shield or 0) > 0 then
@@ -73,7 +73,7 @@ local function release_pulse(actor, stack)
 end
 
 -- РљР°Р¶РґС‹Р№ РєР°РґСЂ: Р»РѕРІРёРј РїСЂРѕР±РёС‚РёРµ С‰РёС‚Р° Рё РґРµСЂР¶РёРј Р±РѕРЅСѓСЃ Р±СЂРѕРЅРё Р°РєС‚СѓР°Р»СЊРЅС‹Рј.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
     local data = actor:get_data("DeerItems", GUID)
     if data.nm_cd and data.nm_cd > 0 then data.nm_cd = data.nm_cd - 1 end

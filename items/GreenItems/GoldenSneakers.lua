@@ -23,7 +23,7 @@ item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Пересчёт статов: бонус к pHmax пропорционален текущему золоту относительно порога.
 -- Порог = 700 × инфляция золота × 0.5^(стак-1): со временем растёт, за стаки — снижается.
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     if stack <= 0 then return end
 
     local gold = actor.gold or 0
@@ -43,7 +43,7 @@ end)
 
 -- Золото меняется постоянно, а статы сами по себе так часто не пересчитываются.
 -- Поэтому при изменении золота запускаем пересчёт статов, чтобы бонус оставался актуальным.
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     local data = actor:get_data("DeerItems", GUID)
     local gold = actor.gold or 0
     if data.gs_last_gold ~= gold then

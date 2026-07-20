@@ -69,7 +69,7 @@ end)
 -- РџСЂРё РїРѕРїР°РґР°РЅРёРё РїРѕ Р±РѕСЃСЃСѓ РґРѕР±Р°РІР»СЏРµРј РґРѕР»СЋ СѓСЂРѕРЅР° РѕС‚РґРµР»СЊРЅС‹Рј В«Р±РµР·РїСЂРѕРєРѕРІС‹РјВ» С…РёС‚РѕРј.
 -- onHitProc (Р° РЅРµ onAttackHit) вЂ” СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ С‚РѕР»СЊРєРѕ РЅР° РїСЂРѕРєРѕРІС‹С… Р°С‚Р°РєР°С…; Р±РѕРЅСѓСЃ-С…РёС‚ РЅРёР¶Рµ
 -- РїРѕРјРµС‡РµРЅ proc=false, РїРѕСЌС‚РѕРјСѓ СЃР°Рј СЃРµР±СЏ РЅРµ РїСЂРѕРєР°РµС‚ (РёРЅР°С‡Рµ Р±РµСЃРєРѕРЅРµС‡РЅР°СЏ С†РµРїРѕС‡РєР°).
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
     if stack <= 0 then return end
     if not is_boss(victim) then return end

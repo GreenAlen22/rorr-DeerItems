@@ -12,12 +12,11 @@ local DIFFICULTY_TICK_FRAMES = 60
 local EVENT_TIME_MULTIPLIER = 5
 
 local artifact = Artifact.new("Stagnation")
-artifact:set_sprites(sprite, sprite)
-artifact:set_text(
-    "artifact.Stagnation.name",
-    "artifact.Stagnation.pickup",
-    "artifact.Stagnation.description"
-)
+artifact.sprite_loadout_id = sprite
+artifact.sprite_pickup_id = sprite
+artifact.token_name = "artifact.Stagnation.name"
+artifact.token_pickup_name = "artifact.Stagnation.pickup"
+artifact.token_description = "artifact.Stagnation.description"
 
 local function set_difficulty_alarm(director, value)
     local ok = pcall(function()

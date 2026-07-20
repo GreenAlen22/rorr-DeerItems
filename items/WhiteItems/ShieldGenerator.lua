@@ -63,17 +63,17 @@ local function recalculate_drones(actor)
     end
 end
 
-item:onAcquire(function(actor, stack)
+DeerItemsCallbacks.item_acquired(item, function(actor, stack)
     refresh_team_stacks()
     recalculate_drones(actor)
 end)
 
 -- onRemove приходит до изменения инвентаря, поэтому пересчёт переносим на следующий onStep.
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     pending_recalculate[actor.id] = actor
 end)
 
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     local changed = refresh_team_stacks()
     if changed then
         recalculate_drones(actor)

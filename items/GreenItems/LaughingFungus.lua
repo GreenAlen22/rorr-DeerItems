@@ -100,7 +100,7 @@ end
 local objMushroom = Object.new("EfLaughingFungusMushroom")
 objMushroom:set_sprite(zoneSprite)
 objMushroom:set_depth(50)
-objMushroom:onCreate(function(self)
+Callback.add(objMushroom.on_create, function(self)
     self.zone = -4
     self.life = 0
     self.variant = 0
@@ -124,7 +124,7 @@ objMushroom:onCreate(function(self)
     end
 end)
 
-objMushroom:onStep(function(self)
+Callback.add(objMushroom.on_step, function(self)
     self.life = (self.life or 0) + 1
     self.image_index = mushroom_frame_for(self.variant, self.life)
 
@@ -151,7 +151,7 @@ objMushroom:onStep(function(self)
     end
 end)
 
-objMushroom:onDestroy(function(self)
+Callback.add(objMushroom.on_destroy, function(self)
     self:instance_destroy_sync()
 end)
 
@@ -227,7 +227,7 @@ local function ensure_zone_mushrooms(zone)
 end
 
 -- РџСЂРё СЃРѕР·РґР°РЅРёРё Р·РѕРЅС‹
-objZone:onCreate(function(self)
+Callback.add(objZone.on_create, function(self)
     self.radius = ZONE_RADIUS_BASE
     self.height = zone_height_for(self.radius)
     self.life   = 0           -- СЃРєРѕР»СЊРєРѕ РєР°РґСЂРѕРІ Р·РѕРЅР° СЃСѓС‰РµСЃС‚РІСѓРµС‚ (РїСЂРёРіРѕРґРёС‚СЃСЏ РґР»СЏ Р°РЅРёРјР°С†РёРё РїР°СЂС‚РёРєР»РѕРІ)
@@ -236,7 +236,7 @@ objZone:onCreate(function(self)
 end)
 
 -- РљР°Р¶РґС‹Р№ РєР°РґСЂ: СЃС‡РёС‚Р°РµРј В«РІРѕР·СЂР°СЃС‚В» Р·РѕРЅС‹ Рё РїСЂРѕРІРµСЂСЏРµРј СЃС‚СЂР°С…РѕРІРѕС‡РЅС‹Р№ С‚Р°Р№РјРµСЂ
-objZone:onStep(function(self)
+Callback.add(objZone.on_step, function(self)
     if Net.client then return end
 
     self.life = self.life + 1
@@ -246,7 +246,7 @@ objZone:onStep(function(self)
     ensure_zone_mushrooms(self)
 end)
 
-objZone:onDestroy(function(self)
+Callback.add(objZone.on_destroy, function(self)
     if not Net.client then
         destroy_zone_mushrooms(self)
     end
@@ -264,7 +264,7 @@ local function destroy_zone(data)
     data.lf_zone = nil
 end
 -- РљР°Р¶РґС‹Р№ РєР°РґСЂ: РѕС‚СЃР»РµР¶РёРІР°РµРј РЅРµРїРѕРґРІРёР¶РЅРѕСЃС‚СЊ, РІРµРґС‘Рј РІРёР·СѓР°Р»СЊРЅСѓСЋ Р·РѕРЅСѓ Рё Р»РµС‡РёРј СЃРѕСЋР·РЅРёРєРѕРІ СЂР°Р· РІ СЃРµРєСѓРЅРґСѓ
-item:onPostStep(function(actor, stack)
+DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
 
     local data = actor:get_data("DeerItems", GUID)
@@ -319,6 +319,6 @@ item:onPostStep(function(actor, stack)
 end)
 
 -- РџСЂРё РїРѕС‚РµСЂРµ РїСЂРµРґРјРµС‚Р° вЂ” РіР°СЂР°РЅС‚РёСЂРѕРІР°РЅРЅРѕ СѓР±РёСЂР°РµРј Р·РѕРЅСѓ
-item:onRemove(function(actor, stack)
+DeerItemsCallbacks.item_removed(item, function(actor, stack)
     destroy_zone(actor:get_data("DeerItems", GUID))
 end)

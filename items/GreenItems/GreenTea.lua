@@ -24,7 +24,7 @@ gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result,
 end)
 
 -- После пересчёта статов — применяем бонусы
-item:onPostStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_post_stat_recalc(item, function(actor, stack)
     -- Увеличение максимального HP на 6.8% за стак
     actor.maxhp = actor.maxhp + math.ceil(actor.maxhp * (0.068 * stack))
     -- Вычисляем недостающее HP после изменения maxhp

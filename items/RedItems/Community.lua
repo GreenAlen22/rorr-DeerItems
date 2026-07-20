@@ -26,7 +26,7 @@ local function count_total_items(actor)
     return total
 end
 -- Перерасчёт основных характеристик
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     -- Подсчёт предметов у игрока (список реестра кэшируется)
     local total_items = count_total_items(actor)
 
@@ -51,7 +51,7 @@ gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result,
 end)
 
 -- После пересчёта: компенсируем изменение maxhp, чтобы не потерять здоровье
-item:onPostStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_post_stat_recalc(item, function(actor, stack)
 	local total_items = count_total_items(actor)
 
     local mult = 1.0 + (0.01 * total_items * (stack or 1))

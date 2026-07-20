@@ -15,14 +15,14 @@ item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Очистка всех предыдущих коллбеков предмета (важно для перезагрузки логики)
 -- Пересчёт статов: уменьшение кулдауна утилитарного скилла на 5% за стак
-item:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
 	local utility = actor:get_active_skill(Skill.Slot.UTILITY)
 	utility.cooldown = math.ceil(utility.cooldown * (0.95 ^ stack))
 end)
 -- При использовании утилитарного скилла: барьер, зависящий от базового кулдауна навыка.
 -- Чем длиннее кулдаун (т.е. чем реже доступен барьер), тем он больше — это уравнивает
 -- ценность предмета у персонажей с коротким и длинным КД третьего навыка.
-item:onUtilityUse(function(actor, stack)
+DeerItemsCallbacks.item_utility_use(item, function(actor, stack)
 	local utility = actor:get_active_skill(Skill.Slot.UTILITY)
 	-- cooldown хранится в кадрах (60 к/с) → переводим в секунды
 	local cd_seconds = (utility.cooldown or 0) / 60

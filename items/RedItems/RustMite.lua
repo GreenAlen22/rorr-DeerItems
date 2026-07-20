@@ -37,7 +37,7 @@ item:set_tier(ItemTier.RARE)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 -- РџСЂРё РїРѕРїР°РґР°РЅРёРё (100% С€Р°РЅСЃ): РІРµС€Р°РµРј С†РµР»Рё СЃС‚Р°РєРё СЂР¶Р°РІС‡РёРЅС‹ = С‡РёСЃР»Сѓ СЃС‚Р°РєРѕРІ РїСЂРµРґРјРµС‚Р°.
 -- РљРѕР»Р»Р±СЌРє СѓСЂРѕРЅР° РќР• РЅР°РЅРѕСЃРёС‚ в†’ СЃР°РјРѕРїСЂРѕРє РЅРµРІРѕР·РјРѕР¶РµРЅ, proc=false РЅРµ РЅСѓР¶РµРЅ.
-item:onHitProc(function(actor, victim, stack, hit_info)
+DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if stack <= 0 then return end
     if not Net.host then return end           -- СЃС‚Р°РєРё РІРµС€Р°РµРј РЅР° С…РѕСЃС‚Рµ (СЃРёРЅРє РґРІРёР¶РєРѕРј)
     if not (victim and Instance.exists(victim)) then return end

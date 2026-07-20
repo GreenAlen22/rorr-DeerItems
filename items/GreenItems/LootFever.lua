@@ -28,7 +28,7 @@ buff.stack_number_col    = Array.new(1, Color(0xffd24a))
 buff.is_timed  = false
 buff.max_stack = 999
 -- РљР°Р¶РґРѕРµ РїСЂРёРјРµРЅРµРЅРёРµ Р±Р°С„С„Р° РґРѕР±Р°РІР»СЏРµС‚ РѕС‚РґРµР»СЊРЅС‹Р№ С‚Р°Р№РјРµСЂ РЅР° DURATION РєР°РґСЂРѕРІ
-buff:onApply(function(actor, stack)
+DeerItemsCallbacks.buff_apply(buff, function(actor, stack)
     local data = actor:get_data("LootFever", GUID)
     if not data.timers then data.timers = {} end
     local item_stack = actor:item_count(item) or 1
@@ -40,7 +40,7 @@ buff:onApply(function(actor, stack)
 end)
 
 -- РўРёРє С‚Р°Р№РјРµСЂРѕРІ: РёСЃС‚С‘РєС€РёРµ СЃС‚Р°РєРё СЃРЅРёРјР°РµРј; СЃРІРµСЂС…Сѓ РґРµСЂР¶РёРј РєР°Рї РїРѕ С‡РёСЃР»Сѓ РїСЂРµРґРјРµС‚РѕРІ
-buff:onPostStep(function(actor, stack)
+DeerItemsCallbacks.buff_post_step(buff, function(actor, stack)
     local data = actor:get_data("LootFever", GUID)
     if data.timers then
         for i = #data.timers, 1, -1 do
@@ -55,7 +55,7 @@ buff:onPostStep(function(actor, stack)
 end)
 
 -- РЎСѓРјРјР°СЂРЅС‹Р№ Р±РѕРЅСѓСЃ Рє РѕСЃРЅРѕРІРЅС‹Рј С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєР°Рј, РѕРіСЂР°РЅРёС‡РµРЅРЅС‹Р№ РєР°РїРѕРј.
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     local data = actor:get_data("LootFever", GUID)
     local total = 0
     for _, entry in ipairs(data.timers or {}) do
@@ -105,7 +105,7 @@ local function bonus_for_pickup(pickup)
 end
 
 -- Р›СЋР±РѕР№ РїРѕРґРѕР±СЂР°РЅРЅС‹Р№ РїСЂРµРґРјРµС‚ РґРѕР±Р°РІР»СЏРµС‚ РІСЂРµРјРµРЅРЅС‹Р№ Р±РѕРЅСѓСЃ (С‚РѕР»СЊРєРѕ РґРµСЂР¶Р°С‚РµР»СЏРј РїСЂРµРґРјРµС‚Р°, РЅР° С…РѕСЃС‚Рµ).
-item:onPickupCollected(function(actor, stack, pickup_instance)
+DeerItemsCallbacks.item_pickup_collected(item, function(actor, stack, pickup_instance)
     if not (actor and Instance.exists(actor)) then return end
     if not Net.host then return end
     if stack <= 0 then return end

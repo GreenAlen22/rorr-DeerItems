@@ -45,13 +45,13 @@ buff.show_icon = false
 buff.is_debuff = false
 buff.max_stack = 1
 -- РџРѕРєР° Р±Р°С„С„ Р°РєС‚РёРІРµРЅ: +СЃРєРѕСЂРѕСЃС‚СЊ Р°С‚Р°РєРё Рё +СѓСЂРѕРЅ РѕС‚ Р±Р°Р·РѕРІС‹С… Р·РЅР°С‡РµРЅРёР№
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     actor.attack_speed = actor.attack_speed + actor.attack_speed_base * ATK_SPEED_MULT
     actor.damage       = actor.damage       + actor.damage_base       * DAMAGE_MULT
 end)
 
 -- РђРєС‚РёРІР°С†РёСЏ СЃРЅР°СЂСЏР¶РµРЅРёСЏ (actor вЂ” РѕР±С‘СЂРЅСѓС‚С‹Р№ РёРіСЂРѕРє-Р°РєС‚РёРІР°С‚РѕСЂ)
-equip:onUse(function(actor)
+Callback.add(equip.on_use, function(actor)
     -- Р“Р»СѓС€РёРј РїСЂРѕС€Р»С‹Р№ С‚СЂРµРє, РµСЃР»Рё РµС‰С‘ Р·РІСѓС‡РёС‚ (Р·Р°С‰РёС‚Р° РѕС‚ РЅР°Р»РѕР¶РµРЅРёСЏ РїСЂРё РїРѕРІС‚РѕСЂРЅРѕР№ Р°РєС‚РёРІР°С†РёРё)
     if music_id and gm.audio_is_playing(music_id) then gm.audio_stop_sound(music_id) end
     -- РњСѓР·С‹РєР° РёСЃС…РѕРґРёС‚ РѕС‚ Р°РєС‚РёРІР°С‚РѕСЂР° (РїРѕР·РёС†РёРѕРЅРЅРѕ), РіСЂРѕРјРєРѕСЃС‚СЊ вЂ” РёР· РЅР°СЃС‚СЂРѕР№РєРё РјСѓР·С‹РєРё

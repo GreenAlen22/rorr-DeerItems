@@ -22,13 +22,13 @@ local function extend_zone(actor)
     end
 end
 
-item:onKillProc(function(actor, victim, stack)
+DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if Net.client then return end
 
     extend_zone(actor)
 end)
 
-item:onStageStart(function(actor, stack)
+DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
     if Net.client then return end
 
     active = active or Item.find("RiftBeacon", "DeerItems")

@@ -40,12 +40,11 @@ local TIER_WEIGHTS = {
 }
 
 local artifact = Artifact.new("Storm")
-artifact:set_sprites(sprite, sprite)
-artifact:set_text(
-    "artifact.Storm.name",
-    "artifact.Storm.pickup",
-    "artifact.Storm.description"
-)
+artifact.sprite_loadout_id = sprite
+artifact.sprite_pickup_id = sprite
+artifact.token_name = "artifact.Storm.name"
+artifact.token_pickup_name = "artifact.Storm.pickup"
+artifact.token_description = "artifact.Storm.description"
 
 local storm_timer = 0
 local pending_strikes = {}

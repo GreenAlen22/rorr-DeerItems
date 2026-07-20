@@ -11,12 +11,11 @@ local REVIVE_INVINCIBILITY_FRAMES = 60
 local PLAYER_DRONE_OBJECT = gm.constants.oPDrone
 
 local artifact = Artifact.new("Victory")
-artifact:set_sprites(sprite, sprite)
-artifact:set_text(
-    "artifact.Victory.name",
-    "artifact.Victory.pickup",
-    "artifact.Victory.description"
-)
+artifact.sprite_loadout_id = sprite
+artifact.sprite_pickup_id = sprite
+artifact.token_name = "artifact.Victory.name"
+artifact.token_pickup_name = "artifact.Victory.pickup"
+artifact.token_description = "artifact.Victory.description"
 
 local dead_players = {}
 local event_active_last_step = false

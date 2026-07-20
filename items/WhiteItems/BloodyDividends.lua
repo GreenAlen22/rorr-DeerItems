@@ -19,7 +19,7 @@ local item = Item.new("BloodyDividends")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
-item:onDamagedProc(function(actor, attacker, stack, hit_info)
+DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_info)
     if stack <= 0 then return end
     if not (attacker and Instance.exists(attacker)) then return end
     if actor:same(attacker) or actor.team == attacker.team then return end

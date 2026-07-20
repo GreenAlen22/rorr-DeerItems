@@ -20,11 +20,11 @@ local buff = Buff.new("TacticalVisor")
 buff.show_icon = false
 buff.is_debuff = false
 buff.max_stack = 1
-buff:onStatRecalc(function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
     actor.critical_chance = actor.critical_chance + CRIT_BONUS
 end)
 
 -- Активация: вешаем бафф крита на 8 секунд
-equip:onUse(function(actor)
+Callback.add(equip.on_use, function(actor)
     actor:buff_apply(buff, BUFF_DURATION, 1)
 end)

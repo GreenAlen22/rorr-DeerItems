@@ -20,12 +20,12 @@
 -- obj:set_sprite(turretSprite)
 -- obj:set_depth(2)
 
--- obj:onCreate(function(self)
+-- Callback.add(obj.on_create, function(self)
 --     self.life = LIFE
 --     self:instance_sync()
 -- end)
 
--- obj:onStep(function(self)
+-- Callback.add(obj.on_step, function(self)
 --     if Net.client then return end
 --     local data   = self:get_data(nil, GUID)
 --     local parent = data.parent
@@ -70,7 +70,7 @@
 --     end
 -- end)
 
--- obj:onDestroy(function(self)
+-- Callback.add(obj.on_destroy, function(self)
 --     self:instance_destroy_sync()
 -- end)
 
@@ -80,7 +80,7 @@
 -- item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 
 -- -- Р СџРЎР‚Р С‘ Р В°Р С”РЎвЂљР С‘Р Р†Р В°РЎвЂ Р С‘Р С‘ Р С‘Р Р…РЎвЂљР ВµРЎР‚Р В°Р С”РЎвЂљР С‘Р Р†Р В° РІР‚вЂќ РЎРѓР С—Р В°Р Р†Р Р…Р С‘Р С РЎвЂљРЎС“РЎР‚Р ВµР В»РЎРЉ РЎС“ РЎРЊРЎвЂљР С•Р С–Р С• Р С•Р В±РЎР‰Р ВµР С”РЎвЂљР В° (Р Р…Р Вµ Р В±Р С•Р В»РЎРЉРЎв‚¬Р Вµ stack Р С•Р Т‘Р Р…Р С•Р Р†РЎР‚Р ВµР СР ВµР Р…Р Р…Р С•)
--- item:onInteractableActivate(function(actor, stack, interactable)
+-- DeerItemsCallbacks.item_interactable_activate(item, function(actor, stack, interactable)
 --     if Net.client then return end
 --     local data = actor:get_data("Golemshot", GUID)
 --     if not data.turrets then data.turrets = {} end
