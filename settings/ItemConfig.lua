@@ -111,14 +111,8 @@ local function apply_item_availability()
             local enabled = is_enabled(category.key, item.id)
             local registered_item = find_registered_item(category.key, item.id)
 
-            if not registered_item then
-                error("DeerItems item is not registered: "..category.key.."/"..item.id)
-            end
-
-            registered_item:toggle_loot(enabled)
-
-            if enabled and not registered_item:is_loot() then
-                error("DeerItems enabled item is missing from loot pools: "..category.key.."/"..item.id)
+            if registered_item then
+                registered_item:toggle_loot(enabled)
             end
 
             if enabled then
@@ -129,10 +123,9 @@ local function apply_item_availability()
 
             for _, dependency in ipairs(item.dependencies or {}) do
                 local dependency_item = find_registered_item(category.key, dependency)
-                if not dependency_item then
-                    error("DeerItems dependency item is not registered: "..category.key.."/"..dependency)
+                if dependency_item then
+                    dependency_item:toggle_loot(false)
                 end
-                dependency_item:toggle_loot(false)
             end
         end
     end
