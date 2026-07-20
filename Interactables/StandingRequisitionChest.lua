@@ -376,27 +376,28 @@ Hook.add_pre(gm.constants.interactable_pay_cost, function(self, other, result, a
 end)
 
 gm.post_script_hook(gm.constants.interactable_check_cost, function(self, other, result, args)
-    if not is_requisition_object(self) then return end
+    local chest = Instance.wrap(self)
+    if not is_requisition_object(chest) then return end
     local actor = Instance.wrap(args[3].value)
-    refresh_cost(self)
-    local chosen = self.sr_chosen or 0
+    refresh_cost(chest)
+    local chosen = chest.sr_chosen or 0
     if chosen >= 2 then result.value = false return end
     if chosen == 0 then
-        result.value = (self.sr_choice_a or -1) >= 0 and (self.sr_choice_b or -1) >= 0
+        result.value = (chest.sr_choice_a or -1) >= 0 and (chest.sr_choice_b or -1) >= 0
         return
     end
 
     if Net.client then
-        result.value = item_from_contents(self, 0) ~= nil
+        result.value = item_from_contents(chest, 0) ~= nil
         return
     end
 
-    local can_use = #paid_choice_ids(self) > 0 and actor_can_pay(actor, self.cost or 0)
+    local can_use = #paid_choice_ids(chest) > 0 and actor_can_pay(actor, chest.cost or 0)
     if can_use then
-        local data = self:get_data("DeerItems", GUID)
+        local data = chest:get_data("DeerItems", GUID)
         data.pending_payer_id = actor.id
         data.pending_gold = actor.gold
-        data.pending_cost = self.cost or 0
+        data.pending_cost = chest.cost or 0
     end
     result.value = can_use
 end)
