@@ -1,63 +1,60 @@
 -- DeerItems-NewtonsMechanism
--- Даёт щит (4% от макс. HP). Пока щит есть — +30 брони (+30 за шт.).
--- Когда щит пробивают — выпускает оглушающий пульс: 100% урона + 100% (+10% за шт.) от макс. щита.
+-- Р”Р°С‘С‚ С‰РёС‚ (4% РѕС‚ РјР°РєСЃ. HP). РџРѕРєР° С‰РёС‚ РµСЃС‚СЊ вЂ” +30 Р±СЂРѕРЅРё (+30 Р·Р° С€С‚.).
+-- РљРѕРіРґР° С‰РёС‚ РїСЂРѕР±РёРІР°СЋС‚ вЂ” РІС‹РїСѓСЃРєР°РµС‚ РѕРіР»СѓС€Р°СЋС‰РёР№ РїСѓР»СЊСЃ: 100% СѓСЂРѕРЅР° + 100% (+10% Р·Р° С€С‚.) РѕС‚ РјР°РєСЃ. С‰РёС‚Р°.
 
--- Загружаем спрайт предмета
--- Загружаем спрайты эффектов
--- Загружаем звуковой эффект
-local sprite = Resources.sprite_load("DeerItems", "item/NewtonsMechanism", PATH.."assets/sprites/items/sGreenItems/NewtonsMechanism.png", 1, 17, 17)
-local voltOverload = Resources.sprite_load("DeerItems", "paticle/voltOverload", PATH.."assets/sprites/particle/voltOverload.png", 13, 64, 112)
-local voltOverloadHit = Resources.sprite_load("DeerItems", "paticle/voltOverloadHit", PATH.."assets/sprites/particle/voltOverloadHit.png", 6, 16, 16)
-local sound = Resources.sfx_load("DeerItems", "sound/voltOverload", PATH.."assets/sounds/voltOverload.ogg")
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚С‹ СЌС„С„РµРєС‚РѕРІ
+-- Р—Р°РіСЂСѓР¶Р°РµРј Р·РІСѓРєРѕРІРѕР№ СЌС„С„РµРєС‚
+local sprite = Sprite.new("item/NewtonsMechanism", PATH.."assets/sprites/items/sGreenItems/NewtonsMechanism.png", 1, 17, 17)
+local voltOverload = Sprite.new("paticle/voltOverload", PATH.."assets/sprites/particle/voltOverload.png", 13, 64, 112)
+local voltOverloadHit = Sprite.new("paticle/voltOverloadHit", PATH.."assets/sprites/particle/voltOverloadHit.png", 6, 16, 16)
+local sound = Sound.new("sound/voltOverload", PATH.."assets/sounds/voltOverload.ogg")
 
--- guid мода выносим один раз — чтобы get_data не искал его через debug-стек каждый кадр
+-- guid РјРѕРґР° РІС‹РЅРѕСЃРёРј РѕРґРёРЅ СЂР°Р· вЂ” С‡С‚РѕР±С‹ get_data РЅРµ РёСЃРєР°Р» РµРіРѕ С‡РµСЂРµР· debug-СЃС‚РµРє РєР°Р¶РґС‹Р№ РєР°РґСЂ
 local GUID = _ENV["!guid"]
 
--- Балансные константы
-local ARMOR_PER_STACK   = 5     -- +5 брони за стак, пока есть щит
-local PULSE_PLAYER_BASE = 1.5    -- пульс: 150% базового урона
-local PULSE_PLAYER_STACK= 1.25   -- +125% базового урона за каждый доп. стак
-local PULSE_SHIELD_BASE = 1.25    -- пульс: +125% от макс. щита
-local PULSE_SHIELD_STACK= 1.0    -- +100% от макс. щита за стак сверх первого
-local STUN_SECONDS      = 1.5    -- длительность оглушения от пульса
-local RADIUS_BASE       = 3 * 32      -- базовый радиус пульса (3 м)
-local RADIUS_STACK      = 0.5 * 32    -- +0.5 м радиуса за стак сверх первого
+-- Р‘Р°Р»Р°РЅСЃРЅС‹Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹
+local ARMOR_PER_STACK   = 5     -- +5 Р±СЂРѕРЅРё Р·Р° СЃС‚Р°Рє, РїРѕРєР° РµСЃС‚СЊ С‰РёС‚
+local PULSE_PLAYER_BASE = 1.5    -- РїСѓР»СЊСЃ: 150% Р±Р°Р·РѕРІРѕРіРѕ СѓСЂРѕРЅР°
+local PULSE_PLAYER_STACK= 1.25   -- +125% Р±Р°Р·РѕРІРѕРіРѕ СѓСЂРѕРЅР° Р·Р° РєР°Р¶РґС‹Р№ РґРѕРї. СЃС‚Р°Рє
+local PULSE_SHIELD_BASE = 1.25    -- РїСѓР»СЊСЃ: +125% РѕС‚ РјР°РєСЃ. С‰РёС‚Р°
+local PULSE_SHIELD_STACK= 1.0    -- +100% РѕС‚ РјР°РєСЃ. С‰РёС‚Р° Р·Р° СЃС‚Р°Рє СЃРІРµСЂС… РїРµСЂРІРѕРіРѕ
+local STUN_SECONDS      = 1.5    -- РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РѕРіР»СѓС€РµРЅРёСЏ РѕС‚ РїСѓР»СЊСЃР°
+local RADIUS_BASE       = 3 * 32      -- Р±Р°Р·РѕРІС‹Р№ СЂР°РґРёСѓСЃ РїСѓР»СЊСЃР° (3 Рј)
+local RADIUS_STACK      = 0.5 * 32    -- +0.5 Рј СЂР°РґРёСѓСЃР° Р·Р° СЃС‚Р°Рє СЃРІРµСЂС… РїРµСЂРІРѕРіРѕ
 
--- Создание предмета NewtonsMechanism
--- Привязка спрайта к предмету
--- Установка тира предмета: зелёный (необычный)
--- Назначение тега лута: предмет, повышающий живучесть
-local item = Item.new("DeerItems", "NewtonsMechanism")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р° NewtonsMechanism
+-- РџСЂРёРІСЏР·РєР° СЃРїСЂР°Р№С‚Р° Рє РїСЂРµРґРјРµС‚Сѓ
+-- РЈСЃС‚Р°РЅРѕРІРєР° С‚РёСЂР° РїСЂРµРґРјРµС‚Р°: Р·РµР»С‘РЅС‹Р№ (РЅРµРѕР±С‹С‡РЅС‹Р№)
+-- РќР°Р·РЅР°С‡РµРЅРёРµ С‚РµРіР° Р»СѓС‚Р°: РїСЂРµРґРјРµС‚, РїРѕРІС‹С€Р°СЋС‰РёР№ Р¶РёРІСѓС‡РµСЃС‚СЊ
+local item = Item.new("NewtonsMechanism")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
-
-item:clear_callbacks()
-
--- Пока у игрока есть щит из любого источника, даём броню.
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
+-- РџРѕРєР° Сѓ РёРіСЂРѕРєР° РµСЃС‚СЊ С‰РёС‚ РёР· Р»СЋР±РѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР°, РґР°С‘Рј Р±СЂРѕРЅСЋ.
 item:onStatRecalc(function(actor, stack)
     if stack <= 0 then return end
-    -- Броня — только пока у игрока реально есть щит.
+    -- Р‘СЂРѕРЅСЏ вЂ” С‚РѕР»СЊРєРѕ РїРѕРєР° Сѓ РёРіСЂРѕРєР° СЂРµР°Р»СЊРЅРѕ РµСЃС‚СЊ С‰РёС‚.
     if (actor.shield or 0) > 0 then
         actor.armor = actor.armor + ARMOR_PER_STACK * stack
     end
 end)
 
--- Оглушающий пульс при пробитии щита: 150%(+75%/стак) базового урона + 100%(+50%/стак) от макс. щита.
+-- РћРіР»СѓС€Р°СЋС‰РёР№ РїСѓР»СЊСЃ РїСЂРё РїСЂРѕР±РёС‚РёРё С‰РёС‚Р°: 150%(+75%/СЃС‚Р°Рє) Р±Р°Р·РѕРІРѕРіРѕ СѓСЂРѕРЅР° + 100%(+50%/СЃС‚Р°Рє) РѕС‚ РјР°РєСЃ. С‰РёС‚Р°.
 local function release_pulse(actor, stack)
     local radius = RADIUS_BASE + RADIUS_STACK * (stack - 1)
-    -- ПЛОСКИЙ урон по ТЗ: 150%(+75%/стак) базового урона + 100%(+50%/стак) от макс. щита.
-    -- ВНИМАНИЕ: параметр damage у fire_explosion — это КОЭФФИЦИЕНТ (движок умножает его на
-    -- actor.damage). Без поправки получалось dmg×actor.damage ≈ урон в квадрате (било слишком сильно).
-    -- Поэтому форсим «сырой» урон через use_raw_damage()+set_damage(), как в Домбре.
+    -- РџР›РћРЎРљРР™ СѓСЂРѕРЅ РїРѕ РўР—: 150%(+75%/СЃС‚Р°Рє) Р±Р°Р·РѕРІРѕРіРѕ СѓСЂРѕРЅР° + 100%(+50%/СЃС‚Р°Рє) РѕС‚ РјР°РєСЃ. С‰РёС‚Р°.
+    -- Р’РќРРњРђРќРР•: РїР°СЂР°РјРµС‚СЂ damage Сѓ fire_explosion вЂ” СЌС‚Рѕ РљРћР­Р¤Р¤РР¦РР•РќРў (РґРІРёР¶РѕРє СѓРјРЅРѕР¶Р°РµС‚ РµРіРѕ РЅР°
+    -- actor.damage). Р‘РµР· РїРѕРїСЂР°РІРєРё РїРѕР»СѓС‡Р°Р»РѕСЃСЊ dmgГ—actor.damage в‰€ СѓСЂРѕРЅ РІ РєРІР°РґСЂР°С‚Рµ (Р±РёР»Рѕ СЃР»РёС€РєРѕРј СЃРёР»СЊРЅРѕ).
+    -- РџРѕСЌС‚РѕРјСѓ С„РѕСЂСЃРёРј В«СЃС‹СЂРѕР№В» СѓСЂРѕРЅ С‡РµСЂРµР· use_raw_damage()+set_damage(), РєР°Рє РІ Р”РѕРјР±СЂРµ.
     local dmg = actor.damage * (PULSE_PLAYER_BASE + PULSE_PLAYER_STACK * (stack - 1))
               + actor.maxshield * (PULSE_SHIELD_BASE + PULSE_SHIELD_STACK * (stack - 1))
 
-    -- Оба визуальных спрайта nil — рисуем РОВНО ОДИН спрайт вручную (без двойной молнии).
-    -- proc=false: пульс не должен прокать другие предметы и сам себя.
+    -- РћР±Р° РІРёР·СѓР°Р»СЊРЅС‹С… СЃРїСЂР°Р№С‚Р° nil вЂ” СЂРёСЃСѓРµРј Р РћР’РќРћ РћР”РРќ СЃРїСЂР°Р№С‚ РІСЂСѓС‡РЅСѓСЋ (Р±РµР· РґРІРѕР№РЅРѕР№ РјРѕР»РЅРёРё).
+    -- proc=false: РїСѓР»СЊСЃ РЅРµ РґРѕР»Р¶РµРЅ РїСЂРѕРєР°С‚СЊ РґСЂСѓРіРёРµ РїСЂРµРґРјРµС‚С‹ Рё СЃР°Рј СЃРµР±СЏ.
     local attack = actor:fire_explosion(actor.x, actor.y, radius, radius, dmg, nil, nil, false)
     attack.max_hit_number = 5 + 10 * stack
-    -- Оглушение поражённых врагов + фиксация плоского урона (без крита)
+    -- РћРіР»СѓС€РµРЅРёРµ РїРѕСЂР°Р¶С‘РЅРЅС‹С… РІСЂР°РіРѕРІ + С„РёРєСЃР°С†РёСЏ РїР»РѕСЃРєРѕРіРѕ СѓСЂРѕРЅР° (Р±РµР· РєСЂРёС‚Р°)
     if attack and attack.attack_info then
         attack.attack_info:use_raw_damage()
         attack.attack_info:set_damage(dmg)
@@ -65,7 +62,7 @@ local function release_pulse(actor, stack)
         attack.attack_info:set_stun(STUN_SECONDS)
     end
 
-    -- Один спрайт молнии: высота = радиус, ширина = 0.8×высоты (пропорция арта). Спрайт 64×112 px.
+    -- РћРґРёРЅ СЃРїСЂР°Р№С‚ РјРѕР»РЅРёРё: РІС‹СЃРѕС‚Р° = СЂР°РґРёСѓСЃ, С€РёСЂРёРЅР° = 0.8Г—РІС‹СЃРѕС‚С‹ (РїСЂРѕРїРѕСЂС†РёСЏ Р°СЂС‚Р°). РЎРїСЂР°Р№С‚ 64Г—112 px.
     local ef = gm.instance_create(actor.x, actor.y, gm.constants.oEfExplosion)
     ef.sprite_index = voltOverload
     ef.image_yscale = radius / 112
@@ -75,7 +72,7 @@ local function release_pulse(actor, stack)
     actor:screen_shake(3)
 end
 
--- Каждый кадр: ловим пробитие щита и держим бонус брони актуальным.
+-- РљР°Р¶РґС‹Р№ РєР°РґСЂ: Р»РѕРІРёРј РїСЂРѕР±РёС‚РёРµ С‰РёС‚Р° Рё РґРµСЂР¶РёРј Р±РѕРЅСѓСЃ Р±СЂРѕРЅРё Р°РєС‚СѓР°Р»СЊРЅС‹Рј.
 item:onPostStep(function(actor, stack)
     if stack <= 0 then return end
     local data = actor:get_data("DeerItems", GUID)
@@ -83,17 +80,17 @@ item:onPostStep(function(actor, stack)
     local shield = actor.shield or 0
     local prev = data.nm_prev_shield or 0
 
-    -- Щит пробит (был > 0, стал ≤ 0) → выпускаем пульс. Кулдаун = защита от ДВОЙНОЙ молнии:
-    -- если детект пробития срабатывает несколько кадров подряд (щит «дёргается» у нуля или из-за
-    -- пересчёта статов), пульс и его визуал больше не дублируются.
+    -- Р©РёС‚ РїСЂРѕР±РёС‚ (Р±С‹Р» > 0, СЃС‚Р°Р» в‰¤ 0) в†’ РІС‹РїСѓСЃРєР°РµРј РїСѓР»СЊСЃ. РљСѓР»РґР°СѓРЅ = Р·Р°С‰РёС‚Р° РѕС‚ Р”Р’РћР™РќРћР™ РјРѕР»РЅРёРё:
+    -- РµСЃР»Рё РґРµС‚РµРєС‚ РїСЂРѕР±РёС‚РёСЏ СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ РЅРµСЃРєРѕР»СЊРєРѕ РєР°РґСЂРѕРІ РїРѕРґСЂСЏРґ (С‰РёС‚ В«РґС‘СЂРіР°РµС‚СЃСЏВ» Сѓ РЅСѓР»СЏ РёР»Рё РёР·-Р·Р°
+    -- РїРµСЂРµСЃС‡С‘С‚Р° СЃС‚Р°С‚РѕРІ), РїСѓР»СЊСЃ Рё РµРіРѕ РІРёР·СѓР°Р» Р±РѕР»СЊС€Рµ РЅРµ РґСѓР±Р»РёСЂСѓСЋС‚СЃСЏ.
     if prev > 0 and shield <= 0 and (data.nm_cd or 0) <= 0 then
-        if not gm._mod_net_isClient() then
+        if not Net.client then
             release_pulse(actor, stack)
         end
         data.nm_cd = 30
     end
 
-    -- Наличие щита переключилось → пересчёт, чтобы +30 брони включалось/выключалось вовремя
+    -- РќР°Р»РёС‡РёРµ С‰РёС‚Р° РїРµСЂРµРєР»СЋС‡РёР»РѕСЃСЊ в†’ РїРµСЂРµСЃС‡С‘С‚, С‡С‚РѕР±С‹ +30 Р±СЂРѕРЅРё РІРєР»СЋС‡Р°Р»РѕСЃСЊ/РІС‹РєР»СЋС‡Р°Р»РѕСЃСЊ РІРѕРІСЂРµРјСЏ
     if (prev > 0) ~= (shield > 0) then
         actor:recalculate_stats()
     end

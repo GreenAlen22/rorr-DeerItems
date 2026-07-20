@@ -1,9 +1,9 @@
 -- DeerItems-MagmaFragment
--- Союзные покупаемые дроны поджигают врагов при попадании на 50% урона.
+-- РЎРѕСЋР·РЅС‹Рµ РїРѕРєСѓРїР°РµРјС‹Рµ РґСЂРѕРЅС‹ РїРѕРґР¶РёРіР°СЋС‚ РІСЂР°РіРѕРІ РїСЂРё РїРѕРїР°РґР°РЅРёРё РЅР° 50% СѓСЂРѕРЅР°.
 
-local sprite = Resources.sprite_load("DeerItems", "item/MagmaFragment", PATH.."assets/sprites/items/sWhiteItems/MagmaFragment.png", 1, 16, 16)
-local drone_indicator = Resources.sprite_load("DeerItems", "particle/MagmaFragmentDrone", PATH.."assets/sprites/particle/MagmaFragmentDrone.png", 8, 10, 7)
-local sound = Resources.sfx_load("DeerItems", "sound/MagmaFragment", PATH.."assets/sounds/MagmaFragment.ogg")
+local sprite = Sprite.new("item/MagmaFragment", PATH.."assets/sprites/items/sWhiteItems/MagmaFragment.png", 1, 16, 16)
+local drone_indicator = Sprite.new("particle/MagmaFragmentDrone", PATH.."assets/sprites/particle/MagmaFragmentDrone.png", 8, 10, 7)
+local sound = Sound.new("sound/MagmaFragment", PATH.."assets/sounds/MagmaFragment.ogg")
 
 local GUID = _ENV["!guid"]
 local oP = gm.constants.oP
@@ -13,8 +13,8 @@ local DOT_RATE = 60
 local DOT_DAMAGE = 0.30
 local IGNITE_SOUND_CHANCE = 0.25
 
--- Следуем рабочему критерию HeavyLungs/GlassMagnifier: купленные дроны — союзные
--- не-игроки. Cernunnos явно исключён, чтобы не считаться дроном.
+-- РЎР»РµРґСѓРµРј СЂР°Р±РѕС‡РµРјСѓ РєСЂРёС‚РµСЂРёСЋ HeavyLungs/GlassMagnifier: РєСѓРїР»РµРЅРЅС‹Рµ РґСЂРѕРЅС‹ вЂ” СЃРѕСЋР·РЅС‹Рµ
+-- РЅРµ-РёРіСЂРѕРєРё. Cernunnos СЏРІРЅРѕ РёСЃРєР»СЋС‡С‘РЅ, С‡С‚РѕР±С‹ РЅРµ СЃС‡РёС‚Р°С‚СЊСЃСЏ РґСЂРѕРЅРѕРј.
 local function is_not_drone(actor)
     return DeerItemsCernunnos and DeerItemsCernunnos.is_not_drone and DeerItemsCernunnos.is_not_drone(actor)
 end
@@ -23,14 +23,12 @@ local function is_drone(actor)
     return actor and actor.object_index ~= oP and not is_not_drone(actor)
 end
 
-local item = Item.new("DeerItems", "MagmaFragment")
+local item = Item.new("MagmaFragment")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
-item:clear_callbacks()
-
--- Данные хранятся по команде: игровые покупаемые дроны не всегда отдают владельца
--- в callback атаки, зато команда у них корректна и совпадает с владельцем.
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
+-- Р”Р°РЅРЅС‹Рµ С…СЂР°РЅСЏС‚СЃСЏ РїРѕ РєРѕРјР°РЅРґРµ: РёРіСЂРѕРІС‹Рµ РїРѕРєСѓРїР°РµРјС‹Рµ РґСЂРѕРЅС‹ РЅРµ РІСЃРµРіРґР° РѕС‚РґР°СЋС‚ РІР»Р°РґРµР»СЊС†Р°
+-- РІ callback Р°С‚Р°РєРё, Р·Р°С‚Рѕ РєРѕРјР°РЅРґР° Сѓ РЅРёС… РєРѕСЂСЂРµРєС‚РЅР° Рё СЃРѕРІРїР°РґР°РµС‚ СЃ РІР»Р°РґРµР»СЊС†РµРј.
 local team_stacks = {}
 local team_sources = {}
 local team_dots = {}
@@ -45,7 +43,7 @@ local function refresh_team_state()
     local sources = {}
     for _, player in ipairs(Instance.find_all(oP)) do
         if Instance.exists(player) then
-            local stack = player:item_stack_count(item) or 0
+            local stack = player:item_count(item) or 0
             if stack > 0 then
                 stacks[player.team] = (stacks[player.team] or 0) + stack
                 sources[player.team] = player
@@ -80,13 +78,13 @@ end
 
 item:onPostStep(function(actor, stack)
     refresh_team_state()
-    if gm._mod_net_isHost() then active_dots(actor.team) end
+    if Net.host then active_dots(actor.team) end
 end)
 
--- onHitProc пропускает атаки с proc=false. Глобальный onAttackHit получает каждое
--- попадание дрона, включая стандартный выстрел Gunner Drone.
+-- onHitProc РїСЂРѕРїСѓСЃРєР°РµС‚ Р°С‚Р°РєРё СЃ proc=false. Р“Р»РѕР±Р°Р»СЊРЅС‹Р№ onAttackHit РїРѕР»СѓС‡Р°РµС‚ РєР°Р¶РґРѕРµ
+-- РїРѕРїР°РґР°РЅРёРµ РґСЂРѕРЅР°, РІРєР»СЋС‡Р°СЏ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РІС‹СЃС‚СЂРµР» Gunner Drone.
 Actor:onAttackHit("DeerItems-MagmaFragment-drone", function(drone, victim, hit_info)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
     if not is_drone(drone) or not victim or not Instance.exists(victim) then return end
     if gm.object_is_ancestor(victim.object_index, gm.constants.pActor) ~= 1.0 then return end
     if not hit_info or not hit_info.damage then return end
@@ -97,14 +95,14 @@ Actor:onAttackHit("DeerItems-MagmaFragment-drone", function(drone, victim, hit_i
     if stack <= 0 or not source or not Instance.exists(source) then return end
 
     local attack_info = hit_info.attack_info
-    local force_proc = attack_info and attack_info:get_attack_flag(Attack_Info.ATTACK_FLAG.force_proc)
+    local force_proc = attack_info and attack_info:get_flag(AttackFlag.FORCE_PROC)
     if not force_proc and math.random() > math.min(1, 0.10 * stack) then return end
 
     local dots, count = active_dots(drone.team)
     local vdata = victim:get_data("MagmaFragment", GUID)
     local dot = vdata.dot
 
-    -- Одна команда поддерживает на цели одно горение; повторный прок обновляет его.
+    -- РћРґРЅР° РєРѕРјР°РЅРґР° РїРѕРґРґРµСЂР¶РёРІР°РµС‚ РЅР° С†РµР»Рё РѕРґРЅРѕ РіРѕСЂРµРЅРёРµ; РїРѕРІС‚РѕСЂРЅС‹Р№ РїСЂРѕРє РѕР±РЅРѕРІР»СЏРµС‚ РµРіРѕ.
     if dot and Instance.exists(dot) then
         if vdata.team ~= drone.team then return end
         dots[victim.id] = dot
@@ -116,9 +114,9 @@ Actor:onAttackHit("DeerItems-MagmaFragment-drone", function(drone, victim, hit_i
 
     if count >= stack + 1 then return end
 
-    -- 5 тиков по 30% урона удара с интервалом 60 кадров = один тик в секунду 5 секунд.
-    -- Источник — игрок команды, поэтому DoT не воспринимается как новый удар дрона.
-    dot = victim:apply_dot(hit_info.damage * DOT_DAMAGE, source, DOT_TICKS, DOT_RATE, Color(0xff4d00), true)
+    -- 5 С‚РёРєРѕРІ РїРѕ 30% СѓСЂРѕРЅР° СѓРґР°СЂР° СЃ РёРЅС‚РµСЂРІР°Р»РѕРј 60 РєР°РґСЂРѕРІ = РѕРґРёРЅ С‚РёРє РІ СЃРµРєСѓРЅРґСѓ 5 СЃРµРєСѓРЅРґ.
+    -- РСЃС‚РѕС‡РЅРёРє вЂ” РёРіСЂРѕРє РєРѕРјР°РЅРґС‹, РїРѕСЌС‚РѕРјСѓ DoT РЅРµ РІРѕСЃРїСЂРёРЅРёРјР°РµС‚СЃСЏ РєР°Рє РЅРѕРІС‹Р№ СѓРґР°СЂ РґСЂРѕРЅР°.
+    dot = victim:apply_dot(hit_info.damage * DOT_DAMAGE, DOT_TICKS, DOT_RATE, source, Color(0xff4d00), true)
     dot.textColor = Color(0xff4d00)
     dot.sprite_index = gm.constants.sSparks9
     vdata.dot = dot
@@ -127,7 +125,7 @@ Actor:onAttackHit("DeerItems-MagmaFragment-drone", function(drone, victim, hit_i
     play_ignite_sound(victim)
 end)
 
--- Индикатор виден постоянно, пока у игрока есть предмет, на всех союзных покупаемых дронах.
+-- РРЅРґРёРєР°С‚РѕСЂ РІРёРґРµРЅ РїРѕСЃС‚РѕСЏРЅРЅРѕ, РїРѕРєР° Сѓ РёРіСЂРѕРєР° РµСЃС‚СЊ РїСЂРµРґРјРµС‚, РЅР° РІСЃРµС… СЃРѕСЋР·РЅС‹С… РїРѕРєСѓРїР°РµРјС‹С… РґСЂРѕРЅР°С….
 item:onPostDraw(function(actor, stack)
     local drones = List.wrap(actor:find_characters_circle(actor.x, actor.y, DRONE_RADIUS, false, actor.team, true))
     local frame = math.floor((Global._current_frame or 0) / 4) % 8

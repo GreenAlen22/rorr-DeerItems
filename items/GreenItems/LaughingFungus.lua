@@ -1,35 +1,35 @@
 -- DeerItems-LaughingFungus
--- Застыв на 1 секунду, создаёт вокруг владельца зону, которая раз в секунду лечит всех союзников
--- в радиусе на процент от МАКСИМАЛЬНОГО HP владельца. При движении зона гаснет, отсчёт начинается заново.
+-- Р—Р°СЃС‚С‹РІ РЅР° 1 СЃРµРєСѓРЅРґСѓ, СЃРѕР·РґР°С‘С‚ РІРѕРєСЂСѓРі РІР»Р°РґРµР»СЊС†Р° Р·РѕРЅСѓ, РєРѕС‚РѕСЂР°СЏ СЂР°Р· РІ СЃРµРєСѓРЅРґСѓ Р»РµС‡РёС‚ РІСЃРµС… СЃРѕСЋР·РЅРёРєРѕРІ
+-- РІ СЂР°РґРёСѓСЃРµ РЅР° РїСЂРѕС†РµРЅС‚ РѕС‚ РњРђРљРЎРРњРђР›Р¬РќРћР“Рћ HP РІР»Р°РґРµР»СЊС†Р°. РџСЂРё РґРІРёР¶РµРЅРёРё Р·РѕРЅР° РіР°СЃРЅРµС‚, РѕС‚СЃС‡С‘С‚ РЅР°С‡РёРЅР°РµС‚СЃСЏ Р·Р°РЅРѕРІРѕ.
 
--- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/LaughingFungus", PATH.."assets/sprites/items/sGreenItems/LaughingFungus.png", 1, 18, 18)
-local zoneSprite = Resources.sprite_load("DeerItems", "particle/LaughingFungusZone", PATH.."assets/sprites/particle/LaughingFungusZone.png", 18, 16, 32)
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
+local sprite = Sprite.new("item/LaughingFungus", PATH.."assets/sprites/items/sGreenItems/LaughingFungus.png", 1, 18, 18)
+local zoneSprite = Sprite.new("particle/LaughingFungusZone", PATH.."assets/sprites/particle/LaughingFungusZone.png", 18, 16, 32)
 
--- guid мода выносим один раз — чтобы get_data не искал его через debug-стек каждый кадр
+-- guid РјРѕРґР° РІС‹РЅРѕСЃРёРј РѕРґРёРЅ СЂР°Р· вЂ” С‡С‚РѕР±С‹ get_data РЅРµ РёСЃРєР°Р» РµРіРѕ С‡РµСЂРµР· debug-СЃС‚РµРє РєР°Р¶РґС‹Р№ РєР°РґСЂ
 local GUID = _ENV["!guid"]
 
--- Создание предмета LaughingFungus
--- Привязка спрайта к предмету
--- Установка тира предмета: зелёный (необычный)
--- Назначение тега лута: предмет, повышающий живучесть
-local item = Item.new("DeerItems", "LaughingFungus")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р° LaughingFungus
+-- РџСЂРёРІСЏР·РєР° СЃРїСЂР°Р№С‚Р° Рє РїСЂРµРґРјРµС‚Сѓ
+-- РЈСЃС‚Р°РЅРѕРІРєР° С‚РёСЂР° РїСЂРµРґРјРµС‚Р°: Р·РµР»С‘РЅС‹Р№ (РЅРµРѕР±С‹С‡РЅС‹Р№)
+-- РќР°Р·РЅР°С‡РµРЅРёРµ С‚РµРіР° Р»СѓС‚Р°: РїСЂРµРґРјРµС‚, РїРѕРІС‹С€Р°СЋС‰РёР№ Р¶РёРІСѓС‡РµСЃС‚СЊ
+local item = Item.new("LaughingFungus")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
--- Константы поведения (1 метр = 32 пикселя)
-local STILL_NEEDED  = 60            -- сколько кадров стоять неподвижно для активации зоны (1 сек)
-local HEAL_TICK     = 60            -- период лечения после активации (раз в 1 сек)
-local ZONE_RADIUS_BASE   = 3 * 32   -- базовая полуширина зоны: 3 м
-local ZONE_RADIUS_STACK  = 1.5 * 32 -- прибавка полуширины за каждый стак сверх первого: +1.5 м
-local ZONE_HEIGHT_SCALE  = 0.5      -- высота зоны относительно ширины: 0.5 = срезана в 2 раза по высоте
-local HEAL_BASE     = 0.06          -- базовое лечение: 6% от макс. HP владельца
-local HEAL_STACK    = 0.03          -- прибавка лечения за каждый стак сверх первого: +3%
-local MOVE_POS_EPS  = 0.01          -- порог в пикселях: ловит subpixel-движение во время зажатой атаки
-local MOVE_SPEED_EPS = 0.01         -- порог скорости: ловит движение меньше 1 пикселя за кадр
-local ZONE_Y_OFFSET = 40           -- центр зоны приподнят над ногами персонажа
-local ZONE_TTL      = 15            -- запас кадров жизни зоны без обновления (страховка от «висячих» зон)
+-- РљРѕРЅСЃС‚Р°РЅС‚С‹ РїРѕРІРµРґРµРЅРёСЏ (1 РјРµС‚СЂ = 32 РїРёРєСЃРµР»СЏ)
+local STILL_NEEDED  = 60            -- СЃРєРѕР»СЊРєРѕ РєР°РґСЂРѕРІ СЃС‚РѕСЏС‚СЊ РЅРµРїРѕРґРІРёР¶РЅРѕ РґР»СЏ Р°РєС‚РёРІР°С†РёРё Р·РѕРЅС‹ (1 СЃРµРє)
+local HEAL_TICK     = 60            -- РїРµСЂРёРѕРґ Р»РµС‡РµРЅРёСЏ РїРѕСЃР»Рµ Р°РєС‚РёРІР°С†РёРё (СЂР°Р· РІ 1 СЃРµРє)
+local ZONE_RADIUS_BASE   = 3 * 32   -- Р±Р°Р·РѕРІР°СЏ РїРѕР»СѓС€РёСЂРёРЅР° Р·РѕРЅС‹: 3 Рј
+local ZONE_RADIUS_STACK  = 1.5 * 32 -- РїСЂРёР±Р°РІРєР° РїРѕР»СѓС€РёСЂРёРЅС‹ Р·Р° РєР°Р¶РґС‹Р№ СЃС‚Р°Рє СЃРІРµСЂС… РїРµСЂРІРѕРіРѕ: +1.5 Рј
+local ZONE_HEIGHT_SCALE  = 0.5      -- РІС‹СЃРѕС‚Р° Р·РѕРЅС‹ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ С€РёСЂРёРЅС‹: 0.5 = СЃСЂРµР·Р°РЅР° РІ 2 СЂР°Р·Р° РїРѕ РІС‹СЃРѕС‚Рµ
+local HEAL_BASE     = 0.06          -- Р±Р°Р·РѕРІРѕРµ Р»РµС‡РµРЅРёРµ: 6% РѕС‚ РјР°РєСЃ. HP РІР»Р°РґРµР»СЊС†Р°
+local HEAL_STACK    = 0.03          -- РїСЂРёР±Р°РІРєР° Р»РµС‡РµРЅРёСЏ Р·Р° РєР°Р¶РґС‹Р№ СЃС‚Р°Рє СЃРІРµСЂС… РїРµСЂРІРѕРіРѕ: +3%
+local MOVE_POS_EPS  = 0.01          -- РїРѕСЂРѕРі РІ РїРёРєСЃРµР»СЏС…: Р»РѕРІРёС‚ subpixel-РґРІРёР¶РµРЅРёРµ РІРѕ РІСЂРµРјСЏ Р·Р°Р¶Р°С‚РѕР№ Р°С‚Р°РєРё
+local MOVE_SPEED_EPS = 0.01         -- РїРѕСЂРѕРі СЃРєРѕСЂРѕСЃС‚Рё: Р»РѕРІРёС‚ РґРІРёР¶РµРЅРёРµ РјРµРЅСЊС€Рµ 1 РїРёРєСЃРµР»СЏ Р·Р° РєР°РґСЂ
+local ZONE_Y_OFFSET = 40           -- С†РµРЅС‚СЂ Р·РѕРЅС‹ РїСЂРёРїРѕРґРЅСЏС‚ РЅР°Рґ РЅРѕРіР°РјРё РїРµСЂСЃРѕРЅР°Р¶Р°
+local ZONE_TTL      = 15            -- Р·Р°РїР°СЃ РєР°РґСЂРѕРІ Р¶РёР·РЅРё Р·РѕРЅС‹ Р±РµР· РѕР±РЅРѕРІР»РµРЅРёСЏ (СЃС‚СЂР°С…РѕРІРєР° РѕС‚ В«РІРёСЃСЏС‡РёС…В» Р·РѕРЅ)
 local MUSHROOM_VARIANTS = 6
 local MUSHROOM_VARIANT_FRAMES = 3
 local MUSHROOM_APPEAR_TICK = 4
@@ -97,11 +97,9 @@ local function mushroom_frame_for(variant, life)
     return base + frame
 end
 
-local objMushroom = Object.new("DeerItems", "EfLaughingFungusMushroom")
+local objMushroom = Object.new("EfLaughingFungusMushroom")
 objMushroom:set_sprite(zoneSprite)
 objMushroom:set_depth(50)
-objMushroom:clear_callbacks()
-
 objMushroom:onCreate(function(self)
     self.zone = -4
     self.life = 0
@@ -116,9 +114,9 @@ objMushroom:onCreate(function(self)
     self.direction = 270 + gm.irandom_range(-18, 18)
     self:projectile_sync(8)
 
-    -- Столкновения считает сервер. Если синхронизированный гриб будет сам считать
-    -- гравитацию у клиента, между обновлениями projectile_sync он провалится сквозь карту.
-    if gm._mod_net_isClient() then
+    -- РЎС‚РѕР»РєРЅРѕРІРµРЅРёСЏ СЃС‡РёС‚Р°РµС‚ СЃРµСЂРІРµСЂ. Р•СЃР»Рё СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅРЅС‹Р№ РіСЂРёР± Р±СѓРґРµС‚ СЃР°Рј СЃС‡РёС‚Р°С‚СЊ
+    -- РіСЂР°РІРёС‚Р°С†РёСЋ Сѓ РєР»РёРµРЅС‚Р°, РјРµР¶РґСѓ РѕР±РЅРѕРІР»РµРЅРёСЏРјРё projectile_sync РѕРЅ РїСЂРѕРІР°Р»РёС‚СЃСЏ СЃРєРІРѕР·СЊ РєР°СЂС‚Сѓ.
+    if Net.client then
         self.gravity = 0
         self.speed = 0
         self.hspeed = 0
@@ -130,7 +128,7 @@ objMushroom:onStep(function(self)
     self.life = (self.life or 0) + 1
     self.image_index = mushroom_frame_for(self.variant, self.life)
 
-    if gm._mod_net_isClient() then
+    if Net.client then
         self.gravity = 0
         self.speed = 0
         self.hspeed = 0
@@ -157,13 +155,11 @@ objMushroom:onDestroy(function(self)
     self:instance_destroy_sync()
 end)
 
-objMushroom:onSerialize(function(self, buffer)
+Object.add_serializers(objMushroom, function(self, buffer)
     buffer:write_byte(self.variant or 0)
     buffer:write_byte(self.image_xscale < 0 and 1 or 0)
     buffer:write_byte(math.floor(math.abs(self.image_xscale or 1) * 100 + 0.5))
-end)
-
-objMushroom:onDeserialize(function(self, buffer)
+end, function(self, buffer)
     self.image_speed = 0
     self.variant = buffer:read_byte()
     local flip = buffer:read_byte()
@@ -173,19 +169,16 @@ objMushroom:onDeserialize(function(self, buffer)
     self.image_index = mushroom_frame_for(self.variant, self.life)
 end)
 
--- Объект зоны
--- Отдельный объект, существующий только пока владелец стоит на месте. Отвечает ИСКЛЮЧИТЕЛЬНО
--- за визуализацию: сейчас это простая отрисовка кругов в onDraw, позже сюда встанут партиклы.
--- Логику лечения он не трогает — она остаётся в коллбеках предмета.
+-- РћР±СЉРµРєС‚ Р·РѕРЅС‹
+-- РћС‚РґРµР»СЊРЅС‹Р№ РѕР±СЉРµРєС‚, СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ С‚РѕР»СЊРєРѕ РїРѕРєР° РІР»Р°РґРµР»РµС† СЃС‚РѕРёС‚ РЅР° РјРµСЃС‚Рµ. РћС‚РІРµС‡Р°РµС‚ РРЎРљР›Р®Р§РРўР•Р›Р¬РќРћ
+-- Р·Р° РІРёР·СѓР°Р»РёР·Р°С†РёСЋ: СЃРµР№С‡Р°СЃ СЌС‚Рѕ РїСЂРѕСЃС‚Р°СЏ РѕС‚СЂРёСЃРѕРІРєР° РєСЂСѓРіРѕРІ РІ onDraw, РїРѕР·Р¶Рµ СЃСЋРґР° РІСЃС‚Р°РЅСѓС‚ РїР°СЂС‚РёРєР»С‹.
+-- Р›РѕРіРёРєСѓ Р»РµС‡РµРЅРёСЏ РѕРЅ РЅРµ С‚СЂРѕРіР°РµС‚ вЂ” РѕРЅР° РѕСЃС‚Р°С‘С‚СЃСЏ РІ РєРѕР»Р»Р±РµРєР°С… РїСЂРµРґРјРµС‚Р°.
 --
--- Жизненным циклом управляет предмет (см. ниже): создаёт зону при активации, каждый кадр обновляет
--- её позицию/радиус и продлевает ttl, а при движении сразу уничтожает. ttl — страховка: если предмет
--- по какой-то причине перестал обновлять зону (смерть владельца, потеря предмета), она сама исчезнет.
-local objZone = Object.new("DeerItems", "EfLaughingFungusZone")
+-- Р–РёР·РЅРµРЅРЅС‹Рј С†РёРєР»РѕРј СѓРїСЂР°РІР»СЏРµС‚ РїСЂРµРґРјРµС‚ (СЃРј. РЅРёР¶Рµ): СЃРѕР·РґР°С‘С‚ Р·РѕРЅСѓ РїСЂРё Р°РєС‚РёРІР°С†РёРё, РєР°Р¶РґС‹Р№ РєР°РґСЂ РѕР±РЅРѕРІР»СЏРµС‚
+-- РµС‘ РїРѕР·РёС†РёСЋ/СЂР°РґРёСѓСЃ Рё РїСЂРѕРґР»РµРІР°РµС‚ ttl, Р° РїСЂРё РґРІРёР¶РµРЅРёРё СЃСЂР°Р·Сѓ СѓРЅРёС‡С‚РѕР¶Р°РµС‚. ttl вЂ” СЃС‚СЂР°С…РѕРІРєР°: РµСЃР»Рё РїСЂРµРґРјРµС‚
+-- РїРѕ РєР°РєРѕР№-С‚Рѕ РїСЂРёС‡РёРЅРµ РїРµСЂРµСЃС‚Р°Р» РѕР±РЅРѕРІР»СЏС‚СЊ Р·РѕРЅСѓ (СЃРјРµСЂС‚СЊ РІР»Р°РґРµР»СЊС†Р°, РїРѕС‚РµСЂСЏ РїСЂРµРґРјРµС‚Р°), РѕРЅР° СЃР°РјР° РёСЃС‡РµР·РЅРµС‚.
+local objZone = Object.new("EfLaughingFungusZone")
 objZone.obj_depth = 50
-
-objZone:clear_callbacks()
-
 local function destroy_zone_mushrooms(zone)
     local data = zone:get_data(nil, GUID)
     local mushrooms = data.mushrooms
@@ -233,18 +226,18 @@ local function ensure_zone_mushrooms(zone)
     end
 end
 
--- При создании зоны
+-- РџСЂРё СЃРѕР·РґР°РЅРёРё Р·РѕРЅС‹
 objZone:onCreate(function(self)
     self.radius = ZONE_RADIUS_BASE
     self.height = zone_height_for(self.radius)
-    self.life   = 0           -- сколько кадров зона существует (пригодится для анимации партиклов)
-    self.ttl    = ZONE_TTL    -- кадры до самоуничтожения, если предмет перестал обновлять зону
+    self.life   = 0           -- СЃРєРѕР»СЊРєРѕ РєР°РґСЂРѕРІ Р·РѕРЅР° СЃСѓС‰РµСЃС‚РІСѓРµС‚ (РїСЂРёРіРѕРґРёС‚СЃСЏ РґР»СЏ Р°РЅРёРјР°С†РёРё РїР°СЂС‚РёРєР»РѕРІ)
+    self.ttl    = ZONE_TTL    -- РєР°РґСЂС‹ РґРѕ СЃР°РјРѕСѓРЅРёС‡С‚РѕР¶РµРЅРёСЏ, РµСЃР»Рё РїСЂРµРґРјРµС‚ РїРµСЂРµСЃС‚Р°Р» РѕР±РЅРѕРІР»СЏС‚СЊ Р·РѕРЅСѓ
     self:projectile_sync(4)
 end)
 
--- Каждый кадр: считаем «возраст» зоны и проверяем страховочный таймер
+-- РљР°Р¶РґС‹Р№ РєР°РґСЂ: СЃС‡РёС‚Р°РµРј В«РІРѕР·СЂР°СЃС‚В» Р·РѕРЅС‹ Рё РїСЂРѕРІРµСЂСЏРµРј СЃС‚СЂР°С…РѕРІРѕС‡РЅС‹Р№ С‚Р°Р№РјРµСЂ
 objZone:onStep(function(self)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     self.life = self.life + 1
     self.ttl  = self.ttl - 1
@@ -254,15 +247,15 @@ objZone:onStep(function(self)
 end)
 
 objZone:onDestroy(function(self)
-    if not gm._mod_net_isClient() then
+    if not Net.client then
         destroy_zone_mushrooms(self)
     end
     self:instance_destroy_sync()
 end)
 
--- Логика предмета
+-- Р›РѕРіРёРєР° РїСЂРµРґРјРµС‚Р°
 
--- Уничтожение зоны владельца (если она существует) и очистка ссылки
+-- РЈРЅРёС‡С‚РѕР¶РµРЅРёРµ Р·РѕРЅС‹ РІР»Р°РґРµР»СЊС†Р° (РµСЃР»Рё РѕРЅР° СЃСѓС‰РµСЃС‚РІСѓРµС‚) Рё РѕС‡РёСЃС‚РєР° СЃСЃС‹Р»РєРё
 local function destroy_zone(data)
     local zone = data.lf_zone
     if zone and Instance.exists(zone) then
@@ -270,37 +263,34 @@ local function destroy_zone(data)
     end
     data.lf_zone = nil
 end
-
-item:clear_callbacks()
-
--- Каждый кадр: отслеживаем неподвижность, ведём визуальную зону и лечим союзников раз в секунду
+-- РљР°Р¶РґС‹Р№ РєР°РґСЂ: РѕС‚СЃР»РµР¶РёРІР°РµРј РЅРµРїРѕРґРІРёР¶РЅРѕСЃС‚СЊ, РІРµРґС‘Рј РІРёР·СѓР°Р»СЊРЅСѓСЋ Р·РѕРЅСѓ Рё Р»РµС‡РёРј СЃРѕСЋР·РЅРёРєРѕРІ СЂР°Р· РІ СЃРµРєСѓРЅРґСѓ
 item:onPostStep(function(actor, stack)
     if stack <= 0 then return end
 
     local data = actor:get_data("DeerItems", GUID)
     local px, py = actor.x, actor.y
 
-    -- Сместился ли владелец заметно с прошлого кадра
+    -- РЎРјРµСЃС‚РёР»СЃСЏ Р»Рё РІР»Р°РґРµР»РµС† Р·Р°РјРµС‚РЅРѕ СЃ РїСЂРѕС€Р»РѕРіРѕ РєР°РґСЂР°
     local moved = is_actor_moving(actor, data, px, py)
     data.lf_px, data.lf_py = px, py
 
-    -- При движении: гасим зону и сбрасываем отсчёт
+    -- РџСЂРё РґРІРёР¶РµРЅРёРё: РіР°СЃРёРј Р·РѕРЅСѓ Рё СЃР±СЂР°СЃС‹РІР°РµРј РѕС‚СЃС‡С‘С‚
     if moved then
         data.lf_still = 0
         destroy_zone(data)
         return
     end
 
-    -- Копим время неподвижности; пока зона не активирована — её ещё нет
+    -- РљРѕРїРёРј РІСЂРµРјСЏ РЅРµРїРѕРґРІРёР¶РЅРѕСЃС‚Рё; РїРѕРєР° Р·РѕРЅР° РЅРµ Р°РєС‚РёРІРёСЂРѕРІР°РЅР° вЂ” РµС‘ РµС‰С‘ РЅРµС‚
     data.lf_still = (data.lf_still or 0) + 1
     if data.lf_still < STILL_NEEDED then
         destroy_zone(data)
         return
     end
 
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
-    -- Зона активна: создаём объект, если его ещё нет, и каждый кадр обновляем под владельца.
+    -- Р—РѕРЅР° Р°РєС‚РёРІРЅР°: СЃРѕР·РґР°С‘Рј РѕР±СЉРµРєС‚, РµСЃР»Рё РµРіРѕ РµС‰С‘ РЅРµС‚, Рё РєР°Р¶РґС‹Р№ РєР°РґСЂ РѕР±РЅРѕРІР»СЏРµРј РїРѕРґ РІР»Р°РґРµР»СЊС†Р°.
     local radius = zone_radius_for(stack)
     local height = zone_height_for(radius)
     local zone = data.lf_zone
@@ -313,9 +303,9 @@ item:onPostStep(function(actor, stack)
     zone.ground_y = actor.y
     zone.radius = radius
     zone.height = height
-    zone.ttl    = ZONE_TTL   -- продлеваем жизнь зоны, пока владелец стоит
+    zone.ttl    = ZONE_TTL   -- РїСЂРѕРґР»РµРІР°РµРј Р¶РёР·РЅСЊ Р·РѕРЅС‹, РїРѕРєР° РІР»Р°РґРµР»РµС† СЃС‚РѕРёС‚
 
-    -- Импульс лечения: ровно в момент активации (1 сек) и далее каждую секунду
+    -- РРјРїСѓР»СЊСЃ Р»РµС‡РµРЅРёСЏ: СЂРѕРІРЅРѕ РІ РјРѕРјРµРЅС‚ Р°РєС‚РёРІР°С†РёРё (1 СЃРµРє) Рё РґР°Р»РµРµ РєР°Р¶РґСѓСЋ СЃРµРєСѓРЅРґСѓ
     if (data.lf_still - STILL_NEEDED) % HEAL_TICK ~= 0 then return end
 
     local heal = actor.maxhp * (HEAL_BASE + HEAL_STACK * (stack - 1))
@@ -328,7 +318,7 @@ item:onPostStep(function(actor, stack)
     end
 end)
 
--- При потере предмета — гарантированно убираем зону
+-- РџСЂРё РїРѕС‚РµСЂРµ РїСЂРµРґРјРµС‚Р° вЂ” РіР°СЂР°РЅС‚РёСЂРѕРІР°РЅРЅРѕ СѓР±РёСЂР°РµРј Р·РѕРЅСѓ
 item:onRemove(function(actor, stack)
     destroy_zone(actor:get_data("DeerItems", GUID))
 end)

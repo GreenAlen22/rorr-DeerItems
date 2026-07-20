@@ -1,8 +1,8 @@
--- Передаёт хосту смерть игрока, принадлежащего клиенту, для артефактов с логикой на хосте.
+-- РџРµСЂРµРґР°С‘С‚ С…РѕСЃС‚Сѓ СЃРјРµСЂС‚СЊ РёРіСЂРѕРєР°, РїСЂРёРЅР°РґР»РµР¶Р°С‰РµРіРѕ РєР»РёРµРЅС‚Сѓ, РґР»СЏ Р°СЂС‚РµС„Р°РєС‚РѕРІ СЃ Р»РѕРіРёРєРѕР№ РЅР° С…РѕСЃС‚Рµ.
 
 local M = {}
 local listeners = {}
-local death_packet = Packet.new()
+local death_packet = Packet.new("ArtifactPlayerDeath-death_packet")
 
 local function notify_listeners(player)
     for _, listener in ipairs(listeners) do
@@ -14,20 +14,20 @@ function M.on_host(listener)
     table.insert(listeners, listener)
 end
 
-death_packet:onReceived(function(message)
-    if not gm._mod_net_isHost() then return end
+death_packet:set_serializers(function(buffer, player)
+    buffer:write_instance(player)
+end, function(buffer)
+    if not Net.host then return end
 
-    local player = message:read_instance()
+    local player = buffer:read_instance()
     if player and Instance.exists(player) then
         notify_listeners(player)
     end
 end)
 
-Callback.add(Callback.TYPE.onPlayerDeath, "DeerItems-ArtifactPlayerDeath-notifyHost", function(player)
-    if gm._mod_net_isClient() then
-        local message = death_packet:message_begin()
-        message:write_instance(player)
-        message:send_to_host()
+Callback.add(Callback.ON_PLAYER_DEATH, function(player)
+    if Net.client then
+        death_packet:send_to_host(player)
         return
     end
 

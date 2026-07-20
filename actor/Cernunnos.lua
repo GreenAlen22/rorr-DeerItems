@@ -1,26 +1,26 @@
 -- DeerItems-Cernunnos
--- Призываемый союзник для Ingrown Idol. Создаётся только предметом, а не картами этапа.
+-- РџСЂРёР·С‹РІР°РµРјС‹Р№ СЃРѕСЋР·РЅРёРє РґР»СЏ Ingrown Idol. РЎРѕР·РґР°С‘С‚СЃСЏ С‚РѕР»СЊРєРѕ РїСЂРµРґРјРµС‚РѕРј, Р° РЅРµ РєР°СЂС‚Р°РјРё СЌС‚Р°РїР°.
 
 local SPRITE_PATH = PATH.."assets/sprites/actor/sCernunnos/"
 local GUID = _ENV["!guid"]
 
-local sprite_mask      = Resources.sprite_load("DeerItems", "actor/CernunnosMask", SPRITE_PATH.."cernunnos.png", 1, 64, 128)
-local sprite_palette   = Resources.sprite_load("DeerItems", "actor/CernunnosPalette", SPRITE_PATH.."palette.png", 1, 0, 0)
-local sprite_spawn     = Resources.sprite_load("DeerItems", "actor/CernunnosSpawn", SPRITE_PATH.."spawn.png", 12, 64, 128, 0.5)
-local sprite_idle      = Resources.sprite_load("DeerItems", "actor/CernunnosIdle", SPRITE_PATH.."idle.png", 6, 64, 128, 0.5)
-local sprite_walk      = Resources.sprite_load("DeerItems", "actor/CernunnosWalk", SPRITE_PATH.."walk.png", 8, 64, 128, 0.5)
-local sprite_jump      = Resources.sprite_load("DeerItems", "actor/CernunnosJump", SPRITE_PATH.."jump.png", 1, 64, 128)
-local sprite_jump_peak = Resources.sprite_load("DeerItems", "actor/CernunnosJumpPeak", SPRITE_PATH.."jumpPeak.png", 1, 64, 128)
-local sprite_fall      = Resources.sprite_load("DeerItems", "actor/CernunnosFall", SPRITE_PATH.."fall.png", 1, 64, 128)
-local sprite_death     = Resources.sprite_load("DeerItems", "actor/CernunnosDeath", SPRITE_PATH.."death.png", 9, 64, 128, 0.5)
-local sprite_shoot1    = Resources.sprite_load("DeerItems", "actor/CernunnosShoot1", SPRITE_PATH.."shoot1.png", 7, 64, 128, 0.5)
+local sprite_mask      = Sprite.new("actor/CernunnosMask", SPRITE_PATH.."cernunnos.png", 1, 64, 128)
+local sprite_palette   = Sprite.new("actor/CernunnosPalette", SPRITE_PATH.."palette.png", 1, 0, 0)
+local sprite_spawn     = Sprite.new("actor/CernunnosSpawn", SPRITE_PATH.."spawn.png", 12, 64, 128, 0.5)
+local sprite_idle      = Sprite.new("actor/CernunnosIdle", SPRITE_PATH.."idle.png", 6, 64, 128, 0.5)
+local sprite_walk      = Sprite.new("actor/CernunnosWalk", SPRITE_PATH.."walk.png", 8, 64, 128, 0.5)
+local sprite_jump      = Sprite.new("actor/CernunnosJump", SPRITE_PATH.."jump.png", 1, 64, 128)
+local sprite_jump_peak = Sprite.new("actor/CernunnosJumpPeak", SPRITE_PATH.."jumpPeak.png", 1, 64, 128)
+local sprite_fall      = Sprite.new("actor/CernunnosFall", SPRITE_PATH.."fall.png", 1, 64, 128)
+local sprite_death     = Sprite.new("actor/CernunnosDeath", SPRITE_PATH.."death.png", 9, 64, 128, 0.5)
+local sprite_shoot1    = Sprite.new("actor/CernunnosShoot1", SPRITE_PATH.."shoot1.png", 7, 64, 128, 0.5)
 
 gm.elite_generate_palettes(sprite_palette)
 
-local snd = Resources.sfx_load("DeerItems", "Cernunnos/beast", PATH.."assets/sounds/IngrownIdol.ogg")
-local snd_spawn = Resources.sfx_load("DeerItems", "Cernunnos/spawn", PATH.."assets/sounds/CernunnosSpawn.ogg")
-local snd_hit = Resources.sfx_load("DeerItems", "Cernunnos/hit", PATH.."assets/sounds/CernunnosHit.ogg")
-local snd_death = Resources.sfx_load("DeerItems", "Cernunnos/death", PATH.."assets/sounds/CernunnosDeath.ogg")
+local snd = Sound.new("Cernunnos/beast", PATH.."assets/sounds/IngrownIdol.ogg")
+local snd_spawn = Sound.new("Cernunnos/spawn", PATH.."assets/sounds/CernunnosSpawn.ogg")
+local snd_hit = Sound.new("Cernunnos/hit", PATH.."assets/sounds/CernunnosHit.ogg")
+local snd_death = Sound.new("Cernunnos/death", PATH.."assets/sounds/CernunnosDeath.ogg")
 
 local CernunnosSound = {
     spawn = 1,
@@ -58,15 +58,17 @@ local TIMER_RING_FG = Color(0xff5533)
 local NOT_DRONE_KEY = "deeritems_not_drone"
 local team_beasts = {}
 
-local cernunnos = Object.new("DeerItems", "Cernunnos", Object.PARENT.enemyClassic)
+local cernunnos = Object.new("Cernunnos", Object.Parent.ENEMY_CLASSIC)
 cernunnos:set_sprite(sprite_idle)
 cernunnos:set_depth(11)
-cernunnos:clear_callbacks()
+local primary = Skill.new("CernunnosPrimary")
+primary.cooldown = ATTACK_COOLDOWN
+primary.damage = 1
+primary.sprite = sprite_shoot1
+primary.subimage = 0
+primary.is_primary = true
 
-local primary = Skill.new("DeerItems", "CernunnosPrimary", ATTACK_COOLDOWN, 1, sprite_shoot1, 0, nil, true, false)
-local statePrimary = State.new("DeerItems", "CernunnosPrimary")
-statePrimary:clear_callbacks()
-
+local statePrimary = ActorState.new("CernunnosPrimary")
 local function actor_exists(actor)
     return actor and Instance.exists(actor)
 end
@@ -142,14 +144,17 @@ local function enter_state(actor, state)
     end
 end
 
-local packet_attack = Packet.new()
-local packet_state = Packet.new()
+local packet_attack = Packet.new("Cernunnos-packet_attack")
+local packet_state = Packet.new("Cernunnos-packet_state")
 local sync_network_state
-packet_attack:onReceived(function(message)
-    if not gm._mod_net_isClient() then return end
+packet_attack:set_serializers(function(buffer, actor, facing)
+    buffer:write_instance(actor)
+    buffer:write_byte(facing >= 0 and 1 or 0)
+end, function(buffer)
+    if not Net.client then return end
 
-    local actor = message:read_instance()
-    local facing = message:read_byte() == 1 and 1 or -1
+    local actor = buffer:read_instance()
+    local facing = buffer:read_byte() == 1 and 1 or -1
     if not actor_exists(actor) then return end
 
     actor.image_xscale = facing
@@ -330,7 +335,7 @@ cernunnos:onCreate(function(actor)
     actor.can_drop = false
     actor.exp_worth = 0
     actor.gold = 0
-    actor:set_default_skill(Skill.SLOT.primary, primary)
+    actor:set_default_skill(Skill.Slot.PRIMARY, primary)
     set_targettable(actor, false)
 
     local data = data_of(actor)
@@ -350,7 +355,7 @@ cernunnos:onStep(function(actor)
     local data = data_of(actor)
     data[NOT_DRONE_KEY] = true
 
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
     actor:alarm_set(0, -1)
 
     data.life = (data.life or LIFE_FRAMES) - 1
@@ -364,7 +369,7 @@ cernunnos:onStep(function(actor)
     data.state_resync = (data.state_resync or 0) + 1
     if data.state_resync >= STATE_RESYNC_PERIOD then
         data.state_resync = 0
-        if Net.is_host() and sync_network_state then sync_network_state(actor) end
+        if Net.host and sync_network_state then sync_network_state(actor) end
     end
 
     update_taunted_enemies(actor, data)
@@ -377,11 +382,8 @@ cernunnos:onStep(function(actor)
         if dist <= ATTACK_RANGE and (data.attack_cd or 0) <= 0 then
             enter_state(actor, statePrimary)
             data.attack_cd = math.max(1, math.floor(ATTACK_COOLDOWN / math.max(0.1, actor.attack_speed or 1)))
-            if Net.is_host() then
-                local message = packet_attack:message_begin()
-                message:write_instance(actor)
-                message:write_byte(actor.image_xscale >= 0 and 1 or 0)
-                message:send_to_all()
+            if Net.host then
+                packet_attack:send_to_all(actor, actor.image_xscale)
             end
         end
     else
@@ -431,7 +433,7 @@ statePrimary:onStep(function(actor, data)
     actor:skill_util_fix_hspeed()
     actor:actor_animation_set(sprite_shoot1, 0.22 * math.max(0.1, actor.attack_speed or 1))
 
-    if gm._mod_net_isClient() then
+    if Net.client then
         actor:skill_util_exit_state_on_anim_end()
         return
     end
@@ -483,30 +485,30 @@ local function configure(inst, owner, stack)
     release_taunted_enemies(inst, data)
 end
 
--- Экземпляры enemyClassic уже синхронизируются сами. Пакет нужен только для
--- дополнительного состояния: ручная синхронизация всего экземпляра создаст у клиента
--- вторую копию союзника.
+-- Р­РєР·РµРјРїР»СЏСЂС‹ enemyClassic СѓР¶Рµ СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓСЋС‚СЃСЏ СЃР°РјРё. РџР°РєРµС‚ РЅСѓР¶РµРЅ С‚РѕР»СЊРєРѕ РґР»СЏ
+-- РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ: СЂСѓС‡РЅР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РІСЃРµРіРѕ СЌРєР·РµРјРїР»СЏСЂР° СЃРѕР·РґР°СЃС‚ Сѓ РєР»РёРµРЅС‚Р°
+-- РІС‚РѕСЂСѓСЋ РєРѕРїРёСЋ СЃРѕСЋР·РЅРёРєР°.
 sync_network_state = function(actor)
-    if not Net.is_host() or not actor_exists(actor) then return end
+    if not Net.host or not actor_exists(actor) then return end
 
     local data = data_of(actor)
     if not actor_exists(data.owner) then return end
 
-    local message = packet_state:message_begin()
-    message:write_instance(actor)
-    message:write_instance(data.owner)
-    message:write_ushort(data.stack or 1)
-    message:write_int(data.life or LIFE_FRAMES)
-    message:send_to_all()
+    packet_state:send_to_all(actor, data.owner, data.stack or 1, data.life or LIFE_FRAMES)
 end
 
-packet_state:onReceived(function(message)
-    if not gm._mod_net_isClient() then return end
+packet_state:set_serializers(function(buffer, actor, owner, stack, life)
+    buffer:write_instance(actor)
+    buffer:write_instance(owner)
+    buffer:write_ushort(stack)
+    buffer:write_int(life)
+end, function(buffer)
+    if not Net.client then return end
 
-    local actor = message:read_instance()
-    local owner = message:read_instance()
-    local stack = message:read_ushort()
-    local life = message:read_int()
+    local actor = buffer:read_instance()
+    local owner = buffer:read_instance()
+    local stack = buffer:read_ushort()
+    local life = buffer:read_int()
     if not actor_exists(actor) or not actor_exists(owner) then return end
 
     apply_network_config(actor, owner, stack, life)
@@ -518,7 +520,7 @@ local function alive(inst)
 end
 
 local function spawn(owner, stack)
-    if gm._mod_net_isClient() or not actor_exists(owner) then return nil end
+    if Net.client or not actor_exists(owner) then return nil end
 
     local existing = team_beasts[owner.team]
     if alive(existing) then
@@ -530,7 +532,7 @@ local function spawn(owner, stack)
     local inst = cernunnos:create(owner.x, owner.y - 16)
     configure(inst, owner, stack)
     team_beasts[owner.team] = inst
-    if Net.is_host() then
+    if Net.host then
         Alarm.create(function()
             if alive(inst) then sync_network_state(inst) end
         end, 1)
@@ -553,8 +555,8 @@ local function is_not_drone(actor)
     return data_of(actor)[NOT_DRONE_KEY] == true
 end
 
-Callback.add(Callback.TYPE.onStageStart, "DeerItems-Cernunnos-clear", function()
-    if gm._mod_net_isClient() then return end
+Callback.add(Callback.ON_STAGE_START, function()
+    if Net.client then return end
     team_beasts = {}
     for _, actor in ipairs(Instance.find_all(cernunnos.value)) do
         if actor_exists(actor) then actor:destroy() end

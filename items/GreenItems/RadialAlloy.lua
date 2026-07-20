@@ -1,34 +1,34 @@
 -- DeerItems-RadialAlloy
--- При получении урона восстанавливает до 12 HP за стак, но не более (урон - 5).
+-- РџСЂРё РїРѕР»СѓС‡РµРЅРёРё СѓСЂРѕРЅР° РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РґРѕ 12 HP Р·Р° СЃС‚Р°Рє, РЅРѕ РЅРµ Р±РѕР»РµРµ (СѓСЂРѕРЅ - 5).
 
--- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/RadialAlloy", PATH.."assets/sprites/items/sGreenItems/RadialAlloy.png", 1, 16, 16)
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
+local sprite = Sprite.new("item/RadialAlloy", PATH.."assets/sprites/items/sGreenItems/RadialAlloy.png", 1, 16, 16)
 
--- Создание предмета RadialAlloy
--- Привязка спрайта к предмету
--- Установка тира предмета: зелёный (необычный)
--- Назначение тега лута: предмет, повышающий живучесть
-local item = Item.new("DeerItems", "RadialAlloy")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р° RadialAlloy
+-- РџСЂРёРІСЏР·РєР° СЃРїСЂР°Р№С‚Р° Рє РїСЂРµРґРјРµС‚Сѓ
+-- РЈСЃС‚Р°РЅРѕРІРєР° С‚РёСЂР° РїСЂРµРґРјРµС‚Р°: Р·РµР»С‘РЅС‹Р№ (РЅРµРѕР±С‹С‡РЅС‹Р№)
+-- РќР°Р·РЅР°С‡РµРЅРёРµ С‚РµРіР° Р»СѓС‚Р°: РїСЂРµРґРјРµС‚, РїРѕРІС‹С€Р°СЋС‰РёР№ Р¶РёРІСѓС‡РµСЃС‚СЊ
+local item = Item.new("RadialAlloy")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
--- При получении урона: лечим часть обратно
+-- РџСЂРё РїРѕР»СѓС‡РµРЅРёРё СѓСЂРѕРЅР°: Р»РµС‡РёРј С‡Р°СЃС‚СЊ РѕР±СЂР°С‚РЅРѕ
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     if stack <= 0 then return end
 
-    -- Извлекаем количество полученного урона
+    -- РР·РІР»РµРєР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ СѓСЂРѕРЅР°
     local dmg = hit_info and (hit_info.damage or (hit_info.get_damage and hit_info:get_damage())) or 0
     if dmg <= 0 then return end
 
-    -- Сколько можно восстановить: максимум (урон - 5), не более лимита от стаков
+    -- РЎРєРѕР»СЊРєРѕ РјРѕР¶РЅРѕ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ: РјР°РєСЃРёРјСѓРј (СѓСЂРѕРЅ - 5), РЅРµ Р±РѕР»РµРµ Р»РёРјРёС‚Р° РѕС‚ СЃС‚Р°РєРѕРІ
     local reduction = 12 * stack
     local can_reduce = math.max(0, dmg - 5)
     local heal_back = math.min(reduction, can_reduce)
 
-    -- Лечение, если есть что восстанавливать
+    -- Р›РµС‡РµРЅРёРµ, РµСЃР»Рё РµСЃС‚СЊ С‡С‚Рѕ РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ
     if heal_back > 0 then
         actor:heal(heal_back)
     end

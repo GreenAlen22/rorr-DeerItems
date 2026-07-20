@@ -1,12 +1,12 @@
--- DeerItems-MagicMissile / «Магическая стрела» / "Magic Missile"
--- Основное умение тратит один заряд и выпускает стрелу в направлении прицела владельца.
--- Урон 120% (+60% за стак). Четыре заряда (+2 за стак), один восстанавливается за 2,5 секунды.
--- Стрела пронзает до четырёх разных врагов. Её попадания не вызывают предметы и не могут запустить себя.
+-- DeerItems-MagicMissile / В«РњР°РіРёС‡РµСЃРєР°СЏ СЃС‚СЂРµР»Р°В» / "Magic Missile"
+-- РћСЃРЅРѕРІРЅРѕРµ СѓРјРµРЅРёРµ С‚СЂР°С‚РёС‚ РѕРґРёРЅ Р·Р°СЂСЏРґ Рё РІС‹РїСѓСЃРєР°РµС‚ СЃС‚СЂРµР»Сѓ РІ РЅР°РїСЂР°РІР»РµРЅРёРё РїСЂРёС†РµР»Р° РІР»Р°РґРµР»СЊС†Р°.
+-- РЈСЂРѕРЅ 120% (+60% Р·Р° СЃС‚Р°Рє). Р§РµС‚С‹СЂРµ Р·Р°СЂСЏРґР° (+2 Р·Р° СЃС‚Р°Рє), РѕРґРёРЅ РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ Р·Р° 2,5 СЃРµРєСѓРЅРґС‹.
+-- РЎС‚СЂРµР»Р° РїСЂРѕРЅР·Р°РµС‚ РґРѕ С‡РµС‚С‹СЂС‘С… СЂР°Р·РЅС‹С… РІСЂР°РіРѕРІ. Р•С‘ РїРѕРїР°РґР°РЅРёСЏ РЅРµ РІС‹Р·С‹РІР°СЋС‚ РїСЂРµРґРјРµС‚С‹ Рё РЅРµ РјРѕРіСѓС‚ Р·Р°РїСѓСЃС‚РёС‚СЊ СЃРµР±СЏ.
 
-local sprite = Resources.sprite_load("DeerItems", "item/MagicMissile", PATH.."assets/sprites/items/sGreenItems/MagicMissile.png", 1, 16, 16)
-local arrowSprite = Resources.sprite_load("DeerItems", "particle/MagicMissileArrow", PATH.."assets/sprites/particle/MagicMissile.png", 5, 16, 16)
-local MagicMissileHit = Resources.sfx_load("DeerItems", "sound/boom", PATH.."assets/sounds/MagicMissileHit.ogg")
-local MagicMissileLaunch = Resources.sfx_load("DeerItems", "sound/launch", PATH.."assets/sounds/MagicMissileLaunch.ogg")
+local sprite = Sprite.new("item/MagicMissile", PATH.."assets/sprites/items/sGreenItems/MagicMissile.png", 1, 16, 16)
+local arrowSprite = Sprite.new("particle/MagicMissileArrow", PATH.."assets/sprites/particle/MagicMissile.png", 5, 16, 16)
+local MagicMissileHit = Sound.new("sound/boom", PATH.."assets/sounds/MagicMissileHit.ogg")
+local MagicMissileLaunch = Sound.new("sound/launch", PATH.."assets/sounds/MagicMissileLaunch.ogg")
 
 local GUID  = _ENV["!guid"]
 local BLEND = Color(0xbfe3ff)
@@ -21,10 +21,8 @@ local ARROW_LIFE  = 45
 local HIT_RADIUS = 12
 local PIERCE_TARGETS = 4
 
-local arrow = Object.new("DeerItems", "MagicMissileArrow")
+local arrow = Object.new("MagicMissileArrow")
 arrow:set_sprite(arrowSprite)
-arrow:clear_callbacks()
-
 arrow:onCreate(function(self)
     self.timer = 0
     self.speed = ARROW_SPEED
@@ -39,7 +37,7 @@ end)
 arrow:onStep(function(self)
     self.image_angle = self.direction
 
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
     if not Instance.exists(self.parent) then self:destroy(); return end
 
     self.timer = self.timer + 1
@@ -62,7 +60,7 @@ arrow:onStep(function(self)
                 hit.attack_info:set_color(BLEND)
             end
 
-            local efSparks = Object.find("ror-efSparks")
+            local efSparks = Object.find("efSparks", "ror")
             if efSparks then
                 local sp = efSparks:create(target.x, target.y)
                 sp.sprite_index = gm.constants.sSparks1
@@ -84,12 +82,10 @@ arrow:onDestroy(function(self)
     self:instance_destroy_sync()
 end)
 
-arrow:onSerialize(function(self, buffer)
+Object.add_serializers(arrow, function(self, buffer)
     buffer:write_instance(self.parent)
     gm.write_direction(self.direction)
-end)
-
-arrow:onDeserialize(function(self, buffer)
+end, function(self, buffer)
     self.parent = buffer:read_instance()
     if Instance.exists(self.parent) then self.team = self.parent.team end
     self.direction = gm.read_direction()
@@ -102,12 +98,10 @@ local function aim_direction(actor)
     return (actor.image_xscale or 1) >= 0 and 0 or 180
 end
 
-local item = Item.new("DeerItems", "MagicMissile")
+local item = Item.new("MagicMissile")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
-item:clear_callbacks()
-
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 item:onPostStep(function(actor, stack)
     local data = actor:get_data("MagicMissile", GUID)
     local cap = CAP_BASE + CAP_STACK * (stack - 1)
@@ -125,7 +119,7 @@ item:onPostStep(function(actor, stack)
 end)
 
 item:onPrimaryUse(function(actor, stack, active_skill)
-    if not gm._mod_net_isHost() then return end
+    if not Net.host then return end
     local data = actor:get_data("MagicMissile", GUID)
 
     local cap = CAP_BASE + CAP_STACK * (stack - 1)

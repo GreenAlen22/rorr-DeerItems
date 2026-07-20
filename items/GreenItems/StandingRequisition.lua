@@ -1,22 +1,20 @@
--- DeerItems-StandingRequisition / «Постоянное снабжение» / "Standing Requisition"
--- В начале этапа создаёт для каждого владельца ящик с двумя бесплатными вариантами и одним платным.
--- Хост создаёт ящики после того, как все игроки подтвердили загрузку этапа.
+-- DeerItems-StandingRequisition / В«РџРѕСЃС‚РѕСЏРЅРЅРѕРµ СЃРЅР°Р±Р¶РµРЅРёРµВ» / "Standing Requisition"
+-- Р’ РЅР°С‡Р°Р»Рµ СЌС‚Р°РїР° СЃРѕР·РґР°С‘С‚ РґР»СЏ РєР°Р¶РґРѕРіРѕ РІР»Р°РґРµР»СЊС†Р° СЏС‰РёРє СЃ РґРІСѓРјСЏ Р±РµСЃРїР»Р°С‚РЅС‹РјРё РІР°СЂРёР°РЅС‚Р°РјРё Рё РѕРґРЅРёРј РїР»Р°С‚РЅС‹Рј.
+-- РҐРѕСЃС‚ СЃРѕР·РґР°С‘С‚ СЏС‰РёРєРё РїРѕСЃР»Рµ С‚РѕРіРѕ, РєР°Рє РІСЃРµ РёРіСЂРѕРєРё РїРѕРґС‚РІРµСЂРґРёР»Рё Р·Р°РіСЂСѓР·РєСѓ СЌС‚Р°РїР°.
 
-local sprite = Resources.sprite_load("DeerItems", "item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 18, 18)
+local sprite = Sprite.new("item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 18, 18)
 
--- Проверяем ящики дважды: сразу после загрузки и ещё раз, когда сеть успеет создать все экземпляры.
+-- РџСЂРѕРІРµСЂСЏРµРј СЏС‰РёРєРё РґРІР°Р¶РґС‹: СЃСЂР°Р·Сѓ РїРѕСЃР»Рµ Р·Р°РіСЂСѓР·РєРё Рё РµС‰С‘ СЂР°Р·, РєРѕРіРґР° СЃРµС‚СЊ СѓСЃРїРµРµС‚ СЃРѕР·РґР°С‚СЊ РІСЃРµ СЌРєР·РµРјРїР»СЏСЂС‹.
 local CHEST_RECONCILE_DELAYS = { 8, 120 }
 
-local item = Item.new("DeerItems", "StandingRequisition")
+local item = Item.new("StandingRequisition")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility, Item.LOOT_TAG.item_blacklist_engi_turrets)
-item:clear_callbacks()
-
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY + Item.LootTag.ITEM_BLACKLIST_ENGI_TURRETS
 local stage_plans = {}
 local reconcile_scheduled_frame = -1
 local chest_api
-local packet_stage_ready = Packet.new()
+local packet_stage_ready = Packet.new("StandingRequisition-packet_stage_ready")
 local pending_stage_ready = {}
 local active_stage_key
 local expected_stage_players = {}
@@ -24,7 +22,7 @@ local ready_stage_players = {}
 local stage_reconcile_started = false
 local schedule_reconcile
 
--- Подключает API ящика. Оно может ещё не быть загружено, если порядок файлов изменился.
+-- РџРѕРґРєР»СЋС‡Р°РµС‚ API СЏС‰РёРєР°. РћРЅРѕ РјРѕР¶РµС‚ РµС‰С‘ РЅРµ Р±С‹С‚СЊ Р·Р°РіСЂСѓР¶РµРЅРѕ, РµСЃР»Рё РїРѕСЂСЏРґРѕРє С„Р°Р№Р»РѕРІ РёР·РјРµРЅРёР»СЃСЏ.
 local function load_chest_api()
     if chest_api then return chest_api end
 
@@ -51,7 +49,7 @@ local function load_chest_api()
     return chest_api
 end
 
--- Прокси позволяет обращаться к API ящика как к таблице и подгружает его только при первом обращении.
+-- РџСЂРѕРєСЃРё РїРѕР·РІРѕР»СЏРµС‚ РѕР±СЂР°С‰Р°С‚СЊСЃСЏ Рє API СЏС‰РёРєР° РєР°Рє Рє С‚Р°Р±Р»РёС†Рµ Рё РїРѕРґРіСЂСѓР¶Р°РµС‚ РµРіРѕ С‚РѕР»СЊРєРѕ РїСЂРё РїРµСЂРІРѕРј РѕР±СЂР°С‰РµРЅРёРё.
 local Chest = setmetatable({}, {
     __index = function(_, key)
         return load_chest_api()[key]
@@ -66,7 +64,7 @@ local function make_stage_key(level, stage_id)
     return tostring(level)..":"..tostring(stage_id)
 end
 
--- Создаём ящики только после готовности всех игроков, иначе клиент может получить дубликат.
+-- РЎРѕР·РґР°С‘Рј СЏС‰РёРєРё С‚РѕР»СЊРєРѕ РїРѕСЃР»Рµ РіРѕС‚РѕРІРЅРѕСЃС‚Рё РІСЃРµС… РёРіСЂРѕРєРѕРІ, РёРЅР°С‡Рµ РєР»РёРµРЅС‚ РјРѕР¶РµС‚ РїРѕР»СѓС‡РёС‚СЊ РґСѓР±Р»РёРєР°С‚.
 local function try_schedule_reconcile()
     if stage_reconcile_started or not active_stage_key then return end
 
@@ -78,7 +76,7 @@ local function try_schedule_reconcile()
     schedule_reconcile()
 end
 
--- Хост начинает ожидание клиентов на новом этапе.
+-- РҐРѕСЃС‚ РЅР°С‡РёРЅР°РµС‚ РѕР¶РёРґР°РЅРёРµ РєР»РёРµРЅС‚РѕРІ РЅР° РЅРѕРІРѕРј СЌС‚Р°РїРµ.
 local function begin_stage_ready_barrier(level, stage_id)
     if not is_chest_authority() then return end
 
@@ -103,19 +101,19 @@ local function begin_stage_ready_barrier(level, stage_id)
     try_schedule_reconcile()
 end
 
--- Клиент сообщает хосту, что завершил загрузку этапа.
+-- РљР»РёРµРЅС‚ СЃРѕРѕР±С‰Р°РµС‚ С…РѕСЃС‚Сѓ, С‡С‚Рѕ Р·Р°РІРµСЂС€РёР» Р·Р°РіСЂСѓР·РєСѓ СЌС‚Р°РїР°.
 local function send_stage_ready(level, stage_id)
-    if not Net.is_client() then return end
+    if not Net.client then return end
 
-    local message = packet_stage_ready:message_begin()
-    message:write_int(level)
-    message:write_int(stage_id)
-    message:send_to_host()
+    packet_stage_ready:send_to_host(level, stage_id)
 end
 
-packet_stage_ready:onReceived(function(message, player)
-    local level = message:read_int()
-    local stage_id = message:read_int()
+packet_stage_ready:set_serializers(function(buffer, level, stage_id)
+    buffer:write_int(level)
+    buffer:write_int(stage_id)
+end, function(buffer, player)
+    local level = buffer:read_int()
+    local stage_id = buffer:read_int()
     if not is_chest_authority() or not Instance.exists(player) then return end
 
     local key = make_stage_key(level, stage_id)
@@ -132,7 +130,7 @@ packet_stage_ready:onReceived(function(message, player)
     end
 end)
 
--- Больше стаков повышает вес необычных и редких предметов.
+-- Р‘РѕР»СЊС€Рµ СЃС‚Р°РєРѕРІ РїРѕРІС‹С€Р°РµС‚ РІРµСЃ РЅРµРѕР±С‹С‡РЅС‹С… Рё СЂРµРґРєРёС… РїСЂРµРґРјРµС‚РѕРІ.
 local function roll_tier(stack)
     local n = math.max(1, stack or 1)
     local common_weight = 0.79
@@ -141,9 +139,9 @@ local function roll_tier(stack)
     local total = common_weight + uncommon_weight + rare_weight
     local r = math.random() * total
 
-    if r < common_weight then return Item.TIER.common end
-    if r < common_weight + uncommon_weight then return Item.TIER.uncommon end
-    return Item.TIER.rare
+    if r < common_weight then return ItemTier.COMMON end
+    if r < common_weight + uncommon_weight then return ItemTier.UNCOMMON end
+    return ItemTier.RARE
 end
 
 local function is_excluded(value, exclude)
@@ -156,10 +154,10 @@ local function is_excluded(value, exclude)
     return false
 end
 
--- Выбирает доступный и открытый предмет нужного тира, исключая указанные ID.
+-- Р’С‹Р±РёСЂР°РµС‚ РґРѕСЃС‚СѓРїРЅС‹Р№ Рё РѕС‚РєСЂС‹С‚С‹Р№ РїСЂРµРґРјРµС‚ РЅСѓР¶РЅРѕРіРѕ С‚РёСЂР°, РёСЃРєР»СЋС‡Р°СЏ СѓРєР°Р·Р°РЅРЅС‹Рµ ID.
 local function pick_item(tier, exclude)
     local candidates = {}
-    for _, it in ipairs(Item.find_all(tier, Item.ARRAY.tier)) do
+    for _, it in ipairs(Item.find_all(tier, Item.Property.TIER)) do
         if it and it:is_loot() and it:is_unlocked() and not is_excluded(it.value, exclude) then
             candidates[#candidates + 1] = it
         end
@@ -173,7 +171,7 @@ local function pick_item_with_fallback(tier, exclude)
     local it = pick_item(tier, exclude)
     if it then return it end
 
-    for _, fallback_tier in ipairs({ Item.TIER.common, Item.TIER.uncommon, Item.TIER.rare }) do
+    for _, fallback_tier in ipairs({ ItemTier.COMMON, ItemTier.UNCOMMON, ItemTier.RARE }) do
         if fallback_tier ~= tier then
             it = pick_item(fallback_tier, exclude)
             if it then return it end
@@ -183,7 +181,7 @@ local function pick_item_with_fallback(tier, exclude)
     return nil
 end
 
--- Два варианта не могут повторяться и не могут быть самим StandingRequisition.
+-- Р”РІР° РІР°СЂРёР°РЅС‚Р° РЅРµ РјРѕРіСѓС‚ РїРѕРІС‚РѕСЂСЏС‚СЊСЃСЏ Рё РЅРµ РјРѕРіСѓС‚ Р±С‹С‚СЊ СЃР°РјРёРј StandingRequisition.
 local function pick_choices(stack)
     local a = pick_item_with_fallback(roll_tier(stack), { item.value })
     if not a then return nil end
@@ -194,14 +192,14 @@ local function pick_choices(stack)
     return a, b
 end
 
--- Готовит по одному плану ящика на каждого игрока, у которого есть предмет.
+-- Р“РѕС‚РѕРІРёС‚ РїРѕ РѕРґРЅРѕРјСѓ РїР»Р°РЅСѓ СЏС‰РёРєР° РЅР° РєР°Р¶РґРѕРіРѕ РёРіСЂРѕРєР°, Сѓ РєРѕС‚РѕСЂРѕРіРѕ РµСЃС‚СЊ РїСЂРµРґРјРµС‚.
 local function collect_stage_plans()
     stage_plans = {}
 
     local players = Instance.find_all(gm.constants.oP)
     for _, actor in ipairs(players) do
         if Instance.exists(actor) then
-            local stack = actor:item_stack_count(item) or 0
+            local stack = actor:item_count(item) or 0
             if stack > 0 then
                 local a, b = pick_choices(stack)
                 if a and b then
@@ -221,7 +219,7 @@ local function collect_stage_plans()
     return #stage_plans
 end
 
--- Ищет случайную точку пола. Если не находит, ящик появится рядом с владельцем.
+-- РС‰РµС‚ СЃР»СѓС‡Р°Р№РЅСѓСЋ С‚РѕС‡РєСѓ РїРѕР»Р°. Р•СЃР»Рё РЅРµ РЅР°С…РѕРґРёС‚, СЏС‰РёРє РїРѕСЏРІРёС‚СЃСЏ СЂСЏРґРѕРј СЃ РІР»Р°РґРµР»СЊС†РµРј.
 local function find_chest_position()
     local director = gm._mod_game_getDirector()
     local width = gm._mod_room_get_current_width()
@@ -257,7 +255,7 @@ local function spawn_chest(plan, index)
     return Chest.create_at(x, y, plan)
 end
 
--- Сверяет реальные ящики с планами этапа: создаёт недостающие и удаляет лишние.
+-- РЎРІРµСЂСЏРµС‚ СЂРµР°Р»СЊРЅС‹Рµ СЏС‰РёРєРё СЃ РїР»Р°РЅР°РјРё СЌС‚Р°РїР°: СЃРѕР·РґР°С‘С‚ РЅРµРґРѕСЃС‚Р°СЋС‰РёРµ Рё СѓРґР°Р»СЏРµС‚ Р»РёС€РЅРёРµ.
 local function reconcile_chests()
     if not is_chest_authority() then return end
 
@@ -314,7 +312,7 @@ local function reconcile_chests()
     end
 end
 
--- Откладывает сверку до двух моментов после загрузки этапа, но не ставит её дважды в один кадр.
+-- РћС‚РєР»Р°РґС‹РІР°РµС‚ СЃРІРµСЂРєСѓ РґРѕ РґРІСѓС… РјРѕРјРµРЅС‚РѕРІ РїРѕСЃР»Рµ Р·Р°РіСЂСѓР·РєРё СЌС‚Р°РїР°, РЅРѕ РЅРµ СЃС‚Р°РІРёС‚ РµС‘ РґРІР°Р¶РґС‹ РІ РѕРґРёРЅ РєР°РґСЂ.
 schedule_reconcile = function()
     local frame = Global._current_frame or 0
     if reconcile_scheduled_frame == frame then return end
@@ -324,21 +322,21 @@ schedule_reconcile = function()
     end
 end
 
--- На новом этапе клиент отправляет подтверждение, а хост запускает ожидание всех игроков.
-Callback.add(Callback.TYPE.onStageStart, "DeerItems-StandingRequisition-stageReady", function()
+-- РќР° РЅРѕРІРѕРј СЌС‚Р°РїРµ РєР»РёРµРЅС‚ РѕС‚РїСЂР°РІР»СЏРµС‚ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ, Р° С…РѕСЃС‚ Р·Р°РїСѓСЃРєР°РµС‚ РѕР¶РёРґР°РЅРёРµ РІСЃРµС… РёРіСЂРѕРєРѕРІ.
+Callback.add(Callback.ON_STAGE_START, function()
     local level = math.floor(Global.stage_current_level or -1)
     local stage_id = math.floor(Global.stage_id or -1)
 
     -- The multiplayer chest is deferred until its synchronization is fixed.
     -- toggle_loot affects normal drop pools only, not explicit item grants.
-    item:toggle_loot(Net.is_single())
+    item:toggle_loot(not Net.online)
 
-    if Net.is_single() then
+    if not Net.online then
         schedule_reconcile()
         return
     end
 
-    if Net.is_client() then
+    if Net.client then
         for _, delay in ipairs({ 1, 30 }) do
             Alarm.create(function()
                 send_stage_ready(level, stage_id)

@@ -1,56 +1,54 @@
 -- DeerItems-CoolGlasses
--- Даёт +5% критшанса. Критические атаки создают взрыв, нанося дополнительный урон.
+-- Р вЂќР В°РЎвЂРЎвЂљ +5% Р С”РЎР‚Р С‘РЎвЂљРЎв‚¬Р В°Р Р…РЎРѓР В°. Р С™РЎР‚Р С‘РЎвЂљР С‘РЎвЂЎР ВµРЎРѓР С”Р С‘Р Вµ Р В°РЎвЂљР В°Р С”Р С‘ РЎРѓР С•Р В·Р Т‘Р В°РЎР‹РЎвЂљ Р Р†Р В·РЎР‚РЎвЂ№Р Р†, Р Р…Р В°Р Р…Р С•РЎРѓРЎРЏ Р Т‘Р С•Р С—Р С•Р В»Р Р…Р С‘РЎвЂљР ВµР В»РЎРЉР Р…РЎвЂ№Р в„– РЎС“РЎР‚Р С•Р Р….
 
--- Загружаем спрайт предмета
--- Загружаем спрайт индикатора
--- Загружаем спрайт взрыва
-local sprite = Resources.sprite_load("DeerItems", "item/CoolGlasses", PATH.."assets/sprites/items/sGreenItems/CoolGlasses.png", 1, 16, 16)
-local CoolIndictor = Resources.sprite_load("DeerItems", "paticle/CoolIndictor", PATH.."assets/sprites/particle/CoolIndictor.png", 1, 8, 8)
-local sunExplosion = Resources.sprite_load("DeerItems", "paticle/sunExplosion", PATH.."assets/sprites/particle/SunExplosion.png", 9, 32, 32)
+-- Р вЂ”Р В°Р С–РЎР‚РЎС“Р В¶Р В°Р ВµР С РЎРѓР С—РЎР‚Р В°Р в„–РЎвЂљ Р С—РЎР‚Р ВµР Т‘Р СР ВµРЎвЂљР В°
+-- Р вЂ”Р В°Р С–РЎР‚РЎС“Р В¶Р В°Р ВµР С РЎРѓР С—РЎР‚Р В°Р в„–РЎвЂљ Р С‘Р Р…Р Т‘Р С‘Р С”Р В°РЎвЂљР С•РЎР‚Р В°
+-- Р вЂ”Р В°Р С–РЎР‚РЎС“Р В¶Р В°Р ВµР С РЎРѓР С—РЎР‚Р В°Р в„–РЎвЂљ Р Р†Р В·РЎР‚РЎвЂ№Р Р†Р В°
+local sprite = Sprite.new("item/CoolGlasses", PATH.."assets/sprites/items/sGreenItems/CoolGlasses.png", 1, 16, 16)
+local CoolIndictor = Sprite.new("paticle/CoolIndictor", PATH.."assets/sprites/particle/CoolIndictor.png", 1, 8, 8)
+local sunExplosion = Sprite.new("paticle/sunExplosion", PATH.."assets/sprites/particle/SunExplosion.png", 9, 32, 32)
 
--- Создание предмета CoolGlasses
--- Привязка спрайта к предмету
--- Установка тира предмета: зелёный (необычный)
--- Назначение тега лута: предмет, усиливающий урон
-local item = Item.new("DeerItems", "CoolGlasses")
+-- Р РЋР С•Р В·Р Т‘Р В°Р Р…Р С‘Р Вµ Р С—РЎР‚Р ВµР Т‘Р СР ВµРЎвЂљР В° CoolGlasses
+-- Р СџРЎР‚Р С‘Р Р†РЎРЏР В·Р С”Р В° РЎРѓР С—РЎР‚Р В°Р в„–РЎвЂљР В° Р С” Р С—РЎР‚Р ВµР Т‘Р СР ВµРЎвЂљРЎС“
+-- Р Р€РЎРѓРЎвЂљР В°Р Р…Р С•Р Р†Р С”Р В° РЎвЂљР С‘РЎР‚Р В° Р С—РЎР‚Р ВµР Т‘Р СР ВµРЎвЂљР В°: Р В·Р ВµР В»РЎвЂР Р…РЎвЂ№Р в„– (Р Р…Р ВµР С•Р В±РЎвЂ№РЎвЂЎР Р…РЎвЂ№Р в„–)
+-- Р СњР В°Р В·Р Р…Р В°РЎвЂЎР ВµР Р…Р С‘Р Вµ РЎвЂљР ВµР С–Р В° Р В»РЎС“РЎвЂљР В°: Р С—РЎР‚Р ВµР Т‘Р СР ВµРЎвЂљ, РЎС“РЎРѓР С‘Р В»Р С‘Р Р†Р В°РЎР‹РЎвЂ°Р С‘Р в„– РЎС“РЎР‚Р С•Р Р…
+local item = Item.new("CoolGlasses")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
-item:clear_callbacks()
-
--- При попадании атакой — если был крит, создаётся взрыв
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
+-- Р СџРЎР‚Р С‘ Р С—Р С•Р С—Р В°Р Т‘Р В°Р Р…Р С‘Р С‘ Р В°РЎвЂљР В°Р С”Р С•Р в„– РІР‚вЂќ Р ВµРЎРѓР В»Р С‘ Р В±РЎвЂ№Р В» Р С”РЎР‚Р С‘РЎвЂљ, РЎРѓР С•Р В·Р Т‘Р В°РЎвЂРЎвЂљРЎРѓРЎРЏ Р Р†Р В·РЎР‚РЎвЂ№Р Р†
 item:onHitProc(function(actor, victim, stack, hit_info)
-    if not gm._mod_net_isHost() then return end
+    if not Net.host then return end
     local attack_info = hit_info and hit_info.attack_info
     if not attack_info then return end
     if attack_info.critical then
-        -- Получаем базовый урон до модификаторов
+        -- Р СџР С•Р В»РЎС“РЎвЂЎР В°Р ВµР С Р В±Р В°Р В·Р С•Р Р†РЎвЂ№Р в„– РЎС“РЎР‚Р С•Р Р… Р Т‘Р С• Р СР С•Р Т‘Р С‘РЎвЂћР С‘Р С”Р В°РЎвЂљР С•РЎР‚Р С•Р Р†
         local base_damage = attack_info:get_damage_nocrit()
-        -- Создание взрыва на месте жертвы
+        -- Р РЋР С•Р В·Р Т‘Р В°Р Р…Р С‘Р Вµ Р Р†Р В·РЎР‚РЎвЂ№Р Р†Р В° Р Р…Р В° Р СР ВµРЎРѓРЎвЂљР Вµ Р В¶Р ВµРЎР‚РЎвЂљР Р†РЎвЂ№
         local inst = actor:fire_explosion(
             victim.x,
             victim.y,
-            128, 128,                         -- радиус по X и Y
-            base_damage * 1.2 * stack,        -- урон от взрыва
-            nil,                              -- спрайт взырва
-            sunExplosion,                     -- спрайт эффекта при поподании
-            false                             -- не имеет proc 
+            128, 128,                         -- РЎР‚Р В°Р Т‘Р С‘РЎС“РЎРѓ Р С—Р С• X Р С‘ Y
+            base_damage * 1.2 * stack,        -- РЎС“РЎР‚Р С•Р Р… Р С•РЎвЂљ Р Р†Р В·РЎР‚РЎвЂ№Р Р†Р В°
+            nil,                              -- РЎРѓР С—РЎР‚Р В°Р в„–РЎвЂљ Р Р†Р В·РЎвЂ№РЎР‚Р Р†Р В°
+            sunExplosion,                     -- РЎРѓР С—РЎР‚Р В°Р в„–РЎвЂљ РЎРЊРЎвЂћРЎвЂћР ВµР С”РЎвЂљР В° Р С—РЎР‚Р С‘ Р С—Р С•Р С—Р С•Р Т‘Р В°Р Р…Р С‘Р С‘
+            false                             -- Р Р…Р Вµ Р С‘Р СР ВµР ВµРЎвЂљ proc
         )
-        -- Дополнительная настройка урона от взрыва
+        -- Р вЂќР С•Р С—Р С•Р В»Р Р…Р С‘РЎвЂљР ВµР В»РЎРЉР Р…Р В°РЎРЏ Р Р…Р В°РЎРѓРЎвЂљРЎР‚Р С•Р в„–Р С”Р В° РЎС“РЎР‚Р С•Р Р…Р В° Р С•РЎвЂљ Р Р†Р В·РЎР‚РЎвЂ№Р Р†Р В°
         local sunDMG = inst.attack_info
-        sunDMG:set_critical(false)            -- убираем возможность крита
-        sunDMG.proc = false                   -- отключаем проки
-        sunDMG:use_raw_damage()              -- игнорируем модификаторы
-        sunDMG:set_damage(base_damage * 0.2 * stack) -- наносим "сырой" урон
+        sunDMG:set_critical(false)            -- РЎС“Р В±Р С‘РЎР‚Р В°Р ВµР С Р Р†Р С•Р В·Р СР С•Р В¶Р Р…Р С•РЎРѓРЎвЂљРЎРЉ Р С”РЎР‚Р С‘РЎвЂљР В°
+        sunDMG.proc = false                   -- Р С•РЎвЂљР С”Р В»РЎР‹РЎвЂЎР В°Р ВµР С Р С—РЎР‚Р С•Р С”Р С‘
+        sunDMG:use_raw_damage()              -- Р С‘Р С–Р Р…Р С•РЎР‚Р С‘РЎР‚РЎС“Р ВµР С Р СР С•Р Т‘Р С‘РЎвЂћР С‘Р С”Р В°РЎвЂљР С•РЎР‚РЎвЂ№
+        sunDMG:set_damage(base_damage * 0.2 * stack) -- Р Р…Р В°Р Р…Р С•РЎРѓР С‘Р С "РЎРѓРЎвЂ№РЎР‚Р С•Р в„–" РЎС“РЎР‚Р С•Р Р…
     end
 end)
 
--- При пересчёте статов — даём +5% критического шанса
+-- Р СџРЎР‚Р С‘ Р С—Р ВµРЎР‚Р ВµРЎРѓРЎвЂЎРЎвЂРЎвЂљР Вµ РЎРѓРЎвЂљР В°РЎвЂљР С•Р Р† РІР‚вЂќ Р Т‘Р В°РЎвЂР С +5% Р С”РЎР‚Р С‘РЎвЂљР С‘РЎвЂЎР ВµРЎРѓР С”Р С•Р С–Р С• РЎв‚¬Р В°Р Р…РЎРѓР В°
 item:onStatRecalc(function(actor, stack)
     actor.critical_chance = actor.critical_chance + 5
 end)
 
--- Отображение индикатора предмета поверх персонажа
+-- Р С›РЎвЂљР С•Р В±РЎР‚Р В°Р В¶Р ВµР Р…Р С‘Р Вµ Р С‘Р Р…Р Т‘Р С‘Р С”Р В°РЎвЂљР С•РЎР‚Р В° Р С—РЎР‚Р ВµР Т‘Р СР ВµРЎвЂљР В° Р С—Р С•Р Р†Р ВµРЎР‚РЎвЂ¦ Р С—Р ВµРЎР‚РЎРѓР С•Р Р…Р В°Р В¶Р В°
 item:onPostDraw(function(actor, stack)
     gm.draw_sprite(CoolIndictor, 0, actor.x + 30, actor.y + 50)
 end)

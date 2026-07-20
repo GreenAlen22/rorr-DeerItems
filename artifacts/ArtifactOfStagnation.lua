@@ -1,8 +1,6 @@
 -- Артефакт стагнации: таймер сложности идёт только во время события телепорта.
 
-local sprite = Resources.sprite_load(
-    "DeerItems",
-    "artifact/Stagnation",
+local sprite = Sprite.new("artifact/Stagnation",
     PATH.."assets/sprites/artifacts/ArtifactOfStagnation.png",
     3,
     16,
@@ -13,7 +11,7 @@ local DIFFICULTY_ALARM = 0
 local DIFFICULTY_TICK_FRAMES = 60
 local EVENT_TIME_MULTIPLIER = 5
 
-local artifact = Artifact.new("DeerItems", "Stagnation")
+local artifact = Artifact.new("Stagnation")
 artifact:set_sprites(sprite, sprite)
 artifact:set_text(
     "artifact.Stagnation.name",
@@ -36,7 +34,7 @@ local function get_difficulty_alarm(director)
     return value
 end
 
-Callback.add(Callback.TYPE.postStep, "DeerItems-Stagnation-updateDifficultyTimer", function()
+Callback.add(Callback.POST_STEP, function()
     if not artifact.active then return end
 
     local director = gm._mod_game_getDirector()

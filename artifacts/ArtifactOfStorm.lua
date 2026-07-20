@@ -1,24 +1,18 @@
--- Артефакт бури: чем больше предметов у команды, тем чаще в неё бьют молнии.
+-- РђСЂС‚РµС„Р°РєС‚ Р±СѓСЂРё: С‡РµРј Р±РѕР»СЊС€Рµ РїСЂРµРґРјРµС‚РѕРІ Сѓ РєРѕРјР°РЅРґС‹, С‚РµРј С‡Р°С‰Рµ РІ РЅРµС‘ Р±СЊСЋС‚ РјРѕР»РЅРёРё.
 
-local sprite = Resources.sprite_load(
-    "DeerItems",
-    "artifact/Storm",
+local sprite = Sprite.new("artifact/Storm",
     PATH.."assets/sprites/artifacts/ArtifactOfStorm.png",
     3,
     16,
     16
 )
-local volt_overload = Resources.sprite_load(
-    "DeerItems",
-    "artifact/StormVoltOverload",
+local volt_overload = Sprite.new("artifact/StormVoltOverload",
     PATH.."assets/sprites/particle/voltOverload.png",
     13,
     64,
     112
 )
-local volt_overload_sound = Resources.sfx_load(
-    "DeerItems",
-    "artifact/StormVoltOverload",
+local volt_overload_sound = Sound.new("artifact/StormVoltOverload",
     PATH.."assets/sounds/voltOverload.ogg"
 )
 
@@ -32,20 +26,20 @@ local STRIKE_RANGE = 8 * 32
 local STRIKE_RADIUS = 2 * 32
 local MAX_HP_DAMAGE = 0.05
 local TELEGRAPH_DURATION = 60
--- Предупреждение занимает кадры 1–4. На пятом кадре начинается анимация удара.
+-- РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ Р·Р°РЅРёРјР°РµС‚ РєР°РґСЂС‹ 1вЂ“4. РќР° РїСЏС‚РѕРј РєР°РґСЂРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ Р°РЅРёРјР°С†РёСЏ СѓРґР°СЂР°.
 local TELEGRAPH_END_FRAME = 4
 
 local TIER_WEIGHTS = {
-    [Item.TIER.common] = 1,
-    [Item.TIER.uncommon] = 3,
-    [Item.TIER.rare] = 9,
-    [Item.TIER.equipment] = 6,
-    [Item.TIER.boss] = 6,
-    [Item.TIER.special] = 6,
-    [Item.TIER.notier] = 0
+    [ItemTier.COMMON] = 1,
+    [ItemTier.UNCOMMON] = 3,
+    [ItemTier.RARE] = 9,
+    [ItemTier.EQUIPMENT] = 6,
+    [ItemTier.BOSS] = 6,
+    [ItemTier.SPECIAL] = 6,
+    [ItemTier.NOTIER] = 0
 }
 
-local artifact = Artifact.new("DeerItems", "Storm")
+local artifact = Artifact.new("Storm")
 artifact:set_sprites(sprite, sprite)
 artifact:set_text(
     "artifact.Storm.name",
@@ -56,7 +50,7 @@ artifact:set_text(
 local storm_timer = 0
 local pending_strikes = {}
 
-Callback.add(Callback.TYPE.onGameStart, "DeerItems-Storm-resetTimer", function()
+Callback.add(Callback.ON_GAME_START, function()
     storm_timer = 0
     pending_strikes = {}
 end)
@@ -141,8 +135,8 @@ local function queue_strike(players)
     })
 end
 
-Callback.add(Callback.TYPE.postStep, "DeerItems-Storm-update", function()
-    if gm._mod_net_isClient() or not artifact.active then
+Callback.add(Callback.POST_STEP, function()
+    if Net.client or not artifact.active then
         storm_timer = 0
         clear_pending_strikes()
         return

@@ -1,34 +1,34 @@
 -- DeerItems-DeepcoreGK2
--- Призывает Bosco, который стреляет по врагам и замедляет их. Кол-во целей и радиус зависят от стаков.
+-- РџСЂРёР·С‹РІР°РµС‚ Bosco, РєРѕС‚РѕСЂС‹Р№ СЃС‚СЂРµР»СЏРµС‚ РїРѕ РІСЂР°РіР°Рј Рё Р·Р°РјРµРґР»СЏРµС‚ РёС…. РљРѕР»-РІРѕ С†РµР»РµР№ Рё СЂР°РґРёСѓСЃ Р·Р°РІРёСЃСЏС‚ РѕС‚ СЃС‚Р°РєРѕРІ.
 
--- Загружаем спрайт дрона
--- Загружаем спрайт предмета
-local droneSprite = Resources.sprite_load("DeerItems", "object/bosco", PATH.."assets/sprites/particle/bosco.png", 4, 16, 8)
-local sprite = Resources.sprite_load("DeerItems", "item/DeepcoreGK2", PATH.."assets/sprites/items/sGreenItems/DeepcoreGK2.png", 1, 16, 16)
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РґСЂРѕРЅР°
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
+local droneSprite = Sprite.new("object/bosco", PATH.."assets/sprites/particle/bosco.png", 4, 16, 8)
+local sprite = Sprite.new("item/DeepcoreGK2", PATH.."assets/sprites/items/sGreenItems/DeepcoreGK2.png", 1, 16, 16)
 
--- Выносим один раз: guid мода (чтобы get_data не искал его через debug-стек каждый кадр)
--- и цвет эффектов (чтобы не пересоздавать Color на каждый выстрел)
+-- Р’С‹РЅРѕСЃРёРј РѕРґРёРЅ СЂР°Р·: guid РјРѕРґР° (С‡С‚РѕР±С‹ get_data РЅРµ РёСЃРєР°Р» РµРіРѕ С‡РµСЂРµР· debug-СЃС‚РµРє РєР°Р¶РґС‹Р№ РєР°РґСЂ)
+-- Рё С†РІРµС‚ СЌС„С„РµРєС‚РѕРІ (С‡С‚РѕР±С‹ РЅРµ РїРµСЂРµСЃРѕР·РґР°РІР°С‚СЊ Color РЅР° РєР°Р¶РґС‹Р№ РІС‹СЃС‚СЂРµР»)
 local GUID = _ENV["!guid"]
 local BLEND = Color(0x221f00)
 local oP = gm.constants.oP
 
--- Замедление цели от выстрела дрона (небольшое): множитель к скорости и длительность в кадрах.
-local SLOW_MULT     = 0.85   -- -15% скорости передвижения цели
-local SLOW_DURATION = 90     -- держится 1.5 сек, обновляется при каждом попадании
-local HIT_DMG_FRAC  = 0.05   -- урон выстрела = 5% урона игрока (коэффициент для fire_direct)
+-- Р—Р°РјРµРґР»РµРЅРёРµ С†РµР»Рё РѕС‚ РІС‹СЃС‚СЂРµР»Р° РґСЂРѕРЅР° (РЅРµР±РѕР»СЊС€РѕРµ): РјРЅРѕР¶РёС‚РµР»СЊ Рє СЃРєРѕСЂРѕСЃС‚Рё Рё РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РІ РєР°РґСЂР°С….
+local SLOW_MULT     = 0.85   -- -15% СЃРєРѕСЂРѕСЃС‚Рё РїРµСЂРµРґРІРёР¶РµРЅРёСЏ С†РµР»Рё
+local SLOW_DURATION = 90     -- РґРµСЂР¶РёС‚СЃСЏ 1.5 СЃРµРє, РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РїСЂРё РєР°Р¶РґРѕРј РїРѕРїР°РґР°РЅРёРё
+local HIT_DMG_FRAC  = 0.05   -- СѓСЂРѕРЅ РІС‹СЃС‚СЂРµР»Р° = 5% СѓСЂРѕРЅР° РёРіСЂРѕРєР° (РєРѕСЌС„С„РёС†РёРµРЅС‚ РґР»СЏ fire_direct)
 local PROC_CHANCE   = 0.20
 local SHIELD_PER_DRONE = 0.05
 local DRONE_FIND_RADIUS = 100000
-local packet_shot = Packet.new()
-local packet_facing = Packet.new()
+local packet_shot = Packet.new("DeepcoreGK2-packet_shot")
+local packet_facing = Packet.new("DeepcoreGK2-packet_facing")
 
 local function instance_exists(inst)
     return inst ~= nil and Instance.exists(inst)
 end
 
 local function create_shot_effect(source_x, source_y, target_x, target_y, facing)
-    local efLineTracer = Object.find("ror-efLineTracer")
-    local efSparks = Object.find("ror-efSparks")
+    local efLineTracer = Object.find("efLineTracer", "ror")
+    local efSparks = Object.find("efSparks", "ror")
 
     if efLineTracer then
         local tracer = efLineTracer:create(source_x + facing, source_y)
@@ -47,22 +47,31 @@ local function create_shot_effect(source_x, source_y, target_x, target_y, facing
     end
 end
 
-packet_shot:onReceived(function(message)
-    if not gm._mod_net_isClient() then return end
+packet_shot:set_serializers(function(buffer, source_x, source_y, target_x, target_y, facing)
+    buffer:write_float(source_x)
+    buffer:write_float(source_y)
+    buffer:write_float(target_x)
+    buffer:write_float(target_y)
+    buffer:write_byte(facing >= 0 and 1 or 0)
+end, function(buffer)
+    if not Net.client then return end
 
     create_shot_effect(
-        message:read_float(), message:read_float(),
-        message:read_float(), message:read_float(),
-        message:read_byte() == 1 and 1 or -1
+        buffer:read_float(), buffer:read_float(),
+        buffer:read_float(), buffer:read_float(),
+        buffer:read_byte() == 1 and 1 or -1
     )
 end)
 
-packet_facing:onReceived(function(message)
-    if gm._mod_net_isClient() then return end
+packet_facing:set_serializers(function(buffer, actor, facing)
+    buffer:write_instance(actor)
+    buffer:write_byte(facing >= 0 and 1 or 0)
+end, function(buffer)
+    if Net.client then return end
 
-    local actor = message:read_instance()
+    local actor = buffer:read_instance()
     if not instance_exists(actor) then return end
-    actor:get_data("DeerItems", GUID).bosco_facing = message:read_byte() == 1 and 1 or -1
+    actor:get_data("DeerItems", GUID).bosco_facing = buffer:read_byte() == 1 and 1 or -1
 end)
 
 local function is_not_drone(char)
@@ -80,21 +89,20 @@ local function count_drones(actor)
     return n
 end
 
--- Создание предмета DeepcoreGK2
--- Привязка спрайта к предмету
--- Установка тира предмета: зелёный (необычный)
--- Назначение тега лута: утилитарный предмет
-local item = Item.new("DeerItems", "DeepcoreGK2")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р° DeepcoreGK2
+-- РџСЂРёРІСЏР·РєР° СЃРїСЂР°Р№С‚Р° Рє РїСЂРµРґРјРµС‚Сѓ
+-- РЈСЃС‚Р°РЅРѕРІРєР° С‚РёСЂР° РїСЂРµРґРјРµС‚Р°: Р·РµР»С‘РЅС‹Р№ (РЅРµРѕР±С‹С‡РЅС‹Р№)
+-- РќР°Р·РЅР°С‡РµРЅРёРµ С‚РµРіР° Р»СѓС‚Р°: СѓС‚РёР»РёС‚Р°СЂРЅС‹Р№ РїСЂРµРґРјРµС‚
+local item = Item.new("DeepcoreGK2")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
--- Скрытый дебафф замедления, который дрон вешает на цель (иконку не показываем — спрайт не нужен).
-local slowBuff = Buff.new("DeerItems", "DeepcoreSlow")
+-- РЎРєСЂС‹С‚С‹Р№ РґРµР±Р°С„С„ Р·Р°РјРµРґР»РµРЅРёСЏ, РєРѕС‚РѕСЂС‹Р№ РґСЂРѕРЅ РІРµС€Р°РµС‚ РЅР° С†РµР»СЊ (РёРєРѕРЅРєСѓ РЅРµ РїРѕРєР°Р·С‹РІР°РµРј вЂ” СЃРїСЂР°Р№С‚ РЅРµ РЅСѓР¶РµРЅ).
+local slowBuff = Buff.new("DeepcoreSlow")
 slowBuff.show_icon = false
 slowBuff.is_debuff = true
 slowBuff.max_stack = 1
-slowBuff:clear_callbacks()
 slowBuff:onStatRecalc(function(actor, stack)
     actor.pHmax = actor.pHmax * SLOW_MULT
 end)
@@ -109,13 +117,11 @@ item:onStatRecalc(function(actor, stack)
     end
 end)
 
--- Создание объекта-дрона Bosco
-local obj = Object.new("DeerItems", "Bosco")
+-- РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р°-РґСЂРѕРЅР° Bosco
+local obj = Object.new("Bosco")
 obj:set_sprite(droneSprite)
 obj:set_depth(1)
-obj:clear_callbacks()
-
--- При создании дрона: инициализация параметров
+-- РџСЂРё СЃРѕР·РґР°РЅРёРё РґСЂРѕРЅР°: РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
 obj:onCreate(function(self)
     local data = self:get_data(nil, GUID)
     self.persistent = true
@@ -128,27 +134,27 @@ obj:onCreate(function(self)
     self:projectile_sync(8)
 end)
 
--- Поведение дрона каждый кадр
+-- РџРѕРІРµРґРµРЅРёРµ РґСЂРѕРЅР° РєР°Р¶РґС‹Р№ РєР°РґСЂ
 obj:onStep(function(self)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     local data = self:get_data(nil, GUID)
     local parent = self.parent
     if not instance_exists(parent) then parent = data.parent end
 
-    -- Уничтожаем дрона, если владелец исчез
+    -- РЈРЅРёС‡С‚РѕР¶Р°РµРј РґСЂРѕРЅР°, РµСЃР»Рё РІР»Р°РґРµР»РµС† РёСЃС‡РµР·
     if not instance_exists(parent) then
         self:destroy()
         return
     end
 
-    -- Расчёт позиции вокруг игрока по синусоиде
+    -- Р Р°СЃС‡С‘С‚ РїРѕР·РёС†РёРё РІРѕРєСЂСѓРі РёРіСЂРѕРєР° РїРѕ СЃРёРЅСѓСЃРѕРёРґРµ
     data.angle = (data.angle or 0) + (data.angle_speed or 120) / 60
     self.x = parent.x + gm.dcos(data.angle) * (data.radius or 48)
     self.y = parent.y - 10
 
-    -- По умолчанию дрон смотрит туда же, куда повёрнут игрок (направление прицела).
-    -- Если ниже найдётся цель — ориентация переопределится на неё.
+    -- РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РґСЂРѕРЅ СЃРјРѕС‚СЂРёС‚ С‚СѓРґР° Р¶Рµ, РєСѓРґР° РїРѕРІС‘СЂРЅСѓС‚ РёРіСЂРѕРє (РЅР°РїСЂР°РІР»РµРЅРёРµ РїСЂРёС†РµР»Р°).
+    -- Р•СЃР»Рё РЅРёР¶Рµ РЅР°Р№РґС‘С‚СЃСЏ С†РµР»СЊ вЂ” РѕСЂРёРµРЅС‚Р°С†РёСЏ РїРµСЂРµРѕРїСЂРµРґРµР»РёС‚СЃСЏ РЅР° РЅРµС‘.
     local owner_data = parent:get_data("DeerItems", GUID)
     local facing = owner_data.bosco_facing or parent.image_xscale
     if facing and facing ~= 0 and self.image_xscale ~= facing then
@@ -156,8 +162,8 @@ obj:onStep(function(self)
         self:instance_resync()
     end
 
-    -- Зарядка атаки по времени, зависящему от скорости атаки владельца.
-    -- Пока не заряжено — копим заряд и выходим (дешёвый путь, выполняется большинство кадров).
+    -- Р—Р°СЂСЏРґРєР° Р°С‚Р°РєРё РїРѕ РІСЂРµРјРµРЅРё, Р·Р°РІРёСЃСЏС‰РµРјСѓ РѕС‚ СЃРєРѕСЂРѕСЃС‚Рё Р°С‚Р°РєРё РІР»Р°РґРµР»СЊС†Р°.
+    -- РџРѕРєР° РЅРµ Р·Р°СЂСЏР¶РµРЅРѕ вЂ” РєРѕРїРёРј Р·Р°СЂСЏРґ Рё РІС‹С…РѕРґРёРј (РґРµС€С‘РІС‹Р№ РїСѓС‚СЊ, РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ Р±РѕР»СЊС€РёРЅСЃС‚РІРѕ РєР°РґСЂРѕРІ).
     local req = 60 / (parent.attack_speed or 1)
     if data.charge < req then
         data.charge = data.charge + 1
@@ -165,59 +171,53 @@ obj:onStep(function(self)
     end
     data.charge = 0
 
-    -- Дальше — только в момент выстрела. Стак и радиус нужны лишь здесь.
-    local stack = parent:item_stack_count(item)
+    -- Р”Р°Р»СЊС€Рµ вЂ” С‚РѕР»СЊРєРѕ РІ РјРѕРјРµРЅС‚ РІС‹СЃС‚СЂРµР»Р°. РЎС‚Р°Рє Рё СЂР°РґРёСѓСЃ РЅСѓР¶РЅС‹ Р»РёС€СЊ Р·РґРµСЃСЊ.
+    local stack = parent:item_count(item)
     local fire_range = 320 + stack * 32
 
-    -- Нативный поиск врагов в радиусе: круг и команду фильтрует движок
-    -- (команда врагов — противоположная команде владельца, как в примерах тулкита).
+    -- РќР°С‚РёРІРЅС‹Р№ РїРѕРёСЃРє РІСЂР°РіРѕРІ РІ СЂР°РґРёСѓСЃРµ: РєСЂСѓРі Рё РєРѕРјР°РЅРґСѓ С„РёР»СЊС‚СЂСѓРµС‚ РґРІРёР¶РѕРє
+    -- (РєРѕРјР°РЅРґР° РІСЂР°РіРѕРІ вЂ” РїСЂРѕС‚РёРІРѕРїРѕР»РѕР¶РЅР°СЏ РєРѕРјР°РЅРґРµ РІР»Р°РґРµР»СЊС†Р°, РєР°Рє РІ РїСЂРёРјРµСЂР°С… С‚СѓР»РєРёС‚Р°).
     local enemy_team = parent.team == 1 and 2 or 1
     local found = List.wrap(self:find_characters_circle(self.x, self.y, fire_range, true, enemy_team, true))
 
-    -- Считаем дистанции, чтобы бить ближайших
+    -- РЎС‡РёС‚Р°РµРј РґРёСЃС‚Р°РЅС†РёРё, С‡С‚РѕР±С‹ Р±РёС‚СЊ Р±Р»РёР¶Р°Р№С€РёС…
     local enemies = {}
     for _, actor in ipairs(found) do
         enemies[#enemies + 1] = {actor = actor, dist = gm.point_distance(self.x, self.y, actor.x, actor.y)}
     end
 
-    -- Нет целей в радиусе — выходим
+    -- РќРµС‚ С†РµР»РµР№ РІ СЂР°РґРёСѓСЃРµ вЂ” РІС‹С…РѕРґРёРј
     if not enemies[1] then return end
 
-    -- Сортировка по дистанции нужна, только если целей больше одной
+    -- РЎРѕСЂС‚РёСЂРѕРІРєР° РїРѕ РґРёСЃС‚Р°РЅС†РёРё РЅСѓР¶РЅР°, С‚РѕР»СЊРєРѕ РµСЃР»Рё С†РµР»РµР№ Р±РѕР»СЊС€Рµ РѕРґРЅРѕР№
     if enemies[2] then
         table.sort(enemies, function(a, b) return a.dist < b.dist end)
     end
 
-    -- Объекты эффектов и данные владельца берём один раз на выстрел, а не на каждую цель
-    local efLineTracer = Object.find("ror-efLineTracer")
-    local efSparks = Object.find("ror-efSparks")
+    -- РћР±СЉРµРєС‚С‹ СЌС„С„РµРєС‚РѕРІ Рё РґР°РЅРЅС‹Рµ РІР»Р°РґРµР»СЊС†Р° Р±РµСЂС‘Рј РѕРґРёРЅ СЂР°Р· РЅР° РІС‹СЃС‚СЂРµР», Р° РЅРµ РЅР° РєР°Р¶РґСѓСЋ С†РµР»СЊ
+    local efLineTracer = Object.find("efLineTracer", "ror")
+    local efSparks = Object.find("efSparks", "ror")
 
-    -- Атака ближайших врагов
+    -- РђС‚Р°РєР° Р±Р»РёР¶Р°Р№С€РёС… РІСЂР°РіРѕРІ
     local max_targets = 2 + 2 * stack
     for i = 1, max_targets do
         local entry = enemies[i]
         if not entry then break end
         local target = entry.actor
 
-        -- Ориентация дрона
+        -- РћСЂРёРµРЅС‚Р°С†РёСЏ РґСЂРѕРЅР°
         self.image_xscale = (target.x < self.x) and -1 or 1
         self:instance_resync()
 
-        -- Визуальные эффекты: луч + искры
+        -- Р’РёР·СѓР°Р»СЊРЅС‹Рµ СЌС„С„РµРєС‚С‹: Р»СѓС‡ + РёСЃРєСЂС‹
         create_shot_effect(self.x, self.y, target.x, target.y, self.image_xscale)
-        if Net.is_host() then
-            local message = packet_shot:message_begin()
-            message:write_float(self.x)
-            message:write_float(self.y)
-            message:write_float(target.x)
-            message:write_float(target.y)
-            message:write_byte(self.image_xscale >= 0 and 1 or 0)
-            message:send_to_all()
+        if Net.host then
+            packet_shot:send_to_all(self.x, self.y, target.x, target.y, self.image_xscale)
         end
 
-        -- Наносим урон напрямую цели. damage у fire_direct — КОЭФФИЦИЕНТ (×урон игрока),
-        -- поэтому передаём долю напрямую: 0.05 = 5% урона игрока (раньше тут ошибочно
-        -- умножали на parent.damage ещё раз → урон шёл «в квадрате»).
+        -- РќР°РЅРѕСЃРёРј СѓСЂРѕРЅ РЅР°РїСЂСЏРјСѓСЋ С†РµР»Рё. damage Сѓ fire_direct вЂ” РљРћР­Р¤Р¤РР¦РР•РќРў (Г—СѓСЂРѕРЅ РёРіСЂРѕРєР°),
+        -- РїРѕСЌС‚РѕРјСѓ РїРµСЂРµРґР°С‘Рј РґРѕР»СЋ РЅР°РїСЂСЏРјСѓСЋ: 0.05 = 5% СѓСЂРѕРЅР° РёРіСЂРѕРєР° (СЂР°РЅСЊС€Рµ С‚СѓС‚ РѕС€РёР±РѕС‡РЅРѕ
+        -- СѓРјРЅРѕР¶Р°Р»Рё РЅР° parent.damage РµС‰С‘ СЂР°Р· в†’ СѓСЂРѕРЅ С€С‘Р» В«РІ РєРІР°РґСЂР°С‚РµВ»).
         local hit = parent:fire_direct(target, HIT_DMG_FRAC)
         if hit and hit.attack_info then
             hit.attack_info:set_color(BLEND)
@@ -226,7 +226,7 @@ obj:onStep(function(self)
             end
         end
 
-        -- Небольшое замедление цели; обновляем длительность при каждом попадании
+        -- РќРµР±РѕР»СЊС€РѕРµ Р·Р°РјРµРґР»РµРЅРёРµ С†РµР»Рё; РѕР±РЅРѕРІР»СЏРµРј РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РїСЂРё РєР°Р¶РґРѕРј РїРѕРїР°РґР°РЅРёРё
         target:buff_apply(slowBuff, SLOW_DURATION)
     end
 end)
@@ -235,20 +235,18 @@ obj:onDestroy(function(self)
     self:instance_destroy_sync()
 end)
 
-obj:onSerialize(function(self, buffer)
+Object.add_serializers(obj, function(self, buffer)
     buffer:write_instance(self.parent)
     buffer:write_byte(self.image_xscale >= 0 and 1 or 0)
-end)
-
-obj:onDeserialize(function(self, buffer)
+end, function(self, buffer)
     self.parent = buffer:read_instance()
     self.image_xscale = buffer:read_byte() == 1 and 1 or -1
     self:get_data(nil, GUID).parent = self.parent
 end)
 
--- Когда игрок получает предмет — создаём дрона, если его ещё нет
+-- РљРѕРіРґР° РёРіСЂРѕРє РїРѕР»СѓС‡Р°РµС‚ РїСЂРµРґРјРµС‚ вЂ” СЃРѕР·РґР°С‘Рј РґСЂРѕРЅР°, РµСЃР»Рё РµРіРѕ РµС‰С‘ РЅРµС‚
 item:onAcquire(function(actor, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     local data = actor:get_data("DeerItems", GUID)
     if not instance_exists(data.inst) then
@@ -263,15 +261,12 @@ item:onPostStep(function(actor, stack)
     if stack <= 0 then return end
 
     local data = actor:get_data("DeerItems", GUID)
-    if gm._mod_net_isClient() then
+    if Net.client then
         if actor.is_local then
             local facing = actor.image_xscale >= 0 and 1 or -1
             if data.bosco_facing ~= facing then
                 data.bosco_facing = facing
-                local message = packet_facing:message_begin()
-                message:write_instance(actor)
-                message:write_byte(facing == 1 and 1 or 0)
-                message:send_to_host()
+                packet_facing:send_to_host(actor, facing)
             end
         end
         return
@@ -288,9 +283,9 @@ item:onPostStep(function(actor, stack)
     end
 end)
 
--- Когда предмет удаляется — уничтожаем дрона, если предмета больше нет
+-- РљРѕРіРґР° РїСЂРµРґРјРµС‚ СѓРґР°Р»СЏРµС‚СЃСЏ вЂ” СѓРЅРёС‡С‚РѕР¶Р°РµРј РґСЂРѕРЅР°, РµСЃР»Рё РїСЂРµРґРјРµС‚Р° Р±РѕР»СЊС€Рµ РЅРµС‚
 item:onRemove(function(actor, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     local data = actor:get_data("DeerItems", GUID)
     if stack <= 1 and instance_exists(data.inst) then

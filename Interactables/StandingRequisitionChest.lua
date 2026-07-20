@@ -1,6 +1,6 @@
 -- DeerItems-StandingRequisitionChest
--- Ящик для предмета StandingRequisition: показывает два бесплатных выбора и один платный.
--- Создаётся и заполняется хостом, а клиентам передаются выбор и содержимое.
+-- РЇС‰РёРє РґР»СЏ РїСЂРµРґРјРµС‚Р° StandingRequisition: РїРѕРєР°Р·С‹РІР°РµС‚ РґРІР° Р±РµСЃРїР»Р°С‚РЅС‹С… РІС‹Р±РѕСЂР° Рё РѕРґРёРЅ РїР»Р°С‚РЅС‹Р№.
+-- РЎРѕР·РґР°С‘С‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏРµС‚СЃСЏ С…РѕСЃС‚РѕРј, Р° РєР»РёРµРЅС‚Р°Рј РїРµСЂРµРґР°СЋС‚СЃСЏ РІС‹Р±РѕСЂ Рё СЃРѕРґРµСЂР¶РёРјРѕРµ.
 
 local GUID = _ENV["!guid"]
 
@@ -20,17 +20,15 @@ local CHOICE_ORIGIN_Y = 11
 local PROMPT_TOKEN = "item.StandingRequisition.interact"
 local NAME_TOKEN = "item.StandingRequisition.name"
 
-local chest_sprite = Resources.sprite_load("DeerItems", "interactable/StandingRequisitionChest", PATH.."assets/sprites/Interactables/StandingRequisitionChest.png", 9, CHEST_ORIGIN_X, CHEST_ORIGIN_Y)
-local choice_sprite = Resources.sprite_load("DeerItems", "interactable/StandingRequisitionChoice", PATH.."assets/sprites/Interactables/StandingRequisitionChoice.png", 1, CHOICE_ORIGIN_X, CHOICE_ORIGIN_Y)
+local chest_sprite = Sprite.new("interactable/StandingRequisitionChest", PATH.."assets/sprites/Interactables/StandingRequisitionChest.png", 9, CHEST_ORIGIN_X, CHEST_ORIGIN_Y)
+local choice_sprite = Sprite.new("interactable/StandingRequisitionChoice", PATH.."assets/sprites/Interactables/StandingRequisitionChoice.png", 1, CHOICE_ORIGIN_X, CHOICE_ORIGIN_Y)
 
-local chest_obj = Object.new("DeerItems", "StandingRequisitionChest", Object.PARENT.interactableCrate)
+local chest_obj = Object.new("StandingRequisitionChest", Object.Parent.INTERACTABLE_CRATE)
 chest_obj:set_sprite(chest_sprite)
 chest_obj:set_depth(90)
-chest_obj:clear_callbacks()
-
-local packet_select = Packet.new()
-local packet_interact = Packet.new()
-local packet_contents = Packet.new()
+local packet_select = Packet.new("StandingRequisitionChest-packet_select")
+local packet_interact = Packet.new("StandingRequisitionChest-packet_interact")
+local packet_contents = Packet.new("StandingRequisitionChest-packet_contents")
 local creation_plan
 
 local function play_interaction_sound(inst)
@@ -45,11 +43,14 @@ local function is_requisition_object(inst)
     return object_index == chest_obj.value
 end
 
-packet_select:onReceived(function(message)
-    if not Net.is_host() then return end
+packet_select:set_serializers(function(buffer, inst, selection)
+    buffer:write_instance(inst)
+    buffer:write_ushort(selection)
+end, function(buffer)
+    if not Net.host then return end
 
-    local inst = message:read_instance()
-    local selection = message:read_ushort()
+    local inst = buffer:read_instance()
+    local selection = buffer:read_ushort()
     if not Instance.exists(inst) then return end
 
     local object_index = inst.__object_index or inst.object_index
@@ -58,8 +59,10 @@ packet_select:onReceived(function(message)
     end
 end)
 
-packet_interact:onReceived(function(message)
-    local inst = message:read_instance()
+packet_interact:set_serializers(function(buffer, inst)
+    buffer:write_instance(inst)
+end, function(buffer)
+    local inst = buffer:read_instance()
     if not Instance.exists(inst) then return end
 
     if is_requisition_object(inst) then
@@ -67,17 +70,23 @@ packet_interact:onReceived(function(message)
     end
 end)
 
-packet_contents:onReceived(function(message)
-    local inst = message:read_instance()
-    local count = message:read_ushort()
+packet_contents:set_serializers(function(buffer, inst, contents)
+    buffer:write_instance(inst)
+    buffer:write_ushort(#contents)
+    for _, object_id in ipairs(contents) do
+        buffer:write_int(object_id)
+    end
+end, function(buffer)
+    local inst = buffer:read_instance()
+    local count = buffer:read_ushort()
     if not inst or not Instance.exists(inst) or not is_requisition_object(inst) then
-        for _ = 1, count do message:read_int() end
+        for _ = 1, count do buffer:read_int() end
         return
     end
 
     local contents = Array.new()
     for _ = 1, count do
-        contents:push(message:read_int())
+        contents:push(buffer:read_int())
     end
     inst.contents = contents
 end)
@@ -85,10 +94,8 @@ end)
 local function sync_interaction_sound(inst)
     play_interaction_sound(inst)
 
-    if Net.is_host() and not Net.is_single() then
-        local message = packet_interact:message_begin()
-        message:write_instance(inst)
-        message:send_to_all()
+    if Net.host and Net.online then
+        packet_interact:send_to_all(inst)
     end
 end
 
@@ -113,7 +120,7 @@ local function refresh_cost(inst)
 end
 
 local function sync_contents_later(inst)
-    if Net.is_host() then
+    if Net.host then
         for _, delay in ipairs({ 1, 8 }) do
             Alarm.create(function()
                 if not Instance.exists(inst) or not inst.contents then return end
@@ -123,20 +130,14 @@ local function sync_contents_later(inst)
                     contents[#contents + 1] = object_id
                 end
 
-                local message = packet_contents:message_begin()
-                message:write_instance(inst)
-                message:write_ushort(#contents)
-                for _, object_id in ipairs(contents) do
-                    message:write_int(object_id)
-                end
-                message:send_to_all()
+                packet_contents:send_to_all(inst, contents)
             end, delay)
         end
     end
 end
 
 local function sync_state(inst)
-    if Net.is_host() and Instance.exists(inst) then
+    if Net.host and Instance.exists(inst) then
         inst:instance_resync()
     end
 end
@@ -176,7 +177,7 @@ local function paid_choice_ids(inst)
     if tier == nil or tier < 0 then return {} end
 
     local ids = {}
-    for _, it in ipairs(Item.find_all(tier, Item.ARRAY.tier)) do
+    for _, it in ipairs(Item.find_all(tier, Item.Property.TIER)) do
         if it
         and it:is_loot()
         and it:is_unlocked()
@@ -193,7 +194,7 @@ local function set_paid_contents(inst)
 end
 
 local function refresh_contents_for_phase(inst)
-    if Net.is_client() then return end
+    if Net.client then return end
 
     local chosen = inst.sr_chosen or 0
     if chosen == 0 then
@@ -312,7 +313,7 @@ function M.get_instances()
 end
 
 function M.is_creation_authority()
-    if Net.is_single() then return true end
+    if not Net.online then return true end
 
     local host = Player.get_host()
     return Instance.exists(host) and Helper.is_true(host.is_local)
@@ -335,7 +336,7 @@ chest_obj:onCreate(function(self)
 
     self.mask_index = chest_sprite
     self.cost = 0
-    self.cost_type = Interactable_Object.COST_TYPE.gold
+    self.cost_type = 0 -- gold
     self.text = translate(PROMPT_TOKEN)
     self.name_text = translate(NAME_TOKEN)
     self.text_offset_x = -20
@@ -357,7 +358,7 @@ chest_obj:onCreate(function(self)
 end)
 
 chest_obj:onDestroy(function(self)
-    if not Net.is_client() then
+    if not Net.client then
         self:instance_destroy_sync()
     end
 end)
@@ -365,8 +366,8 @@ end)
 Hook.add_pre(gm.constants.interactable_pay_cost, function(self, other, result, args)
     if not is_requisition_object(self) or (self.sr_chosen or 0) ~= 1 then return end
 
-    -- Интерфейс ящика берёт цену при открытии. Платное требование списываем
-    -- только после того, как игрок действительно подтвердил выбор.
+    -- РРЅС‚РµСЂС„РµР№СЃ СЏС‰РёРєР° Р±РµСЂС‘С‚ С†РµРЅСѓ РїСЂРё РѕС‚РєСЂС‹С‚РёРё. РџР»Р°С‚РЅРѕРµ С‚СЂРµР±РѕРІР°РЅРёРµ СЃРїРёСЃС‹РІР°РµРј
+    -- С‚РѕР»СЊРєРѕ РїРѕСЃР»Рµ С‚РѕРіРѕ, РєР°Рє РёРіСЂРѕРє РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ РїРѕРґС‚РІРµСЂРґРёР» РІС‹Р±РѕСЂ.
     local cost = self.cost or 0
     self.cost = 0
     for _, argument in ipairs(args or {}) do
@@ -382,7 +383,7 @@ chest_obj:onCheckCost(function(self, actor)
         return (self.sr_choice_a or -1) >= 0 and (self.sr_choice_b or -1) >= 0
     end
 
-    if Net.is_client() then
+    if Net.client then
         return item_from_contents(self, 0) ~= nil
     end
 
@@ -433,7 +434,7 @@ chest_obj:onStep(function(self)
     elseif self.active == 1 then
         local data = self:get_data("DeerItems", GUID)
         local phase = self.sr_chosen or 0
-        if not Net.is_client() and data.contents_phase ~= phase then
+        if not Net.client and data.contents_phase ~= phase then
             if phase == 0 then
                 set_initial_contents(self)
             elseif phase == 1 then
@@ -442,13 +443,10 @@ chest_obj:onStep(function(self)
             data.contents_phase = phase
         end
 
-        if Net.is_client() and self.activator and Instance.exists(self.activator) and self.activator.is_local then
+        if Net.client and self.activator and Instance.exists(self.activator) and self.activator.is_local then
             if data.prev_selection == nil or data.prev_selection ~= self.selection then
                 data.prev_selection = self.selection
-                local message = packet_select:message_begin()
-                message:write_instance(self)
-                message:write_ushort(self.selection or 0)
-                message:send_to_host()
+                packet_select:send_to_host(self, self.selection or 0)
             end
         end
     end
@@ -456,7 +454,7 @@ chest_obj:onStep(function(self)
     if self.active == 3 then
         release_activator(self)
 
-        if Net.is_client() then
+        if Net.client then
             self.active = 100
             return
         end
@@ -525,7 +523,7 @@ chest_obj:onDraw(function(self)
     draw_choice(self, self.sr_choice_b, CAPSULE_B_X)
 end)
 
-chest_obj:onSerialize(function(self, buffer)
+Object.add_serializers(chest_obj, function(self, buffer)
     buffer:write_int(self.sr_owner_id or -1)
     buffer:write_int(self.sr_choice_a or -1)
     buffer:write_int(self.sr_choice_b or -1)
@@ -533,9 +531,7 @@ chest_obj:onSerialize(function(self, buffer)
     buffer:write_int(self.sr_exclude_item or -1)
     buffer:write_byte(self.sr_paid_slot or 1)
     buffer:write_byte(self.sr_chosen or 0)
-end)
-
-chest_obj:onDeserialize(function(self, buffer)
+end, function(self, buffer)
     self.sr_owner_id = buffer:read_int()
     self.sr_choice_a = buffer:read_int()
     self.sr_choice_b = buffer:read_int()
@@ -543,7 +539,7 @@ chest_obj:onDeserialize(function(self, buffer)
     self.sr_exclude_item = buffer:read_int()
     self.sr_paid_slot = buffer:read_byte()
     self.sr_chosen = buffer:read_byte()
-    if not Net.is_client() then
+    if not Net.client then
         refresh_contents_for_phase(self)
     end
     release_activator(self)

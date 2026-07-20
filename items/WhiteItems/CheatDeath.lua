@@ -1,37 +1,33 @@
 -- DeerItems-CheatDeath
--- Обман смерти: 10% (+5% за стак) полученного урона не наносится сразу, а растягивается
--- кровотечением на 5 секунд — у тебя появляется окно, чтобы перехилить удар.
--- (Адаптация Shark Teeth из RoR2.)
+-- РћР±РјР°РЅ СЃРјРµСЂС‚Рё: 10% (+5% Р·Р° СЃС‚Р°Рє) РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ СѓСЂРѕРЅР° РЅРµ РЅР°РЅРѕСЃРёС‚СЃСЏ СЃСЂР°Р·Сѓ, Р° СЂР°СЃС‚СЏРіРёРІР°РµС‚СЃСЏ
+-- РєСЂРѕРІРѕС‚РµС‡РµРЅРёРµРј РЅР° 5 СЃРµРєСѓРЅРґ вЂ” Сѓ С‚РµР±СЏ РїРѕСЏРІР»СЏРµС‚СЃСЏ РѕРєРЅРѕ, С‡С‚РѕР±С‹ РїРµСЂРµС…РёР»РёС‚СЊ СѓРґР°СЂ.
+-- (РђРґР°РїС‚Р°С†РёСЏ Shark Teeth РёР· RoR2.)
 --
--- Что при 110%: доля «отложенного» урона ОГРАНИЧЕНА 100% (math.min). На ~19+ стаках
--- весь удар целиком превращается в кровотечение (мгновенного урона нет вовсе) — отсюда и
--- название. Без капа доля ушла бы за 100% и предмет «создавал» бы урон/лечение из воздуха.
--- Оговорка: как и Shark Teeth, не спасает от удара, который убивает мгновенно (если HP
--- ушло в 0 в тот же кадр, коллбек уже не успевает вернуть здоровье).
+-- Р§С‚Рѕ РїСЂРё 110%: РґРѕР»СЏ В«РѕС‚Р»РѕР¶РµРЅРЅРѕРіРѕВ» СѓСЂРѕРЅР° РћР“Р РђРќРР§Р•РќРђ 100% (math.min). РќР° ~19+ СЃС‚Р°РєР°С…
+-- РІРµСЃСЊ СѓРґР°СЂ С†РµР»РёРєРѕРј РїСЂРµРІСЂР°С‰Р°РµС‚СЃСЏ РІ РєСЂРѕРІРѕС‚РµС‡РµРЅРёРµ (РјРіРЅРѕРІРµРЅРЅРѕРіРѕ СѓСЂРѕРЅР° РЅРµС‚ РІРѕРІСЃРµ) вЂ” РѕС‚СЃСЋРґР° Рё
+-- РЅР°Р·РІР°РЅРёРµ. Р‘РµР· РєР°РїР° РґРѕР»СЏ СѓС€Р»Р° Р±С‹ Р·Р° 100% Рё РїСЂРµРґРјРµС‚ В«СЃРѕР·РґР°РІР°Р»В» Р±С‹ СѓСЂРѕРЅ/Р»РµС‡РµРЅРёРµ РёР· РІРѕР·РґСѓС…Р°.
+-- РћРіРѕРІРѕСЂРєР°: РєР°Рє Рё Shark Teeth, РЅРµ СЃРїР°СЃР°РµС‚ РѕС‚ СѓРґР°СЂР°, РєРѕС‚РѕСЂС‹Р№ СѓР±РёРІР°РµС‚ РјРіРЅРѕРІРµРЅРЅРѕ (РµСЃР»Рё HP
+-- СѓС€Р»Рѕ РІ 0 РІ С‚РѕС‚ Р¶Рµ РєР°РґСЂ, РєРѕР»Р»Р±РµРє СѓР¶Рµ РЅРµ СѓСЃРїРµРІР°РµС‚ РІРµСЂРЅСѓС‚СЊ Р·РґРѕСЂРѕРІСЊРµ).
 
--- Спрайт предмета (кровь рисует движок через цвет урона DoT)
-local sprite = Resources.sprite_load("DeerItems", "item/CheatDeath", PATH.."assets/sprites/items/sWhiteItems/CheatDeath.png", 1, 18, 18)
+-- РЎРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р° (РєСЂРѕРІСЊ СЂРёСЃСѓРµС‚ РґРІРёР¶РѕРє С‡РµСЂРµР· С†РІРµС‚ СѓСЂРѕРЅР° DoT)
+local sprite = Sprite.new("item/CheatDeath", PATH.."assets/sprites/items/sWhiteItems/CheatDeath.png", 1, 18, 18)
 
--- Балансные константы
-local BASE_FRAC      = 0.10   -- 10% базовая доля удара уходит в кровотечение
-local FRAC_PER_STACK = 0.05   -- +5% за стак
-local DOT_TICKS      = 10     -- число тиков кровотечения
-local DOT_RATE       = 30     -- кадров между тиками (30 = 0.5 сек) → 10 × 0.5 = 5 секунд
+-- Р‘Р°Р»Р°РЅСЃРЅС‹Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹
+local BASE_FRAC      = 0.10   -- 10% Р±Р°Р·РѕРІР°СЏ РґРѕР»СЏ СѓРґР°СЂР° СѓС…РѕРґРёС‚ РІ РєСЂРѕРІРѕС‚РµС‡РµРЅРёРµ
+local FRAC_PER_STACK = 0.05   -- +5% Р·Р° СЃС‚Р°Рє
+local DOT_TICKS      = 10     -- С‡РёСЃР»Рѕ С‚РёРєРѕРІ РєСЂРѕРІРѕС‚РµС‡РµРЅРёСЏ
+local DOT_RATE       = 30     -- РєР°РґСЂРѕРІ РјРµР¶РґСѓ С‚РёРєР°РјРё (30 = 0.5 СЃРµРє) в†’ 10 Г— 0.5 = 5 СЃРµРєСѓРЅРґ
 
--- Создание предмета: белый тир, тег «лечение» (по сути про живучесть)
-local item = Item.new("DeerItems", "CheatDeath")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р°: Р±РµР»С‹Р№ С‚РёСЂ, С‚РµРі В«Р»РµС‡РµРЅРёРµВ» (РїРѕ СЃСѓС‚Рё РїСЂРѕ Р¶РёРІСѓС‡РµСЃС‚СЊ)
+local item = Item.new("CheatDeath")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
-
-item:clear_callbacks()
-
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 local GUID = _ENV["!guid"]
 local DAMAGE_TEXT_LIFE = 45
 
-local objDamageText = Object.new("DeerItems", "CheatDeathDamageText")
+local objDamageText = Object.new("CheatDeathDamageText")
 objDamageText:set_depth(-1000)
-objDamageText:clear_callbacks()
 objDamageText:onCreate(function(self)
     self.amount = 0
     self.life = DAMAGE_TEXT_LIFE
@@ -69,9 +65,9 @@ local function clear_delayed_damage(actor)
     actor:get_data("CheatDeath", GUID).cd_ticks = nil
 end
 
--- HP удалённого игрока меняет его клиент. После смерти хост тоже обязан убрать
--- оставшийся отложенный урон, иначе следующий тик убьёт уже воскрешённого игрока,
--- хотя хост всё ещё будет считать его живым.
+-- HP СѓРґР°Р»С‘РЅРЅРѕРіРѕ РёРіСЂРѕРєР° РјРµРЅСЏРµС‚ РµРіРѕ РєР»РёРµРЅС‚. РџРѕСЃР»Рµ СЃРјРµСЂС‚Рё С…РѕСЃС‚ С‚РѕР¶Рµ РѕР±СЏР·Р°РЅ СѓР±СЂР°С‚СЊ
+-- РѕСЃС‚Р°РІС€РёР№СЃСЏ РѕС‚Р»РѕР¶РµРЅРЅС‹Р№ СѓСЂРѕРЅ, РёРЅР°С‡Рµ СЃР»РµРґСѓСЋС‰РёР№ С‚РёРє СѓР±СЊС‘С‚ СѓР¶Рµ РІРѕСЃРєСЂРµС€С‘РЅРЅРѕРіРѕ РёРіСЂРѕРєР°,
+-- С…РѕС‚СЏ С…РѕСЃС‚ РІСЃС‘ РµС‰С‘ Р±СѓРґРµС‚ СЃС‡РёС‚Р°С‚СЊ РµРіРѕ Р¶РёРІС‹Рј.
 DeerItemsPlayerDeath.on_host(clear_delayed_damage)
 
 local function is_invincible(actor)
@@ -96,76 +92,76 @@ local function deal_internal_damage(actor, amount)
     return true
 end
 
--- HP удалённого игрока принадлежит его клиенту. Хост лишь ведёт общий таймер debt и
--- передаёт владельцу итог первого восстановления и каждый последующий тик.
-local packet_restore = Packet.new()
-local packet_tick = Packet.new()
+-- HP СѓРґР°Р»С‘РЅРЅРѕРіРѕ РёРіСЂРѕРєР° РїСЂРёРЅР°РґР»РµР¶РёС‚ РµРіРѕ РєР»РёРµРЅС‚Сѓ. РҐРѕСЃС‚ Р»РёС€СЊ РІРµРґС‘С‚ РѕР±С‰РёР№ С‚Р°Р№РјРµСЂ debt Рё
+-- РїРµСЂРµРґР°С‘С‚ РІР»Р°РґРµР»СЊС†Сѓ РёС‚РѕРі РїРµСЂРІРѕРіРѕ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ Рё РєР°Р¶РґС‹Р№ РїРѕСЃР»РµРґСѓСЋС‰РёР№ С‚РёРє.
+local packet_restore = Packet.new("CheatDeath-packet_restore")
+local packet_tick = Packet.new("CheatDeath-packet_tick")
 
-packet_restore:onReceived(function(message)
-    if not gm._mod_net_isClient() then return end
+packet_restore:set_serializers(function(buffer, actor, hp)
+    buffer:write_instance(actor)
+    buffer:write_float(hp)
+end, function(buffer)
+    if not Net.client then return end
 
-    local actor = message:read_instance()
-    local hp = message:read_float()
+    local actor = buffer:read_instance()
+    local hp = buffer:read_float()
     if not Instance.exists(actor) or not actor:same(Player.get_client()) then return end
     actor.hp = math.min(actor.maxhp, hp)
 end)
 
-packet_tick:onReceived(function(message)
-    if not gm._mod_net_isClient() then return end
+packet_tick:set_serializers(function(buffer, actor, amount)
+    buffer:write_instance(actor)
+    buffer:write_float(amount)
+end, function(buffer)
+    if not Net.client then return end
 
-    local actor = message:read_instance()
-    local amount = message:read_float()
+    local actor = buffer:read_instance()
+    local amount = buffer:read_float()
     if not Instance.exists(actor) or not actor:same(Player.get_client()) then return end
     deal_internal_damage(actor, amount)
 end)
 
 local function send_restore(actor)
-    if not Net.is_host() then return end
-    local message = packet_restore:message_begin()
-    message:write_instance(actor)
-    message:write_float(actor.hp)
-    message:send_to_all()
+    if not Net.host then return end
+    packet_restore:send_to_all(actor, actor.hp)
 end
 
 local function send_tick(actor, amount)
-    if not Net.is_host() then return end
-    local message = packet_tick:message_begin()
-    message:write_instance(actor)
-    message:write_float(amount)
-    message:send_to_all()
+    if not Net.host then return end
+    packet_tick:send_to_all(actor, amount)
 end
 
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
     if stack <= 0 then return end
-    -- КРИТИЧНО: пропускаем урон от самого себя. Иначе тики НАШЕГО же кровотечения снова
-    -- зашли бы сюда и плодили новые DoT (на 100% доле — лавинообразно).
+    -- РљР РРўРР§РќРћ: РїСЂРѕРїСѓСЃРєР°РµРј СѓСЂРѕРЅ РѕС‚ СЃР°РјРѕРіРѕ СЃРµР±СЏ. РРЅР°С‡Рµ С‚РёРєРё РќРђРЁР•Р“Рћ Р¶Рµ РєСЂРѕРІРѕС‚РµС‡РµРЅРёСЏ СЃРЅРѕРІР°
+    -- Р·Р°С€Р»Рё Р±С‹ СЃСЋРґР° Рё РїР»РѕРґРёР»Рё РЅРѕРІС‹Рµ DoT (РЅР° 100% РґРѕР»Рµ вЂ” Р»Р°РІРёРЅРѕРѕР±СЂР°Р·РЅРѕ).
     if attacker and actor:same(attacker) then return end
 
     local dmg = hit_info and (hit_info.damage or 0) or 0
     if dmg <= 0 then return end
 
-    -- Доля удара в кровотечение, с жёстким капом 100%
+    -- Р”РѕР»СЏ СѓРґР°СЂР° РІ РєСЂРѕРІРѕС‚РµС‡РµРЅРёРµ, СЃ Р¶С‘СЃС‚РєРёРј РєР°РїРѕРј 100%
     local frac = math.min(1.0, BASE_FRAC + FRAC_PER_STACK * (stack - 1))
     local total = dmg * frac
 
-    local is_client = gm._mod_net_isClient()
+    local is_client = Net.client
     if is_client and not actor:same(Player.get_client()) then return end
 
-    -- Возвращаем отложенную часть HP в том же кадре. actor:heal() применяется сетевым
-    -- событием позднее, поэтому клиент успевал увидеть полный исходный урон.
+    -- Р’РѕР·РІСЂР°С‰Р°РµРј РѕС‚Р»РѕР¶РµРЅРЅСѓСЋ С‡Р°СЃС‚СЊ HP РІ С‚РѕРј Р¶Рµ РєР°РґСЂРµ. actor:heal() РїСЂРёРјРµРЅСЏРµС‚СЃСЏ СЃРµС‚РµРІС‹Рј
+    -- СЃРѕР±С‹С‚РёРµРј РїРѕР·РґРЅРµРµ, РїРѕСЌС‚РѕРјСѓ РєР»РёРµРЅС‚ СѓСЃРїРµРІР°Р» СѓРІРёРґРµС‚СЊ РїРѕР»РЅС‹Р№ РёСЃС…РѕРґРЅС‹Р№ СѓСЂРѕРЅ.
     actor.hp = math.min(actor.maxhp, actor.hp + total)
 
-    -- Локальный игрок получает мгновенную предикцию; сам debt и последующие тики
-    -- рассчитывает только хост.
+    -- Р›РѕРєР°Р»СЊРЅС‹Р№ РёРіСЂРѕРє РїРѕР»СѓС‡Р°РµС‚ РјРіРЅРѕРІРµРЅРЅСѓСЋ РїСЂРµРґРёРєС†РёСЋ; СЃР°Рј debt Рё РїРѕСЃР»РµРґСѓСЋС‰РёРµ С‚РёРєРё
+    -- СЂР°СЃСЃС‡РёС‚С‹РІР°РµС‚ С‚РѕР»СЊРєРѕ С…РѕСЃС‚.
     if is_client then return end
 
     if not actor:same(Player.get_client()) then send_restore(actor) end
-    -- ...и списываем её как HP-only debt: это не новый damage event и не прокает on-damaged предметы.
+    -- ...Рё СЃРїРёСЃС‹РІР°РµРј РµС‘ РєР°Рє HP-only debt: СЌС‚Рѕ РЅРµ РЅРѕРІС‹Р№ damage event Рё РЅРµ РїСЂРѕРєР°РµС‚ on-damaged РїСЂРµРґРјРµС‚С‹.
     add_delayed_damage(actor, total)
 end)
 
 Actor:onPostStep("DeerItems-CheatDeathTicks", function(actor)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     local data = actor:get_data("CheatDeath", GUID)
     local ticks = data.cd_ticks

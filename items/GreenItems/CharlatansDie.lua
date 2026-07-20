@@ -1,29 +1,27 @@
--- DeerItems-CharlatansDie / «Кость шарлатана» / "Charlatan's Die"
--- Первый сундук, открытый за этап, с шансом дополнительно роняет предмет более высокой редкости.
--- (Объединение Chance Doll + Sale Star: исход Алтаря Шанса в RMT прочитать нельзя, поэтому
---  «удачу» перенесли на сундук — доспавниваем ящик более высокого тира.)
+-- DeerItems-CharlatansDie / В«РљРѕСЃС‚СЊ С€Р°СЂР»Р°С‚Р°РЅР°В» / "Charlatan's Die"
+-- РџРµСЂРІС‹Р№ СЃСѓРЅРґСѓРє, РѕС‚РєСЂС‹С‚С‹Р№ Р·Р° СЌС‚Р°Рї, СЃ С€Р°РЅСЃРѕРј РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ СЂРѕРЅСЏРµС‚ РїСЂРµРґРјРµС‚ Р±РѕР»РµРµ РІС‹СЃРѕРєРѕР№ СЂРµРґРєРѕСЃС‚Рё.
+-- (РћР±СЉРµРґРёРЅРµРЅРёРµ Chance Doll + Sale Star: РёСЃС…РѕРґ РђР»С‚Р°СЂСЏ РЁР°РЅСЃР° РІ RMT РїСЂРѕС‡РёС‚Р°С‚СЊ РЅРµР»СЊР·СЏ, РїРѕСЌС‚РѕРјСѓ
+--  В«СѓРґР°С‡СѓВ» РїРµСЂРµРЅРµСЃР»Рё РЅР° СЃСѓРЅРґСѓРє вЂ” РґРѕСЃРїР°РІРЅРёРІР°РµРј СЏС‰РёРє Р±РѕР»РµРµ РІС‹СЃРѕРєРѕРіРѕ С‚РёСЂР°.)
 
-local sprite = Resources.sprite_load("DeerItems", "item/CharlatansDie", PATH.."assets/sprites/items/sGreenItems/CharlatansDie.png", 1, 18, 18)
+local sprite = Sprite.new("item/CharlatansDie", PATH.."assets/sprites/items/sGreenItems/CharlatansDie.png", 1, 18, 18)
 
 local GUID = _ENV["!guid"]
 
--- Настройки баланса
+-- РќР°СЃС‚СЂРѕР№РєРё Р±Р°Р»Р°РЅСЃР°
 local CHANCE_BASE = 0.35
 local CHANCE_STACK = 0.20
 local EXTRA_STEP  = 0.05
 local MAX_EXTRA_ITEMS = 3
-local RARE_BASE   = 0.08      -- из сработавших — доля редких (иначе необычный)
+local RARE_BASE   = 0.08      -- РёР· СЃСЂР°Р±РѕС‚Р°РІС€РёС… вЂ” РґРѕР»СЏ СЂРµРґРєРёС… (РёРЅР°С‡Рµ РЅРµРѕР±С‹С‡РЅС‹Р№)
 local RARE_STACK  = 0.05
 
 local function truthy(v) return v ~= nil and v ~= false and v ~= 0 end
 
-local item = Item.new("DeerItems", "CharlatansDie")
+local item = Item.new("CharlatansDie")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
-item:clear_callbacks()
-
--- [actor.id] → уже сработал на этом этапе
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
+-- [actor.id] в†’ СѓР¶Рµ СЃСЂР°Р±РѕС‚Р°Р» РЅР° СЌС‚РѕРј СЌС‚Р°РїРµ
 local used_stage = {}
 
 local function is_chest(interactable)
@@ -55,7 +53,7 @@ local function is_excluded(value, exclude)
 end
 
 local function pick_item(tier, exclude)
-    local items = Item.find_all(tier, Item.ARRAY.tier)
+    local items = Item.find_all(tier, Item.Property.TIER)
     local n = #items
     if n == 0 then return nil end
     for _ = 1, 25 do
@@ -79,7 +77,7 @@ local function roll_extra_count(stack)
 end
 
 item:onInteractableActivate(function(actor, stack, interactable)
-    if gm._mod_net_isClient() then return end       -- спавн ящиков только на хосте
+    if Net.client then return end       -- СЃРїР°РІРЅ СЏС‰РёРєРѕРІ С‚РѕР»СЊРєРѕ РЅР° С…РѕСЃС‚Рµ
     if used_stage[actor.id] then return end
     if not is_chest(interactable) then return end
     used_stage[actor.id] = true
@@ -91,9 +89,9 @@ item:onInteractableActivate(function(actor, stack, interactable)
     if math.random() > trigger_chance(stack) then return end
 
     for i = 1, roll_extra_count(stack) do
-        local tier = (math.random() <= (RARE_BASE + RARE_STACK * (stack - 1))) and Item.TIER.rare or Item.TIER.uncommon
+        local tier = (math.random() <= (RARE_BASE + RARE_STACK * (stack - 1))) and ItemTier.RARE or ItemTier.UNCOMMON
         local it = pick_item(tier, exclude)
-        if not it then it = pick_item(Item.TIER.uncommon, exclude) end
+        if not it then it = pick_item(ItemTier.UNCOMMON, exclude) end
         if not it then return end
 
         exclude[#exclude + 1] = it.value
@@ -101,7 +99,7 @@ item:onInteractableActivate(function(actor, stack, interactable)
     end
 end)
 
--- Сброс на новом этапе
+-- РЎР±СЂРѕСЃ РЅР° РЅРѕРІРѕРј СЌС‚Р°РїРµ
 item:onStageStart(function(actor, stack)
     used_stage[actor.id] = nil
 end)

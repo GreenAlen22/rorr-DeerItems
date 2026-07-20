@@ -2,7 +2,7 @@
 -- Увеличивает максимальное HP и реген ВСЕХ дронов владельца на 15% за стак.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/HeavyLungs", PATH.."assets/sprites/items/sWhiteItems/HeavyLungs.png", 1, 16.5, 16.5)
+local sprite = Sprite.new("item/HeavyLungs", PATH.."assets/sprites/items/sWhiteItems/HeavyLungs.png", 1, 16.5, 16.5)
 
 -- guid мода выносим один раз — чтобы get_data не искал его через debug-стек каждый кадр
 local GUID = _ENV["!guid"]
@@ -67,13 +67,10 @@ end
 -- Привязка спрайта к предмету
 -- Установка тира предмета: зелёный (необычный)
 -- Назначение тега лута: утилитарный предмет
-local item = Item.new("DeerItems", "HeavyLungs")
+local item = Item.new("HeavyLungs")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
-
-item:clear_callbacks()
-
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 local function refresh_team_stacks()
     local frame = Global._current_frame or 0
     if team_state_frame == frame then return false end
@@ -82,7 +79,7 @@ local function refresh_team_stacks()
     local stacks = {}
     for _, player in ipairs(Instance.find_all(oP)) do
         if Instance.exists(player) then
-            local stack = player:item_stack_count(item) or 0
+            local stack = player:item_count(item) or 0
             if stack > 0 then
                 stacks[player.team] = (stacks[player.team] or 0) + stack
             end
@@ -155,7 +152,7 @@ item:onRemove(function(actor, stack)
     pending_recalculate[actor.id] = actor
 end)
 
-Callback.add(Callback.TYPE.onStep, "DeerItems-HeavyLungs-remove", function()
+Callback.add(Callback.ON_STEP, function()
     for id, actor in pairs(pending_recalculate) do
         pending_recalculate[id] = nil
         if Instance.exists(actor) then

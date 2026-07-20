@@ -1,22 +1,20 @@
 -- DeerItems-AtGMissileMk0
--- Даёт шанс 7% на стак запустить самонаводящуюся ракету при попадании атакой.
+-- Р”Р°С‘С‚ С€Р°РЅСЃ 7% РЅР° СЃС‚Р°Рє Р·Р°РїСѓСЃС‚РёС‚СЊ СЃР°РјРѕРЅР°РІРѕРґСЏС‰СѓСЋСЃСЏ СЂР°РєРµС‚Сѓ РїСЂРё РїРѕРїР°РґР°РЅРёРё Р°С‚Р°РєРѕР№.
 
--- Загружаем спрайт предмета
--- Загружаем звуковые эффекты
--- Загружаем спрайты эффектов
-local sprite = Resources.sprite_load("DeerItems", "item/AtGMissileMk0", PATH.."assets/sprites/items/sWhiteItems/AtGMissileMk0.png", 1, 16, 16)
-local boom = Resources.sfx_load("DeerItems", "sound/boom", PATH.."assets/sounds/boom.ogg")
-local launch = Resources.sfx_load("DeerItems", "sound/launch", PATH.."assets/sounds/launch.ogg")
-local explosive = Resources.sprite_load("DeerItems", "particle/explosive", PATH.."assets/sprites/particle/Explosive.png", 5, 32, 32)
-local AtgActorSprite = Resources.sprite_load("DeerItems", "particle/AtgActorSprite", PATH.."assets/sprites/particle/AtgActorSprite.png", 1, 34, 34)
-local missile = Resources.sprite_load("DeerItems", "particle/missile", PATH.."assets/sprites/particle/Missile.png", 3, 13, 7)
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
+-- Р—Р°РіСЂСѓР¶Р°РµРј Р·РІСѓРєРѕРІС‹Рµ СЌС„С„РµРєС‚С‹
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚С‹ СЌС„С„РµРєС‚РѕРІ
+local sprite = Sprite.new("item/AtGMissileMk0", PATH.."assets/sprites/items/sWhiteItems/AtGMissileMk0.png", 1, 16, 16)
+local boom = Sound.new("sound/boom", PATH.."assets/sounds/boom.ogg")
+local launch = Sound.new("sound/launch", PATH.."assets/sounds/launch.ogg")
+local explosive = Sprite.new("particle/explosive", PATH.."assets/sprites/particle/Explosive.png", 5, 32, 32)
+local AtgActorSprite = Sprite.new("particle/AtgActorSprite", PATH.."assets/sprites/particle/AtgActorSprite.png", 1, 34, 34)
+local missile = Sprite.new("particle/missile", PATH.."assets/sprites/particle/Missile.png", 3, 13, 7)
 
--- Создаём объект ракеты
-local oMissile = Object.new("DeerItems", "missile")
+-- РЎРѕР·РґР°С‘Рј РѕР±СЉРµРєС‚ СЂР°РєРµС‚С‹
+local oMissile = Object.new("missile")
 oMissile:set_sprite(missile)
-oMissile:clear_callbacks()
-
--- Инициализация ракеты при создании
+-- РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЂР°РєРµС‚С‹ РїСЂРё СЃРѕР·РґР°РЅРёРё
 oMissile:onCreate(function(self)
     self.timer = 0
     self.mask_index = gm.constants.sSinglePixel
@@ -24,22 +22,22 @@ oMissile:onCreate(function(self)
     self.parent = -4
     self.target = -4
     self.team = 1
-    -- Синхронизация объекта в сетевой игре
+    -- РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РѕР±СЉРµРєС‚Р° РІ СЃРµС‚РµРІРѕР№ РёРіСЂРµ
     self:projectile_sync(10)
 end)
 
--- Логика движения и наведения ракеты
+-- Р›РѕРіРёРєР° РґРІРёР¶РµРЅРёСЏ Рё РЅР°РІРµРґРµРЅРёСЏ СЂР°РєРµС‚С‹
 oMissile:onStep(function(self)
-    -- Удаляем ракету, если родитель исчез
+    -- РЈРґР°Р»СЏРµРј СЂР°РєРµС‚Сѓ, РµСЃР»Рё СЂРѕРґРёС‚РµР»СЊ РёСЃС‡РµР·
     if not Instance.exists(self.parent) then
         self:destroy()
         return
     end
     self.timer = self.timer + 1
-    -- Запуск наведения после задержки
+    -- Р—Р°РїСѓСЃРє РЅР°РІРµРґРµРЅРёСЏ РїРѕСЃР»Рµ Р·Р°РґРµСЂР¶РєРё
     if self.timer >= 20 then
         local t = self.target
-        -- Поиск цели, если не задана
+        -- РџРѕРёСЃРє С†РµР»Рё, РµСЃР»Рё РЅРµ Р·Р°РґР°РЅР°
         if not Instance.exists(t) then
             t = self:find_target_nearest()
             if t ~= -4 then
@@ -50,86 +48,82 @@ oMissile:onStep(function(self)
                 self.target = -4
             end
         end
-        -- Если цель найдена и в радиусе действия
+        -- Р•СЃР»Рё С†РµР»СЊ РЅР°Р№РґРµРЅР° Рё РІ СЂР°РґРёСѓСЃРµ РґРµР№СЃС‚РІРёСЏ
         if Instance.exists(t) and gm.point_distance(self.x, self.y, t.x, t.y) < 1000 then
             local tdir = gm.point_direction(self.x, self.y, t.x, t.y)
-            -- Корректировка направления (жёстко или плавно)
+            -- РљРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° РЅР°РїСЂР°РІР»РµРЅРёСЏ (Р¶С‘СЃС‚РєРѕ РёР»Рё РїР»Р°РІРЅРѕ)
             if self:distance_to_object(t) < 70 then
                 self.direction = tdir
             else
                 self:turn_towards(self.direction, tdir)
             end
-            -- Ускорение ракеты до лимита
+            -- РЈСЃРєРѕСЂРµРЅРёРµ СЂР°РєРµС‚С‹ РґРѕ Р»РёРјРёС‚Р°
             self.speed = math.min(12, self.speed + 0.2)
-            -- Проверка столкновения с целью
+            -- РџСЂРѕРІРµСЂРєР° СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ СЃ С†РµР»СЊСЋ
             if self:is_colliding(t) then
                 if self:attack_collision_canhit(t) then
-                    -- Нанесение урона цели. proc=false обязательно: иначе попадание ракеты
-                    -- само сработает в onAttackHit → запустит новую ракету → бесконечный самопрок.
+                    -- РќР°РЅРµСЃРµРЅРёРµ СѓСЂРѕРЅР° С†РµР»Рё. proc=false РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ: РёРЅР°С‡Рµ РїРѕРїР°РґР°РЅРёРµ СЂР°РєРµС‚С‹
+                    -- СЃР°РјРѕ СЃСЂР°Р±РѕС‚Р°РµС‚ РІ onAttackHit в†’ Р·Р°РїСѓСЃС‚РёС‚ РЅРѕРІСѓСЋ СЂР°РєРµС‚Сѓ в†’ Р±РµСЃРєРѕРЅРµС‡РЅС‹Р№ СЃР°РјРѕРїСЂРѕРє.
                     local hit = self.parent:fire_direct(t, 0.75, self.direction, self.x, self.y)
                     if hit and hit.attack_info then hit.attack_info.proc = false end
                 end
                 self:destroy()
             end
         else
-            -- Если цель не найдена долгое время — самоликвидация
+            -- Р•СЃР»Рё С†РµР»СЊ РЅРµ РЅР°Р№РґРµРЅР° РґРѕР»РіРѕРµ РІСЂРµРјСЏ вЂ” СЃР°РјРѕР»РёРєРІРёРґР°С†РёСЏ
             if self.timer > 60 then
                 self:destroy()
             else
-                -- Колебание траектории при поиске
+                -- РљРѕР»РµР±Р°РЅРёРµ С‚СЂР°РµРєС‚РѕСЂРёРё РїСЂРё РїРѕРёСЃРєРµ
                 self.direction = self.direction + math.sin(self.timer / 5) * 5
             end
         end
     end
-    -- Поворот спрайта в соответствии с направлением
+    -- РџРѕРІРѕСЂРѕС‚ СЃРїСЂР°Р№С‚Р° РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ РЅР°РїСЂР°РІР»РµРЅРёРµРј
     self.image_angle = self.direction
 end)
 
--- Взрыв и удаление при уничтожении ракеты
+-- Р’Р·СЂС‹РІ Рё СѓРґР°Р»РµРЅРёРµ РїСЂРё СѓРЅРёС‡С‚РѕР¶РµРЅРёРё СЂР°РєРµС‚С‹
 oMissile:onDestroy(function(self)
     self.parent:sound_play(boom, 1.0, 0.9 + math.random() * 0.4)
-    -- Визуальный эффект взрыва
+    -- Р’РёР·СѓР°Р»СЊРЅС‹Р№ СЌС„С„РµРєС‚ РІР·СЂС‹РІР°
     gm.instance_create(self.x, self.y, gm.constants.oEfExplosion).sprite_index = explosive
-    -- Удаление ракеты в сетевой игре
+    -- РЈРґР°Р»РµРЅРёРµ СЂР°РєРµС‚С‹ РІ СЃРµС‚РµРІРѕР№ РёРіСЂРµ
     self:instance_destroy_sync()
 end)
 
--- Сохранение состояния ракеты для сетевой игры
-oMissile:onSerialize(function(self, buffer)
+-- РЎРѕС…СЂР°РЅРµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЂР°РєРµС‚С‹ РґР»СЏ СЃРµС‚РµРІРѕР№ РёРіСЂС‹
+Object.add_serializers(oMissile, function(self, buffer)
     buffer:write_instance(self.target)
     buffer:write_instance(self.parent)
     gm.write_direction(self.direction)
-end)
-
--- Загрузка состояния ракеты из сетевого буфера
-oMissile:onDeserialize(function(self, buffer)
+end, function(self, buffer)
     self.target = buffer:read_instance()
     self.parent = buffer:read_instance()
     self.team = self.parent.team
     self.direction = gm.read_direction()
 end)
 
--- Создание предмета AtGMissileMk0
--- Привязка спрайта к предмету
--- Установка тира предмета: белый (обычный)
--- Назначение тега лута: предмет, усиливающий урон
-local item = Item.new("DeerItems", "AtGMissileMk0")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р° AtGMissileMk0
+-- РџСЂРёРІСЏР·РєР° СЃРїСЂР°Р№С‚Р° Рє РїСЂРµРґРјРµС‚Сѓ
+-- РЈСЃС‚Р°РЅРѕРІРєР° С‚РёСЂР° РїСЂРµРґРјРµС‚Р°: Р±РµР»С‹Р№ (РѕР±С‹С‡РЅС‹Р№)
+-- РќР°Р·РЅР°С‡РµРЅРёРµ С‚РµРіР° Р»СѓС‚Р°: РїСЂРµРґРјРµС‚, СѓСЃРёР»РёРІР°СЋС‰РёР№ СѓСЂРѕРЅ
+local item = Item.new("AtGMissileMk0")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 
--- Очистка всех коллбеков перед переопределением
-item:clear_callbacks()
--- При попадании атакой: шанс запустить ракету
--- onHitProc (а не onAttackHit!) срабатывает ТОЛЬКО на атаках с включённым proc.
--- Попадание самой ракеты помечено proc=false (см. oMissile:onStep), поэтому её урон сюда
--- не попадает и цепочка «ракета → ракета → …» больше не зацикливается.
+-- РћС‡РёСЃС‚РєР° РІСЃРµС… РєРѕР»Р»Р±РµРєРѕРІ РїРµСЂРµРґ РїРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёРµРј
+-- РџСЂРё РїРѕРїР°РґР°РЅРёРё Р°С‚Р°РєРѕР№: С€Р°РЅСЃ Р·Р°РїСѓСЃС‚РёС‚СЊ СЂР°РєРµС‚Сѓ
+-- onHitProc (Р° РЅРµ onAttackHit!) СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ РўРћР›Р¬РљРћ РЅР° Р°С‚Р°РєР°С… СЃ РІРєР»СЋС‡С‘РЅРЅС‹Рј proc.
+-- РџРѕРїР°РґР°РЅРёРµ СЃР°РјРѕР№ СЂР°РєРµС‚С‹ РїРѕРјРµС‡РµРЅРѕ proc=false (СЃРј. oMissile:onStep), РїРѕСЌС‚РѕРјСѓ РµС‘ СѓСЂРѕРЅ СЃСЋРґР°
+-- РЅРµ РїРѕРїР°РґР°РµС‚ Рё С†РµРїРѕС‡РєР° В«СЂР°РєРµС‚Р° в†’ СЂР°РєРµС‚Р° в†’ вЂ¦В» Р±РѕР»СЊС€Рµ РЅРµ Р·Р°С†РёРєР»РёРІР°РµС‚СЃСЏ.
 item:onHitProc(function(actor, victim, stack, hit_info)
-    if not gm._mod_net_isHost() then return end
-    -- Шанс 7% за стак
+    if not Net.host then return end
+    -- РЁР°РЅСЃ 7% Р·Р° СЃС‚Р°Рє
     if math.random() <= (0.07 * stack) then
         actor:sound_play(launch, 1.0, 0.9 + math.random() * 0.4)
-        -- Создание ракеты рядом с актёром
+        -- РЎРѕР·РґР°РЅРёРµ СЂР°РєРµС‚С‹ СЂСЏРґРѕРј СЃ Р°РєС‚С‘СЂРѕРј
         local s = oMissile:create(actor.x + actor.image_xscale * 10, actor.y - 15)
         s.direction = 90 - actor.image_xscale * 45
         s.parent = actor
@@ -137,7 +131,7 @@ item:onHitProc(function(actor, victim, stack, hit_info)
     end
 end)
 
--- Отрисовка иконки предмета над персонажем
+-- РћС‚СЂРёСЃРѕРІРєР° РёРєРѕРЅРєРё РїСЂРµРґРјРµС‚Р° РЅР°Рґ РїРµСЂСЃРѕРЅР°Р¶РµРј
 item:onPostDraw(function(actor, stack)
     gm.draw_sprite(AtgActorSprite, 0, actor.x, actor.y)
 end)

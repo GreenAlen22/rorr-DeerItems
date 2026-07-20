@@ -1,47 +1,50 @@
--- DeerItems-OrbitalLens / «Орбитальная линза» / "Orbital Lens"
--- Порт Runic Lens из RoR2 (ослаблен под RoRR).
--- 1% (+2/3% за стак) шанс при попадании призвать метеор на 800% (+250% за стак) базового урона.
--- Каждые 100% нанесённого урона повышают шанс и урон метеора (с капом и затуханием).
+-- DeerItems-OrbitalLens / В«РћСЂР±РёС‚Р°Р»СЊРЅР°СЏ Р»РёРЅР·Р°В» / "Orbital Lens"
+-- РџРѕСЂС‚ Runic Lens РёР· RoR2 (РѕСЃР»Р°Р±Р»РµРЅ РїРѕРґ RoRR).
+-- 1% (+2/3% Р·Р° СЃС‚Р°Рє) С€Р°РЅСЃ РїСЂРё РїРѕРїР°РґР°РЅРёРё РїСЂРёР·РІР°С‚СЊ РјРµС‚РµРѕСЂ РЅР° 800% (+250% Р·Р° СЃС‚Р°Рє) Р±Р°Р·РѕРІРѕРіРѕ СѓСЂРѕРЅР°.
+-- РљР°Р¶РґС‹Рµ 100% РЅР°РЅРµСЃС‘РЅРЅРѕРіРѕ СѓСЂРѕРЅР° РїРѕРІС‹С€Р°СЋС‚ С€Р°РЅСЃ Рё СѓСЂРѕРЅ РјРµС‚РµРѕСЂР° (СЃ РєР°РїРѕРј Рё Р·Р°С‚СѓС…Р°РЅРёРµРј).
 
--- Спрайт метеора (его даёшь ты), импакт-эффект из готового Explosive.png, звук удара (его даёшь ты).
-local sprite      = Resources.sprite_load("DeerItems", "item/OrbitalLens", PATH.."assets/sprites/items/sRedItems/OrbitalLens.png", 1, 18, 18)
-local OrbitalLensMeteor = Resources.sprite_load("DeerItems", "particle/OrbitalLens", PATH.."assets/sprites/particle/OrbitalLensMeteor.png", 5, 75, 75)
-local OrbitalLensExplosive   = Resources.sprite_load("DeerItems", "particle/OrbitalLensBurst", PATH.."assets/sprites/particle/OrbitalLensExplosive.png", 14, 125, 235)
-local sound       = Resources.sfx_load("DeerItems", "OrbitalLens/impact", PATH.."assets/sounds/OrbitalLens.ogg")
+-- РЎРїСЂР°Р№С‚ РјРµС‚РµРѕСЂР° (РµРіРѕ РґР°С‘С€СЊ С‚С‹), РёРјРїР°РєС‚-СЌС„С„РµРєС‚ РёР· РіРѕС‚РѕРІРѕРіРѕ Explosive.png, Р·РІСѓРє СѓРґР°СЂР° (РµРіРѕ РґР°С‘С€СЊ С‚С‹).
+local sprite      = Sprite.new("item/OrbitalLens", PATH.."assets/sprites/items/sRedItems/OrbitalLens.png", 1, 18, 18)
+local OrbitalLensMeteor = Sprite.new("particle/OrbitalLens", PATH.."assets/sprites/particle/OrbitalLensMeteor.png", 5, 75, 75)
+local OrbitalLensExplosive   = Sprite.new("particle/OrbitalLensBurst", PATH.."assets/sprites/particle/OrbitalLensExplosive.png", 14, 125, 235)
+local sound       = Sound.new("OrbitalLens/impact", PATH.."assets/sounds/OrbitalLens.ogg")
 
 local GUID = _ENV["!guid"]
 
-local packet_meteor = Packet.new()
-local packet_impact = Packet.new()
+local packet_meteor = Packet.new("OrbitalLens-packet_meteor")
+local packet_impact = Packet.new("OrbitalLens-packet_impact")
 
--- Настройки баланса: вариант 1:1 оказался сильнее нужного, поэтому значения снижены.
-local BASE_CHANCE    = 0.01   -- базовый шанс прока
-local CHANCE_STACK   = 0.02 / 3 -- +2/3% шанса за каждый стак сверх первого
-local BASE_COEF      = 8.0    -- 800% базового урона (не 2000%: в RoRR raw+частые проки)
-local COEF_STACK     = 2.5    -- +250% за каждый стак сверх первого
-local UNIT_CHANCE    = 0.01 / 3 -- +1/3% шанса за каждые 100% нанесённого урона
-local UNIT_COEF      = 0.30   -- +30% урона метеора за каждые 100% нанесённого урона
-local UNIT_CHANCE_CAP= 0.05   -- кап накопленного бонуса к шансу
-local UNIT_COEF_CAP  = 6.0    -- кап накопленного бонуса к урону (=600%)
-local DECAY_PERIOD   = 300    -- раз в 5 сек пул нанесённого урона уменьшается вдвое
-local PROC_CD        = 15     -- мин. интервал между проками (кадры): onHitProc частит на мультихитах
-local FALL_FRAMES    = 36     -- время падения метеора (~0.6 сек)
-local RADIUS         = 160    -- радиус взрыва (~5 м)
-local MAX_METEORS    = 6      -- одновременно в воздухе (как MAX_SUNS в ShineOSun)
+-- РќР°СЃС‚СЂРѕР№РєРё Р±Р°Р»Р°РЅСЃР°: РІР°СЂРёР°РЅС‚ 1:1 РѕРєР°Р·Р°Р»СЃСЏ СЃРёР»СЊРЅРµРµ РЅСѓР¶РЅРѕРіРѕ, РїРѕСЌС‚РѕРјСѓ Р·РЅР°С‡РµРЅРёСЏ СЃРЅРёР¶РµРЅС‹.
+local BASE_CHANCE    = 0.01   -- Р±Р°Р·РѕРІС‹Р№ С€Р°РЅСЃ РїСЂРѕРєР°
+local CHANCE_STACK   = 0.02 / 3 -- +2/3% С€Р°РЅСЃР° Р·Р° РєР°Р¶РґС‹Р№ СЃС‚Р°Рє СЃРІРµСЂС… РїРµСЂРІРѕРіРѕ
+local BASE_COEF      = 8.0    -- 800% Р±Р°Р·РѕРІРѕРіРѕ СѓСЂРѕРЅР° (РЅРµ 2000%: РІ RoRR raw+С‡Р°СЃС‚С‹Рµ РїСЂРѕРєРё)
+local COEF_STACK     = 2.5    -- +250% Р·Р° РєР°Р¶РґС‹Р№ СЃС‚Р°Рє СЃРІРµСЂС… РїРµСЂРІРѕРіРѕ
+local UNIT_CHANCE    = 0.01 / 3 -- +1/3% С€Р°РЅСЃР° Р·Р° РєР°Р¶РґС‹Рµ 100% РЅР°РЅРµСЃС‘РЅРЅРѕРіРѕ СѓСЂРѕРЅР°
+local UNIT_COEF      = 0.30   -- +30% СѓСЂРѕРЅР° РјРµС‚РµРѕСЂР° Р·Р° РєР°Р¶РґС‹Рµ 100% РЅР°РЅРµСЃС‘РЅРЅРѕРіРѕ СѓСЂРѕРЅР°
+local UNIT_CHANCE_CAP= 0.05   -- РєР°Рї РЅР°РєРѕРїР»РµРЅРЅРѕРіРѕ Р±РѕРЅСѓСЃР° Рє С€Р°РЅСЃСѓ
+local UNIT_COEF_CAP  = 6.0    -- РєР°Рї РЅР°РєРѕРїР»РµРЅРЅРѕРіРѕ Р±РѕРЅСѓСЃР° Рє СѓСЂРѕРЅСѓ (=600%)
+local DECAY_PERIOD   = 300    -- СЂР°Р· РІ 5 СЃРµРє РїСѓР» РЅР°РЅРµСЃС‘РЅРЅРѕРіРѕ СѓСЂРѕРЅР° СѓРјРµРЅСЊС€Р°РµС‚СЃСЏ РІРґРІРѕРµ
+local PROC_CD        = 15     -- РјРёРЅ. РёРЅС‚РµСЂРІР°Р» РјРµР¶РґСѓ РїСЂРѕРєР°РјРё (РєР°РґСЂС‹): onHitProc С‡Р°СЃС‚РёС‚ РЅР° РјСѓР»СЊС‚РёС…РёС‚Р°С…
+local FALL_FRAMES    = 36     -- РІСЂРµРјСЏ РїР°РґРµРЅРёСЏ РјРµС‚РµРѕСЂР° (~0.6 СЃРµРє)
+local RADIUS         = 160    -- СЂР°РґРёСѓСЃ РІР·СЂС‹РІР° (~5 Рј)
+local MAX_METEORS    = 6      -- РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ РІ РІРѕР·РґСѓС…Рµ (РєР°Рє MAX_SUNS РІ ShineOSun)
 
-local item = Item.new("DeerItems", "OrbitalLens")
+local item = Item.new("OrbitalLens")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.rare)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
-item:clear_callbacks()
+item:set_tier(ItemTier.RARE)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
+packet_meteor:set_serializers(function(buffer, actor, x, ty, sy)
+    buffer:write_instance(actor)
+    buffer:write_float(x)
+    buffer:write_float(ty)
+    buffer:write_float(sy)
+end, function(buffer)
+    if not Net.client then return end
 
-packet_meteor:onReceived(function(message)
-    if not gm._mod_net_isClient() then return end
-
-    local actor = message:read_instance()
-    local x = message:read_float()
-    local ty = message:read_float()
-    local sy = message:read_float()
+    local actor = buffer:read_instance()
+    local x = buffer:read_float()
+    local ty = buffer:read_float()
+    local sy = buffer:read_float()
     if not Instance.exists(actor) then return end
 
     local data = actor:get_data("OrbitalLens", GUID)
@@ -49,13 +52,18 @@ packet_meteor:onReceived(function(message)
     data.meteors[#data.meteors + 1] = { x = x, ty = ty, sy = sy, t = FALL_FRAMES }
 end)
 
-packet_impact:onReceived(function(message)
-    if not gm._mod_net_isClient() then return end
+packet_impact:set_serializers(function(buffer, actor, x, y, pitch)
+    buffer:write_instance(actor)
+    buffer:write_float(x)
+    buffer:write_float(y)
+    buffer:write_float(pitch)
+end, function(buffer)
+    if not Net.client then return end
 
-    local actor = message:read_instance()
-    local x = message:read_float()
-    local y = message:read_float()
-    local pitch = message:read_float()
+    local actor = buffer:read_instance()
+    local x = buffer:read_float()
+    local y = buffer:read_float()
+    local pitch = buffer:read_float()
     local ef = gm.instance_create(x, y, gm.constants.oEfExplosion)
     ef.sprite_index = OrbitalLensExplosive
     if Instance.exists(actor) then actor:sound_play(sound, 1.0, pitch) end
@@ -67,28 +75,28 @@ item:onAcquire(function(actor, stack)
     data.meteors = data.meteors or {}
 end)
 
--- Накопитель нанесённого урона + ролл метеора (вся логика на хосте).
+-- РќР°РєРѕРїРёС‚РµР»СЊ РЅР°РЅРµСЃС‘РЅРЅРѕРіРѕ СѓСЂРѕРЅР° + СЂРѕР»Р» РјРµС‚РµРѕСЂР° (РІСЃСЏ Р»РѕРіРёРєР° РЅР° С…РѕСЃС‚Рµ).
 item:onHitProc(function(actor, victim, stack, hit_info)
     if stack <= 0 then return end
-    if not gm._mod_net_isHost() then return end
+    if not Net.host then return end
     if not (victim and Instance.exists(victim)) then return end
 
     local data = actor:get_data("OrbitalLens", GUID)
     data.pool    = data.pool or 0
     data.meteors = data.meteors or {}
 
-    -- Копим нанесённый урон.
+    -- РљРѕРїРёРј РЅР°РЅРµСЃС‘РЅРЅС‹Р№ СѓСЂРѕРЅ.
     local dealt = hit_info and (hit_info.damage or 0) or 0
     if dealt > 0 then data.pool = data.pool + dealt end
 
-    -- Дебаунс прока (мультицель/частые атаки дают пачку попаданий за кадр).
+    -- Р”РµР±Р°СѓРЅСЃ РїСЂРѕРєР° (РјСѓР»СЊС‚РёС†РµР»СЊ/С‡Р°СЃС‚С‹Рµ Р°С‚Р°РєРё РґР°СЋС‚ РїР°С‡РєСѓ РїРѕРїР°РґР°РЅРёР№ Р·Р° РєР°РґСЂ).
     local frame = Global._current_frame
     if data.ol_last and (frame - data.ol_last) < PROC_CD then return end
 
     local base = actor.damage or 0
     if base <= 0 then return end
 
-    -- «Юниты» = сколько раз накоплено 100% текущего урона игрока.
+    -- В«Р®РЅРёС‚С‹В» = СЃРєРѕР»СЊРєРѕ СЂР°Р· РЅР°РєРѕРїР»РµРЅРѕ 100% С‚РµРєСѓС‰РµРіРѕ СѓСЂРѕРЅР° РёРіСЂРѕРєР°.
     local units      = math.floor(data.pool / base)
     local bonusChance = math.min(UNIT_CHANCE_CAP, UNIT_CHANCE * units)
     local bonusCoef   = math.min(UNIT_COEF_CAP,  UNIT_COEF  * units)
@@ -100,36 +108,31 @@ item:onHitProc(function(actor, victim, stack, hit_info)
     if #data.meteors >= MAX_METEORS then return end
 
     local coef = BASE_COEF + COEF_STACK * (stack - 1) + bonusCoef
-    -- Метеор расходует накопленный урон: при непрерывной атаке шанс не остаётся на капе.
+    -- РњРµС‚РµРѕСЂ СЂР°СЃС…РѕРґСѓРµС‚ РЅР°РєРѕРїР»РµРЅРЅС‹Р№ СѓСЂРѕРЅ: РїСЂРё РЅРµРїСЂРµСЂС‹РІРЅРѕР№ Р°С‚Р°РєРµ С€Р°РЅСЃ РЅРµ РѕСЃС‚Р°С‘С‚СЃСЏ РЅР° РєР°РїРµ.
     data.pool = 0
     data.meteors[#data.meteors + 1] = {
         x  = victim.x,
-        ty = victim.y,                 -- точка падения
-        sy = victim.y - (10 * 32),     -- старт метеора: ~10 м над целью
+        ty = victim.y,                 -- С‚РѕС‡РєР° РїР°РґРµРЅРёСЏ
+        sy = victim.y - (10 * 32),     -- СЃС‚Р°СЂС‚ РјРµС‚РµРѕСЂР°: ~10 Рј РЅР°Рґ С†РµР»СЊСЋ
         t  = FALL_FRAMES,
         coef = coef,
         w  = RADIUS,
         h  = RADIUS,
     }
 
-    if Net.is_host() then
-        local message = packet_meteor:message_begin()
-        message:write_instance(actor)
-        message:write_float(victim.x)
-        message:write_float(victim.y)
-        message:write_float(victim.y - (10 * 32))
-        message:send_to_all()
+    if Net.host then
+        packet_meteor:send_to_all(actor, victim.x, victim.y, victim.y - (10 * 32))
     end
 end)
 
--- Падение + взрыв метеоров и затухание накопителя.
+-- РџР°РґРµРЅРёРµ + РІР·СЂС‹РІ РјРµС‚РµРѕСЂРѕРІ Рё Р·Р°С‚СѓС…Р°РЅРёРµ РЅР°РєРѕРїРёС‚РµР»СЏ.
 item:onPostStep(function(actor, stack)
     if stack <= 0 then return end
     local data = actor:get_data("OrbitalLens", GUID)
     data.pool    = data.pool or 0
     data.meteors = data.meteors or {}
 
-    if gm._mod_net_isClient() then
+    if Net.client then
         for i = #data.meteors, 1, -1 do
             local meteor = data.meteors[i]
             meteor.t = meteor.t - 1
@@ -138,7 +141,7 @@ item:onPostStep(function(actor, stack)
         return
     end
 
-    -- Затухание накопленного урона, чтобы линейная формула RoR2 не уходила в бесконечность.
+    -- Р—Р°С‚СѓС…Р°РЅРёРµ РЅР°РєРѕРїР»РµРЅРЅРѕРіРѕ СѓСЂРѕРЅР°, С‡С‚РѕР±С‹ Р»РёРЅРµР№РЅР°СЏ С„РѕСЂРјСѓР»Р° RoR2 РЅРµ СѓС…РѕРґРёР»Р° РІ Р±РµСЃРєРѕРЅРµС‡РЅРѕСЃС‚СЊ.
     data.ol_decay = (data.ol_decay or 0) + 1
     if data.ol_decay >= DECAY_PERIOD then
         data.ol_decay = 0
@@ -149,8 +152,8 @@ item:onPostStep(function(actor, stack)
         local m = data.meteors[i]
         m.t = m.t - 1
         if m.t <= 0 then
-            -- coef передаём 5-м аргументом → fire_explosion трактует его как множитель урона игрока
-            -- (= «800% базового урона»). proc=false/без крита — иначе самопрок и цепная реакция.
+            -- coef РїРµСЂРµРґР°С‘Рј 5-Рј Р°СЂРіСѓРјРµРЅС‚РѕРј в†’ fire_explosion С‚СЂР°РєС‚СѓРµС‚ РµРіРѕ РєР°Рє РјРЅРѕР¶РёС‚РµР»СЊ СѓСЂРѕРЅР° РёРіСЂРѕРєР°
+            -- (= В«800% Р±Р°Р·РѕРІРѕРіРѕ СѓСЂРѕРЅР°В»). proc=false/Р±РµР· РєСЂРёС‚Р° вЂ” РёРЅР°С‡Рµ СЃР°РјРѕРїСЂРѕРє Рё С†РµРїРЅР°СЏ СЂРµР°РєС†РёСЏ.
             local atk = actor:fire_explosion(m.x, m.ty, m.w, m.h, m.coef, nil, nil, false)
             if atk and atk.attack_info then
                 atk.attack_info.proc = false
@@ -159,25 +162,20 @@ item:onPostStep(function(actor, stack)
             gm.instance_create(m.x, m.ty, gm.constants.oEfExplosion).sprite_index = OrbitalLensExplosive
             local sound_pitch = 0.9 + math.random() * 0.4
             actor:sound_play(sound, 1.0, sound_pitch)
-            if Net.is_host() then
-                local message = packet_impact:message_begin()
-                message:write_instance(actor)
-                message:write_float(m.x)
-                message:write_float(m.ty)
-                message:write_float(sound_pitch)
-                message:send_to_all()
+            if Net.host then
+                packet_impact:send_to_all(actor, m.x, m.ty, sound_pitch)
             end
             table.remove(data.meteors, i)
         end
     end
 end)
 
--- Визуал: падающий метеор + кольцо-цель (встроенная отрисовка).
+-- Р’РёР·СѓР°Р»: РїР°РґР°СЋС‰РёР№ РјРµС‚РµРѕСЂ + РєРѕР»СЊС†Рѕ-С†РµР»СЊ (РІСЃС‚СЂРѕРµРЅРЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР°).
 item:onPostDraw(function(actor, stack)
     local data = actor:get_data("OrbitalLens", GUID)
     if not data.meteors then return end
     for _, m in ipairs(data.meteors) do
-        local p  = 1 - (m.t / FALL_FRAMES)             -- прогресс падения 0..1
+        local p  = 1 - (m.t / FALL_FRAMES)             -- РїСЂРѕРіСЂРµСЃСЃ РїР°РґРµРЅРёСЏ 0..1
         local cy = m.sy + (m.ty - m.sy) * p
         gm.draw_sprite(OrbitalLensMeteor, 0, m.x, cy)
         gm.draw_set_colour(Color(0xff7733))

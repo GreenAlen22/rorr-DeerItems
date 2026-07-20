@@ -1,8 +1,6 @@
--- Артефакт дроновода: дроны под управлением игрока наследуют предметы своего владельца.
+-- РђСЂС‚РµС„Р°РєС‚ РґСЂРѕРЅРѕРІРѕРґР°: РґСЂРѕРЅС‹ РїРѕРґ СѓРїСЂР°РІР»РµРЅРёРµРј РёРіСЂРѕРєР° РЅР°СЃР»РµРґСѓСЋС‚ РїСЂРµРґРјРµС‚С‹ СЃРІРѕРµРіРѕ РІР»Р°РґРµР»СЊС†Р°.
 
-local sprite = Resources.sprite_load(
-    "DeerItems",
-    "artifact/Droneman",
+local sprite = Sprite.new("artifact/Droneman",
     PATH.."assets/sprites/artifacts/ArtifactOfDroneman.png",
     3,
     16,
@@ -12,7 +10,7 @@ local sprite = Resources.sprite_load(
 local PLAYER_DRONE = gm.constants.oPDrone
 local death_inventories = {}
 
-local artifact = Artifact.new("DeerItems", "Droneman")
+local artifact = Artifact.new("Droneman")
 artifact:set_sprites(sprite, sprite)
 artifact:set_text(
     "artifact.Droneman.name",
@@ -34,7 +32,7 @@ local function copy_inventory(actor)
     return inventory
 end
 
-Callback.add(Callback.TYPE.onGameStart, "DeerItems-Droneman-resetDeathInventories", function()
+Callback.add(Callback.ON_GAME_START, function()
     death_inventories = {}
 end)
 
@@ -56,14 +54,14 @@ local function give_item(drone, item_id, count, stack_kind)
         Wrap.unwrap(drone),
         item_id,
         count,
-        stack_kind or Item.STACK_KIND.normal
+        stack_kind or Item.StackKind.NORMAL
     )
 end
 
 local function inherit_master_items(drone)
-    -- Инвентарь предметов считает хост. Вызовы item_give на клиенте игнорируются
-    -- и не синхронизируют инвентарь дрона игрока.
-    if gm._mod_net_isClient() or not artifact.active
+    -- РРЅРІРµРЅС‚Р°СЂСЊ РїСЂРµРґРјРµС‚РѕРІ СЃС‡РёС‚Р°РµС‚ С…РѕСЃС‚. Р’С‹Р·РѕРІС‹ item_give РЅР° РєР»РёРµРЅС‚Рµ РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
+    -- Рё РЅРµ СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓСЋС‚ РёРЅРІРµРЅС‚Р°СЂСЊ РґСЂРѕРЅР° РёРіСЂРѕРєР°.
+    if Net.client or not artifact.active
     or drone.object_index ~= PLAYER_DRONE then
         return
     end
@@ -81,21 +79,21 @@ gm.post_script_hook(gm.constants.init_drone, function(self, other, result, args)
     inherit_master_items(self)
 end)
 
--- Сообщение клиента о смерти может прийти после того, как хост уже вызвал
--- init_drone. Повторная проверка существующего дрона закрывает эту гонку.
-Callback.add(Callback.TYPE.postStep, "DeerItems-Droneman-inheritLateDeathInventory", function()
-    if gm._mod_net_isClient() or not artifact.active then return end
+-- РЎРѕРѕР±С‰РµРЅРёРµ РєР»РёРµРЅС‚Р° Рѕ СЃРјРµСЂС‚Рё РјРѕР¶РµС‚ РїСЂРёР№С‚Рё РїРѕСЃР»Рµ С‚РѕРіРѕ, РєР°Рє С…РѕСЃС‚ СѓР¶Рµ РІС‹Р·РІР°Р»
+-- init_drone. РџРѕРІС‚РѕСЂРЅР°СЏ РїСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РґСЂРѕРЅР° Р·Р°РєСЂС‹РІР°РµС‚ СЌС‚Сѓ РіРѕРЅРєСѓ.
+Callback.add(Callback.POST_STEP, function()
+    if Net.client or not artifact.active then return end
 
     for _, drone in ipairs(Instance.find_all(PLAYER_DRONE)) do
         inherit_master_items(drone)
     end
 end)
 
--- Подобранные и выданные предметы получает сохранённый oP. Передаём активному
--- oPDrone только новый стак: копирование всего инвентаря задублирует предметы,
--- уже унаследованные при смерти.
+-- РџРѕРґРѕР±СЂР°РЅРЅС‹Рµ Рё РІС‹РґР°РЅРЅС‹Рµ РїСЂРµРґРјРµС‚С‹ РїРѕР»СѓС‡Р°РµС‚ СЃРѕС…СЂР°РЅС‘РЅРЅС‹Р№ oP. РџРµСЂРµРґР°С‘Рј Р°РєС‚РёРІРЅРѕРјСѓ
+-- oPDrone С‚РѕР»СЊРєРѕ РЅРѕРІС‹Р№ СЃС‚Р°Рє: РєРѕРїРёСЂРѕРІР°РЅРёРµ РІСЃРµРіРѕ РёРЅРІРµРЅС‚Р°СЂСЏ Р·Р°РґСѓР±Р»РёСЂСѓРµС‚ РїСЂРµРґРјРµС‚С‹,
+-- СѓР¶Рµ СѓРЅР°СЃР»РµРґРѕРІР°РЅРЅС‹Рµ РїСЂРё СЃРјРµСЂС‚Рё.
 gm.post_script_hook(gm.constants.item_give_internal, function(self, other, result, args)
-    if gm._mod_net_isClient() or not artifact.active then return end
+    if Net.client or not artifact.active then return end
 
     local player = args[1] and args[1].value
     local item_id = args[2] and args[2].value
@@ -108,7 +106,7 @@ gm.post_script_hook(gm.constants.item_give_internal, function(self, other, resul
     if drone then give_item(drone, item_id, count, stack_kind) end
 end)
 
--- Дрон игрока может унаследовать скин, который не подходит для дрона.
+-- Р”СЂРѕРЅ РёРіСЂРѕРєР° РјРѕР¶РµС‚ СѓРЅР°СЃР»РµРґРѕРІР°С‚СЊ СЃРєРёРЅ, РєРѕС‚РѕСЂС‹Р№ РЅРµ РїРѕРґС…РѕРґРёС‚ РґР»СЏ РґСЂРѕРЅР°.
 gm.pre_script_hook(gm.constants.actor_skin_skinnable_set_skin, function(self, other, result, args)
     if not artifact.active then return end
 

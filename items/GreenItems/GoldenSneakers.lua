@@ -3,7 +3,7 @@
 -- Порог золота — 700, масштабируется по времени (инфляция) и снижается вдвое за каждый стак.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/GoldenSneakers", PATH.."assets/sprites/items/sGreenItems/GoldenSneakers.png", 1, 16, 16)
+local sprite = Sprite.new("item/GoldenSneakers", PATH.."assets/sprites/items/sGreenItems/GoldenSneakers.png", 1, 16, 16)
 
 -- guid мода выносим один раз — чтобы get_data не искал его через debug-стек каждый кадр
 local GUID = _ENV["!guid"]
@@ -16,10 +16,10 @@ local BASE_GOLD = 700
 -- Привязка спрайта к предмету
 -- Установка тира предмета: зелёный (необычный)
 -- Назначение тега лута: утилитарный предмет
-local item = Item.new("DeerItems", "GoldenSneakers")
+local item = Item.new("GoldenSneakers")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Пересчёт статов: бонус к pHmax пропорционален текущему золоту относительно порога.
 -- Порог = 700 × инфляция золота × 0.5^(стак-1): со временем растёт, за стаки — снижается.

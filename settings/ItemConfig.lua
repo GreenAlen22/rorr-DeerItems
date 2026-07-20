@@ -95,10 +95,10 @@ end
 -- Снаряжение и обычные предметы регистрируются разными API-вызовами.
 local function find_registered_item(category_key, item_id)
     if category_key == "Equipments" then
-        return Equipment.find("DeerItems", item_id)
+        return Equipment.find(item_id, "DeerItems")
     end
 
-    return Item.find("DeerItems", item_id)
+    return Item.find(item_id, "DeerItems")
 end
 
 -- Применяет настройки к уже зарегистрированным предметам и скрывает служебные зависимости из лута.

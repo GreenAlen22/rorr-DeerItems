@@ -4,36 +4,34 @@
 -- Загружаем спрайт предмета
 -- Загружаем спрайт баффа
 -- Загружаем спрайт эффекта активации
-local sprite = Resources.sprite_load("DeerItems", "item/ThinWings", PATH.."assets/sprites/items/sWhiteItems/ThinWings.png", 1, 16, 16)
-local buffSprite = Resources.sprite_load("DeerItems", "buff/ThinWings", PATH.."assets/sprites/buffs/ThinWings.png", 1, 7, 7)
-local ThinWingsActivate = Resources.sprite_load("DeerItems", "particle/ThinWingsActivate", PATH.."assets/sprites/particle/ThinWingsActivate.png", 7, 32, 32)
-local ThinWingsSkillBorder = Resources.sprite_load("DeerItems", "particle/ThinWingsSkillBorder", PATH.."assets/sprites/particle/ThinWingsSkillBorder.png", 1, 15, 15.5)
+local sprite = Sprite.new("item/ThinWings", PATH.."assets/sprites/items/sWhiteItems/ThinWings.png", 1, 16, 16)
+local buffSprite = Sprite.new("buff/ThinWings", PATH.."assets/sprites/buffs/ThinWings.png", 1, 7, 7)
+local ThinWingsActivate = Sprite.new("particle/ThinWingsActivate", PATH.."assets/sprites/particle/ThinWingsActivate.png", 7, 32, 32)
+local ThinWingsSkillBorder = Sprite.new("particle/ThinWingsSkillBorder", PATH.."assets/sprites/particle/ThinWingsSkillBorder.png", 1, 15, 15.5)
 
 -- guid мода выносим один раз — чтобы get_data не искал его через debug-стек каждый кадр
 local GUID = _ENV["!guid"]
 -- Цвет рамки-индикатора выбранного навыка
 
 -- Создание предмета и баффа
-local item = Item.new("DeerItems", "ThinWings")
-local buff = Buff.new("DeerItems", "ThinWings")
+local item = Item.new("ThinWings")
+local buff = Buff.new("ThinWings")
 
 -- Привязка спрайта к предмету
 -- Установка тира предмета: белый (обычный)
 -- Назначение тега лута: утилитарный предмет
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Очистка старых коллбеков
-item:clear_callbacks()
-
 -- При активации взаимодействий даёт бафф
 item:onInteractableActivate(function(actor, stack, interactable)
     -- Применяем бафф на 10 секунд за стак
     actor:buff_apply(buff, 10 * 60, stack)
     -- Один раз за активацию выбираем, какой навык получит ускоренную перезарядку,
     -- и фиксируем выбор на всё время баффа (раньше он перебрасывался каждый пересчёт статов).
-    -- tw_slot = 1/2/3 = вторичное/утилита/спец (как Skill.SLOT.secondary/utility/special).
+    -- tw_slot = 1/2/3 = вторичное/утилита/спец (как Skill.Slot.SECONDARY/utility/special).
     local data = actor:get_data("DeerItems", GUID)
     data.tw_slot = math.random(3)
     -- Визуальный эффект активации
@@ -80,7 +78,7 @@ gm.post_script_hook(gm.constants.draw_hud, function()
     local p = Player.get_client()
     if not p or not Instance.exists(p) then return end
     -- Подсветка живёт РОВНО пока активен бафф (т.е. пока реально срезан КД этого навыка)
-    if (p:buff_stack_count(buff) or 0) <= 0 then return end
+    if (p:buff_count(buff) or 0) <= 0 then return end
     local slot = p:get_data("DeerItems", GUID).tw_slot
     if not slot then return end
 
@@ -102,8 +100,6 @@ buff.icon_stack_subimage = false
 buff.max_stack = 9999
 
 -- Очистка старых коллбеков баффа
-buff:clear_callbacks()
-
 -- Модификация статов под действием баффа
 buff:onStatRecalc(function(actor, stack)
     -- Увеличение максимальной горизонтальной скорости
@@ -112,15 +108,15 @@ buff:onStatRecalc(function(actor, stack)
     local slot = actor:get_data("DeerItems", GUID).tw_slot or 1
     if slot == 1 then
         -- Уменьшаем кулдаун вторичного умения
-        local secondary = actor:get_active_skill(Skill.SLOT.secondary)
+        local secondary = actor:get_active_skill(Skill.Slot.SECONDARY)
         secondary.cooldown = math.ceil(secondary.cooldown * 0.8)
     elseif slot == 2 then
         -- Уменьшаем кулдаун утилиты
-        local utility = actor:get_active_skill(Skill.SLOT.utility)
+        local utility = actor:get_active_skill(Skill.Slot.UTILITY)
         utility.cooldown = math.ceil(utility.cooldown * 0.9)
     else
         -- Уменьшаем кулдаун специального умения
-        local special = actor:get_active_skill(Skill.SLOT.special)
+        local special = actor:get_active_skill(Skill.Slot.SPECIAL)
         special.cooldown = math.ceil(special.cooldown * 0.8)
     end
 end)

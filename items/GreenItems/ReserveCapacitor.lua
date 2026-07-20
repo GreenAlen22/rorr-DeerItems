@@ -3,7 +3,7 @@
 -- за время, вдвое большее обычного кулдауна снаряжения. Сам кулдаун активки предмет НЕ ускоряет.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/ReserveCapacitor", PATH.."assets/sprites/items/sGreenItems/ReserveCapacitor.png", 1, 18, 18)
+local sprite = Sprite.new("item/ReserveCapacitor", PATH.."assets/sprites/items/sGreenItems/ReserveCapacitor.png", 1, 18, 18)
 
 -- Выносим guid мода один раз (чтобы get_data не искал его через debug-стек каждый кадр)
 local GUID = _ENV["!guid"]
@@ -15,14 +15,12 @@ local CHARGE_CD_MULT = 2
 -- Привязка спрайта к предмету
 -- Установка тира предмета: зелёный (необычный)
 -- Назначение тега лута: утилитарный предмет
-local item = Item.new("DeerItems", "ReserveCapacitor")
+local item = Item.new("ReserveCapacitor")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Очистка старых коллбеков
-item:clear_callbacks()
-
 -- В RoRR снаряжение хранит только один заряд (кулдаун), механики «нескольких зарядов» в движке нет.
 -- Эмулируем «+1 заряд за шт.» как пул запасных зарядов, где КАЖДЫЙ заряд восстанавливается
 -- НЕЗАВИСИМО за ВДВОЕ больший кулдаун активки (а не пополняются все разом).
@@ -107,7 +105,7 @@ gm.post_script_hook(gm.constants.draw_hud, function()
     if g_bar.frame ~= (Global._current_frame or 0) then return end   -- базу поймали в этом кадре
     local p = Player.get_client()
     if not p or not Instance.exists(p) then return end
-    if (p:item_stack_count(item) or 0) <= 0 then return end
+    if (p:item_count(item) or 0) <= 0 then return end
 
     local n = math.floor((p:get_data("DeerItems", GUID).rc_charges) or 0)
 

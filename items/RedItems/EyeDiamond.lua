@@ -3,17 +3,17 @@
 
 -- Загружаем спрайт предмета
 -- Загружаем спрайт визуального индикатора
-local sprite = Resources.sprite_load("DeerItems", "item/EyeDiamond", PATH.."assets/sprites/items/sRedItems/EyeDiamond.png", 1, 16, 16)
-local DiamondIndictor = Resources.sprite_load("DeerItems", "DiamondIndictor", PATH.."assets/sprites/particle/DiamondIndictor.png", 1, 8, 8)
+local sprite = Sprite.new("item/EyeDiamond", PATH.."assets/sprites/items/sRedItems/EyeDiamond.png", 1, 16, 16)
+local DiamondIndictor = Sprite.new("DiamondIndictor", PATH.."assets/sprites/particle/DiamondIndictor.png", 1, 8, 8)
 
 -- Создание предмета EyeDiamond
 -- Привязка спрайта к предмету
 -- Установка тира предмета: красный (легендарный)
 -- Назначение тега лута: предмет, усиливающий урон
-local item = Item.new("DeerItems", "EyeDiamond")
+local item = Item.new("EyeDiamond")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.rare)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
+item:set_tier(ItemTier.RARE)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 
 -- При создании атаки: усиливаем критический урон
 item:onAttackCreate(function(actor, stack, attack_info)

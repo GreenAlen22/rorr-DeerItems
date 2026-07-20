@@ -1,23 +1,23 @@
 -- DeerItems-MassacreCurse
--- После 3 убийств подряд даёт бафф, усиливающий урон и броню. Длительность стаков зависит от количества предметов.
+-- РџРѕСЃР»Рµ 3 СѓР±РёР№СЃС‚РІ РїРѕРґСЂСЏРґ РґР°С‘С‚ Р±Р°С„С„, СѓСЃРёР»РёРІР°СЋС‰РёР№ СѓСЂРѕРЅ Рё Р±СЂРѕРЅСЋ. Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ СЃС‚Р°РєРѕРІ Р·Р°РІРёСЃРёС‚ РѕС‚ РєРѕР»РёС‡РµСЃС‚РІР° РїСЂРµРґРјРµС‚РѕРІ.
 
--- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/MassacreCurse", PATH.."assets/sprites/items/sWhiteItems/MassacreCurse.png", 1, 16, 17)
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
+local sprite = Sprite.new("item/MassacreCurse", PATH.."assets/sprites/items/sWhiteItems/MassacreCurse.png", 1, 16, 17)
 
--- Создание предмета MassacreCurse
--- Привязка спрайта к предмету
--- Установка тира предмета: белый (обычный)
--- Назначение тега лута: предмет, усиливающий урон
-local item = Item.new("DeerItems", "MassacreCurse")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р° MassacreCurse
+-- РџСЂРёРІСЏР·РєР° СЃРїСЂР°Р№С‚Р° Рє РїСЂРµРґРјРµС‚Сѓ
+-- РЈСЃС‚Р°РЅРѕРІРєР° С‚РёСЂР° РїСЂРµРґРјРµС‚Р°: Р±РµР»С‹Р№ (РѕР±С‹С‡РЅС‹Р№)
+-- РќР°Р·РЅР°С‡РµРЅРёРµ С‚РµРіР° Р»СѓС‚Р°: РїСЂРµРґРјРµС‚, СѓСЃРёР»РёРІР°СЋС‰РёР№ СѓСЂРѕРЅ
+local item = Item.new("MassacreCurse")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 
--- guid мода (ускоряет get_data) и ленивый кэш ссылки на бафф
+-- guid РјРѕРґР° (СѓСЃРєРѕСЂСЏРµС‚ get_data) Рё Р»РµРЅРёРІС‹Р№ РєСЌС€ СЃСЃС‹Р»РєРё РЅР° Р±Р°С„С„
 local GUID = _ENV["!guid"]
 local massacreBuff
 
--- При получении предмета инициализируем счётчик убийств
+-- РџСЂРё РїРѕР»СѓС‡РµРЅРёРё РїСЂРµРґРјРµС‚Р° РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СЃС‡С‘С‚С‡РёРє СѓР±РёР№СЃС‚РІ
 item:onAcquire(function(actor, stack)
     local actorData = actor:get_data("MassacreCurse", GUID)
     if not actorData.count then
@@ -25,11 +25,11 @@ item:onAcquire(function(actor, stack)
     end
 end)
 
--- При убийстве увеличиваем счётчик и выдаём бафф при достижении 3
+-- РџСЂРё СѓР±РёР№СЃС‚РІРµ СѓРІРµР»РёС‡РёРІР°РµРј СЃС‡С‘С‚С‡РёРє Рё РІС‹РґР°С‘Рј Р±Р°С„С„ РїСЂРё РґРѕСЃС‚РёР¶РµРЅРёРё 3
 item:onKillProc(function(actor, victim, stack)
-    if not gm._mod_net_isHost() then return end
+    if not Net.host then return end
 
-    massacreBuff = massacreBuff or Buff.find("DeerItems-MassacreCurse")
+    massacreBuff = massacreBuff or Buff.find("MassacreCurse", "DeerItems")
     local buff = massacreBuff
     local actorData = actor:get_data("MassacreCurse", GUID)
 
@@ -37,8 +37,8 @@ item:onKillProc(function(actor, victim, stack)
 
     if actorData.count >= 3 then
         local count = 1
-        -- Если баффа не было вообще — даём сразу 3 стака
-        if actor:buff_stack_count(buff) <= 0 then
+        -- Р•СЃР»Рё Р±Р°С„С„Р° РЅРµ Р±С‹Р»Рѕ РІРѕРѕР±С‰Рµ вЂ” РґР°С‘Рј СЃСЂР°Р·Сѓ 3 СЃС‚Р°РєР°
+        if actor:buff_count(buff) <= 0 then
             count = 3
         end
 
@@ -46,14 +46,14 @@ item:onKillProc(function(actor, victim, stack)
     end
 end)
 
--- Бафф предмета MassacreCurse.
--- Долгосрочный бафф, усиливающий урон и броню, стаки удаляются по истечению времени
+-- Р‘Р°С„С„ РїСЂРµРґРјРµС‚Р° MassacreCurse.
+-- Р”РѕР»РіРѕСЃСЂРѕС‡РЅС‹Р№ Р±Р°С„С„, СѓСЃРёР»РёРІР°СЋС‰РёР№ СѓСЂРѕРЅ Рё Р±СЂРѕРЅСЋ, СЃС‚Р°РєРё СѓРґР°Р»СЏСЋС‚СЃСЏ РїРѕ РёСЃС‚РµС‡РµРЅРёСЋ РІСЂРµРјРµРЅРё
 
--- Загружаем спрайт баффа
-local sprite = Resources.sprite_load("DeerItems", "buff/MassacreCurse", PATH.."assets/sprites/buffs/MassacreCurse.png", 1, 7, 7)
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ Р±Р°С„С„Р°
+local sprite = Sprite.new("buff/MassacreCurse", PATH.."assets/sprites/buffs/MassacreCurse.png", 1, 7, 7)
 
--- Создание баффа
-local buff = Buff.new("DeerItems", "MassacreCurse")
+-- РЎРѕР·РґР°РЅРёРµ Р±Р°С„С„Р°
+local buff = Buff.new("MassacreCurse")
 buff.icon_sprite = sprite
 buff.icon_stack_subimage = false
 buff.draw_stack_number = true
@@ -61,18 +61,18 @@ buff.stack_number_col = Array.new(1, Color(0xa0735b))
 buff.max_stack = 999
 buff.is_timed = false
 
--- При добавлении стака — добавляем таймер его действия
+-- РџСЂРё РґРѕР±Р°РІР»РµРЅРёРё СЃС‚Р°РєР° вЂ” РґРѕР±Р°РІР»СЏРµРј С‚Р°Р№РјРµСЂ РµРіРѕ РґРµР№СЃС‚РІРёСЏ
 buff:onApply(function(actor, stack)
     local actorData = actor:get_data("MassacreCurse", GUID)
     if not actorData.timers then actorData.timers = {} end
-    -- Каждому стаку даётся время действия: 2.5 сек * количество предметов
-    table.insert(actorData.timers, (2.5 * actor:item_stack_count(item)) * 60.0)
+    -- РљР°Р¶РґРѕРјСѓ СЃС‚Р°РєСѓ РґР°С‘С‚СЃСЏ РІСЂРµРјСЏ РґРµР№СЃС‚РІРёСЏ: 2.5 СЃРµРє * РєРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРµРґРјРµС‚РѕРІ
+    table.insert(actorData.timers, (2.5 * actor:item_count(item)) * 60.0)
 end)
 
--- Постобновление: уменьшаем таймеры, удаляем стеки, если истекли
+-- РџРѕСЃС‚РѕР±РЅРѕРІР»РµРЅРёРµ: СѓРјРµРЅСЊС€Р°РµРј С‚Р°Р№РјРµСЂС‹, СѓРґР°Р»СЏРµРј СЃС‚РµРєРё, РµСЃР»Рё РёСЃС‚РµРєР»Рё
 buff:onPostStep(function(actor, stack)
     local actorData = actor:get_data("MassacreCurse", GUID)
-    -- Обновляем каждый таймер
+    -- РћР±РЅРѕРІР»СЏРµРј РєР°Р¶РґС‹Р№ С‚Р°Р№РјРµСЂ
     for i, time in ipairs(actorData.timers) do
         actorData.timers[i] = time - 1
         if time <= 0 then
@@ -80,20 +80,20 @@ buff:onPostStep(function(actor, stack)
         end
     end
 
-    -- Если таймеров меньше, чем стаков — удаляем лишние стаки
+    -- Р•СЃР»Рё С‚Р°Р№РјРµСЂРѕРІ РјРµРЅСЊС€Рµ, С‡РµРј СЃС‚Р°РєРѕРІ вЂ” СѓРґР°Р»СЏРµРј Р»РёС€РЅРёРµ СЃС‚Р°РєРё
     if stack > #actorData.timers then
         local diff = stack - #actorData.timers
         actor:buff_remove(buff, diff)
         actor:recalculate_stats()
     end
 
-    -- Если стаков больше нет — сбрасываем счётчик убийств
+    -- Р•СЃР»Рё СЃС‚Р°РєРѕРІ Р±РѕР»СЊС€Рµ РЅРµС‚ вЂ” СЃР±СЂР°СЃС‹РІР°РµРј СЃС‡С‘С‚С‡РёРє СѓР±РёР№СЃС‚РІ
     if stack == 0 then
         actorData.count = 0
     end
 end)
 
--- Увеличиваем урон и броню на 3% за стак
+-- РЈРІРµР»РёС‡РёРІР°РµРј СѓСЂРѕРЅ Рё Р±СЂРѕРЅСЋ РЅР° 3% Р·Р° СЃС‚Р°Рє
 buff:onStatRecalc(function(actor, stack)
     actor.damage = actor.damage + ((actor.damage * 0.03) * stack)
     actor.armor  = actor.armor  + ((actor.armor  * 0.03) * stack)

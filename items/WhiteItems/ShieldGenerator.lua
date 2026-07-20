@@ -1,7 +1,7 @@
 -- DeerItems-ShieldGenerator
 -- Даёт щит покупаемым союзным дронам.
 
-local sprite = Resources.sprite_load("DeerItems", "item/ShieldGenerator", PATH.."assets/sprites/items/sWhiteItems/ShieldGenerator.png", 1, 16, 16)
+local sprite = Sprite.new("item/ShieldGenerator", PATH.."assets/sprites/items/sWhiteItems/ShieldGenerator.png", 1, 16, 16)
 
 local GUID = _ENV["!guid"]
 local oP = gm.constants.oP
@@ -18,12 +18,10 @@ local function is_drone(actor)
     return actor and actor.object_index ~= oP and not is_not_drone(actor)
 end
 
-local item = Item.new("DeerItems", "ShieldGenerator")
+local item = Item.new("ShieldGenerator")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
-item:clear_callbacks()
-
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 local team_stacks = {}
 local team_state_frame = -1
 local pending_recalculate = {}
@@ -38,7 +36,7 @@ local function refresh_team_stacks()
     local stacks = {}
     for _, player in ipairs(Instance.find_all(oP)) do
         if Instance.exists(player) then
-            local stack = player:item_stack_count(item) or 0
+            local stack = player:item_count(item) or 0
             if stack > 0 then
                 stacks[player.team] = (stacks[player.team] or 0) + stack
             end
@@ -90,7 +88,7 @@ item:onPostStep(function(actor, stack)
     end
 end)
 
-Callback.add(Callback.TYPE.onStep, "DeerItems-ShieldGenerator-remove", function()
+Callback.add(Callback.ON_STEP, function()
     for id, actor in pairs(pending_recalculate) do
         pending_recalculate[id] = nil
         if Instance.exists(actor) then

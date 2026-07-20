@@ -1,5 +1,5 @@
 -- DeerItems-Rusted
--- Элитный враг только для «Муссона»: создаёт под дальними игроками двухэтапные ржавые шипы.
+-- Р­Р»РёС‚РЅС‹Р№ РІСЂР°Рі С‚РѕР»СЊРєРѕ РґР»СЏ В«РњСѓСЃСЃРѕРЅР°В»: СЃРѕР·РґР°С‘С‚ РїРѕРґ РґР°Р»СЊРЅРёРјРё РёРіСЂРѕРєР°РјРё РґРІСѓС…СЌС‚Р°РїРЅС‹Рµ СЂР¶Р°РІС‹Рµ С€РёРїС‹.
 
 local GUID = _ENV["!guid"]
 
@@ -29,57 +29,45 @@ local RUST_DURATION = 4 * 60
 local RUST_DAMAGE_MULTIPLIER = 1.1
 local EXPENSIVE_CARD_QUANTILE = 0.90
 
-local palette = Resources.sprite_load(
-    "DeerItems",
-    "elite/RustedPalette",
+local palette = Sprite.new("elite/RustedPalette",
     PATH.."assets/sprites/elites/sRusted/PaletteRusted.png",
     1,
     0,
     0
 )
-local icon = Resources.sprite_load(
-    "DeerItems",
-    "elite/RustedIcon",
+local icon = Sprite.new("elite/RustedIcon",
     PATH.."assets/sprites/elites/sRusted/IconRusted.png",
     1,
     10.5,
     9
 )
-local spike_sprite = Resources.sprite_load(
-    "DeerItems",
-    "elite/RustedSpike",
+local spike_sprite = Sprite.new("elite/RustedSpike",
     PATH.."assets/sprites/elites/sRusted/RustSpike.png",
     19,
     32,
     64
 )
-local debuff_sprite = Resources.sprite_load(
-    "DeerItems",
-    "elite/RustedDebuff",
+local debuff_sprite = Sprite.new("elite/RustedDebuff",
     PATH.."assets/sprites/elites/sRusted/RustDebuff.png",
     1,
     8,
     8
 )
-local spike_emerge_sound = Resources.sfx_load(
-    "DeerItems",
-    "elite/RustedSpikeEmerge",
+local spike_emerge_sound = Sound.new("elite/RustedSpikeEmerge",
     PATH.."assets/sounds/FearEyes.ogg"
 )
 
-local rusted = Elite.new("DeerItems", "Rusted")
+local rusted = Elite.new("Rusted")
 rusted:set_palette(palette, Color(0x9c4d26))
 rusted:set_healthbar_icon(icon)
 gm.elite_generate_palettes()
 
-local rust = Buff.new("DeerItems", "RustedDebuff")
+local rust = Buff.new("RustedDebuff")
 rust.icon_sprite = debuff_sprite
 rust.icon_stack_subimage = false
 rust.max_stack = 1
 rust.is_timed = true
 rust.is_debuff = true
-rust:clear_callbacks()
-
 local function exists(inst)
     return inst and Instance.exists(inst)
 end
@@ -109,9 +97,9 @@ local function remove_rusted_from_card(card)
     end
 end
 
--- В доступном API у элит нет отдельной цены директора. Поэтому Rusted добавлен
--- только к самым дорогим картам монстров: так он требует большой бюджет директора
--- и появляется заметно реже обычных элит.
+-- Р’ РґРѕСЃС‚СѓРїРЅРѕРј API Сѓ СЌР»РёС‚ РЅРµС‚ РѕС‚РґРµР»СЊРЅРѕР№ С†РµРЅС‹ РґРёСЂРµРєС‚РѕСЂР°. РџРѕСЌС‚РѕРјСѓ Rusted РґРѕР±Р°РІР»РµРЅ
+-- С‚РѕР»СЊРєРѕ Рє СЃР°РјС‹Рј РґРѕСЂРѕРіРёРј РєР°СЂС‚Р°Рј РјРѕРЅСЃС‚СЂРѕРІ: С‚Р°Рє РѕРЅ С‚СЂРµР±СѓРµС‚ Р±РѕР»СЊС€РѕР№ Р±СЋРґР¶РµС‚ РґРёСЂРµРєС‚РѕСЂР°
+-- Рё РїРѕСЏРІР»СЏРµС‚СЃСЏ Р·Р°РјРµС‚РЅРѕ СЂРµР¶Рµ РѕР±С‹С‡РЅС‹С… СЌР»РёС‚.
 local function update_card_availability()
     local cards = MonsterCard.find_all()
     local costs = {}
@@ -139,10 +127,10 @@ local function update_card_availability()
     end
 end
 
-Callback.add(Callback.TYPE.onDirectorPopulateSpawnArrays, "DeerItems-Rusted-availability", update_card_availability)
+Callback.add(Callback.ON_DIRECTOR_POPULATE_SPAWN_ARRAYS, update_card_availability)
 
 rusted:onApply(function(actor)
-    if not gm._mod_net_isHost() then return end
+    if not Net.host then return end
     if not is_rusted(actor) then return end
 
     local data = actor:get_data("Rusted", GUID)
@@ -163,29 +151,29 @@ rusted:onApply(function(actor)
 end)
 
 local spikes = {}
-local spike_packet = Packet.new()
+local spike_packet = Packet.new("Rusted-spike_packet")
 
 local function add_spike(x, y, owner)
     spikes[#spikes + 1] = { x = x, y = y, owner = owner, age = 0 }
 end
 
-spike_packet:onReceived(function(message)
-    if not gm._mod_net_isClient() then return end
-    local owner = message:read_instance()
-    local x = message:read_float()
-    local y = message:read_float()
+spike_packet:set_serializers(function(buffer, owner, x, y)
+    buffer:write_instance(owner)
+    buffer:write_float(x)
+    buffer:write_float(y)
+end, function(buffer)
+    if not Net.client then return end
+    local owner = buffer:read_instance()
+    local x = buffer:read_float()
+    local y = buffer:read_float()
     add_spike(x, y, owner)
 end)
 
 local function spawn_spike(owner, x, y)
     add_spike(x, y, owner)
 
-    if Net.is_host() then
-        local message = spike_packet:message_begin()
-        message:write_instance(owner)
-        message:write_float(x)
-        message:write_float(y)
-        message:send_to_all()
+    if Net.host then
+        spike_packet:send_to_all(owner, x, y)
     end
 end
 
@@ -207,11 +195,11 @@ local function fire_spike_attack(spike, width, height)
 end
 
 Actor:onAttackHit("DeerItems-Rusted-applyDebuff", function(actor, victim, hit_info)
-    if not gm._mod_net_isHost() then return end
+    if not Net.host then return end
     if not is_rusted(actor) or not is_player(victim) then return end
 
-    -- Сначала снимаем эффект, чтобы четыре секунды не складывались, а обновлялись.
-    if victim:buff_stack_count(rust) > 0 then victim:buff_remove(rust) end
+    -- РЎРЅР°С‡Р°Р»Р° СЃРЅРёРјР°РµРј СЌС„С„РµРєС‚, С‡С‚РѕР±С‹ С‡РµС‚С‹СЂРµ СЃРµРєСѓРЅРґС‹ РЅРµ СЃРєР»Р°РґС‹РІР°Р»РёСЃСЊ, Р° РѕР±РЅРѕРІР»СЏР»РёСЃСЊ.
+    if victim:buff_count(rust) > 0 then victim:buff_remove(rust) end
     victim:buff_apply(rust, RUST_DURATION, 1)
 end)
 
@@ -223,20 +211,20 @@ pcall(function()
 
         local victim = Instance.wrap(raw_victim)
         if not exists(victim) then return end
-        -- Расчёт урона приходит и для ящиков, объектов карты и прочих не-актёров.
+        -- Р Р°СЃС‡С‘С‚ СѓСЂРѕРЅР° РїСЂРёС…РѕРґРёС‚ Рё РґР»СЏ СЏС‰РёРєРѕРІ, РѕР±СЉРµРєС‚РѕРІ РєР°СЂС‚С‹ Рё РїСЂРѕС‡РёС… РЅРµ-Р°РєС‚С‘СЂРѕРІ.
         if gm.object_is_ancestor(victim.object_index, gm.constants.pActor) ~= 1.0 then return end
-        if victim:buff_stack_count(rust) <= 0 then return end
+        if victim:buff_count(rust) <= 0 then return end
 
         args[4].value = damage * RUST_DAMAGE_MULTIPLIER
     end)
 end)
 
-Callback.add(Callback.TYPE.postStep, "DeerItems-Rusted-spikes", function()
+Callback.add(Callback.POST_STEP, function()
     for index = #spikes, 1, -1 do
         local spike = spikes[index]
         spike.age = spike.age + 1
 
-        if gm._mod_net_isHost() then
+        if Net.host then
             if spike.age == TELEGRAPH_FRAMES then
                 fire_spike_attack(spike, VERTICAL_WIDTH, VERTICAL_HEIGHT)
             elseif spike.age == TELEGRAPH_FRAMES + VERTICAL_FRAMES then
@@ -251,7 +239,7 @@ Callback.add(Callback.TYPE.postStep, "DeerItems-Rusted-spikes", function()
         end
     end
 
-    if not gm._mod_net_isHost() then return end
+    if not Net.host then return end
 
     local frame = Global._current_frame or 0
     for _, actor in ipairs(Instance.find_all(gm.constants.pActor)) do
@@ -279,7 +267,7 @@ Callback.add(Callback.TYPE.postStep, "DeerItems-Rusted-spikes", function()
     end
 end)
 
-Callback.add(Callback.TYPE.onDraw, "DeerItems-Rusted-drawSpikes", function()
+Callback.add(Callback.ON_DRAW, function()
     for _, spike in ipairs(spikes) do
         local frame
         if spike.age < TELEGRAPH_FRAMES then

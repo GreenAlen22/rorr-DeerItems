@@ -1,8 +1,6 @@
--- Артефакт техника: добавляет в директора этапа покупаемые сломанные дроны.
+-- РђСЂС‚РµС„Р°РєС‚ С‚РµС…РЅРёРєР°: РґРѕР±Р°РІР»СЏРµС‚ РІ РґРёСЂРµРєС‚РѕСЂР° СЌС‚Р°РїР° РїРѕРєСѓРїР°РµРјС‹Рµ СЃР»РѕРјР°РЅРЅС‹Рµ РґСЂРѕРЅС‹.
 
-local sprite = Resources.sprite_load(
-    "DeerItems",
-    "artifact/Technician",
+local sprite = Sprite.new("artifact/Technician",
     PATH.."assets/sprites/artifacts/ArtifactOfTechnician.png",
     3,
     16,
@@ -14,7 +12,7 @@ local MAX_DRONES_PER_STAGE = 8
 local MAX_SPAWN_ATTEMPTS = 24
 local DRONE_INTERACTABLE = gm.constants.pInteractableDrone
 
-local artifact = Artifact.new("DeerItems", "Technician")
+local artifact = Artifact.new("Technician")
 artifact:set_sprites(sprite, sprite)
 artifact:set_text(
     "artifact.Technician.name",
@@ -36,7 +34,7 @@ local function find_drone_spawn_data()
 end
 
 artifact:onStageStart(function()
-    if gm._mod_net_isClient() or not artifact.active then return end
+    if Net.client or not artifact.active then return end
 
     local drone_object, required_tile_space = find_drone_spawn_data()
     if not drone_object then

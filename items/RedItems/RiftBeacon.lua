@@ -1,10 +1,10 @@
--- DeerItems-RiftBeacon / «Маяк разлома» / "Rift Beacon"
--- Падение ниже 25% HP даёт барьер и на 8с открывает разлом вокруг игрока: враги
--- периодически выбрасываются прочь. Любое убийство при активном разломе продлевает его на 1с.
--- После срабатывания ломается и чинится в начале нового этапа.
+-- DeerItems-RiftBeacon / В«РњР°СЏРє СЂР°Р·Р»РѕРјР°В» / "Rift Beacon"
+-- РџР°РґРµРЅРёРµ РЅРёР¶Рµ 25% HP РґР°С‘С‚ Р±Р°СЂСЊРµСЂ Рё РЅР° 8СЃ РѕС‚РєСЂС‹РІР°РµС‚ СЂР°Р·Р»РѕРј РІРѕРєСЂСѓРі РёРіСЂРѕРєР°: РІСЂР°РіРё
+-- РїРµСЂРёРѕРґРёС‡РµСЃРєРё РІС‹Р±СЂР°СЃС‹РІР°СЋС‚СЃСЏ РїСЂРѕС‡СЊ. Р›СЋР±РѕРµ СѓР±РёР№СЃС‚РІРѕ РїСЂРё Р°РєС‚РёРІРЅРѕРј СЂР°Р·Р»РѕРјРµ РїСЂРѕРґР»РµРІР°РµС‚ РµРіРѕ РЅР° 1СЃ.
+-- РџРѕСЃР»Рµ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ Р»РѕРјР°РµС‚СЃСЏ Рё С‡РёРЅРёС‚СЃСЏ РІ РЅР°С‡Р°Р»Рµ РЅРѕРІРѕРіРѕ СЌС‚Р°РїР°.
 
-local sprite = Resources.sprite_load("DeerItems", "item/RiftBeacon", PATH.."assets/sprites/items/sRedItems/RiftBeacon.png", 1, 18, 18)
-local radiusSprite = Resources.sprite_load("DeerItems", "particle/RiftBeaconRadius", PATH.."assets/sprites/particle/RiftBeaconRadius.png", 26, 64, 64)
+local sprite = Sprite.new("item/RiftBeacon", PATH.."assets/sprites/items/sRedItems/RiftBeacon.png", 1, 18, 18)
+local radiusSprite = Sprite.new("particle/RiftBeaconRadius", PATH.."assets/sprites/particle/RiftBeaconRadius.png", 26, 64, 64)
 
 local GUID = _ENV["!guid"]
 local RIFT_COLOR = Color(0x9b4dff)
@@ -12,13 +12,13 @@ local deactivate
 
 local function truthy(v) return v ~= nil and v ~= false and v ~= 0 end
 
--- Настройки баланса
+-- РќР°СЃС‚СЂРѕР№РєРё Р±Р°Р»Р°РЅСЃР°
 local HP_THRESHOLD = 0.25
 local BARRIER_FRAC = 0.25
 local LIFE_BASE    = 8 * 60
-local LIFE_MAX     = 16 * 60     -- потолок продления убийствами
+local LIFE_MAX     = 16 * 60     -- РїРѕС‚РѕР»РѕРє РїСЂРѕРґР»РµРЅРёСЏ СѓР±РёР№СЃС‚РІР°РјРё
 local RADIUS       = 250
-local TP_TICK      = 60          -- выброс раз в 1с
+local TP_TICK      = 60          -- РІС‹Р±СЂРѕСЃ СЂР°Р· РІ 1СЃ
 local TP_DIST      = 250
 
 local RADIUS_SPRITE_SIZE = 128
@@ -76,31 +76,29 @@ local function radius_frame_for(self)
     return RADIUS_LOOP_FIRST + (math.floor(loop_age / RADIUS_ANIM_TICK) % RADIUS_LOOP_LENGTH)
 end
 
--- Объект разлома (центрируется на игроке)
-local obj = Object.new("DeerItems", "RiftZone")
+-- РћР±СЉРµРєС‚ СЂР°Р·Р»РѕРјР° (С†РµРЅС‚СЂРёСЂСѓРµС‚СЃСЏ РЅР° РёРіСЂРѕРєРµ)
+local obj = Object.new("RiftZone")
 obj:set_depth(40)
-obj:clear_callbacks()
-
 obj:onCreate(function(self)
     self.life = LIFE_BASE
     self.age = 0
     self.end_age = nil
     self.radius_frame = 0
     self.tt = 0
-    self:projectile_sync(4)   -- синкаем позицию клиентам (объект следует за игроком на хосте)
+    self:projectile_sync(4)   -- СЃРёРЅРєР°РµРј РїРѕР·РёС†РёСЋ РєР»РёРµРЅС‚Р°Рј (РѕР±СЉРµРєС‚ СЃР»РµРґСѓРµС‚ Р·Р° РёРіСЂРѕРєРѕРј РЅР° С…РѕСЃС‚Рµ)
 end)
 
 obj:onStep(function(self)
     self.age = (self.age or 0) + 1
     self.radius_frame = radius_frame_for(self)
 
-    -- Логика и движение — только на хосте (parent хранится локально у хоста); клиентам
-    -- позиция приходит через projectile_sync, а круг рисует onDraw.
-    if gm._mod_net_isClient() then return end
+    -- Р›РѕРіРёРєР° Рё РґРІРёР¶РµРЅРёРµ вЂ” С‚РѕР»СЊРєРѕ РЅР° С…РѕСЃС‚Рµ (parent С…СЂР°РЅРёС‚СЃСЏ Р»РѕРєР°Р»СЊРЅРѕ Сѓ С…РѕСЃС‚Р°); РєР»РёРµРЅС‚Р°Рј
+    -- РїРѕР·РёС†РёСЏ РїСЂРёС…РѕРґРёС‚ С‡РµСЂРµР· projectile_sync, Р° РєСЂСѓРі СЂРёСЃСѓРµС‚ onDraw.
+    if Net.client then return end
     local data = self:get_data(nil, GUID)
     local parent = data.parent
     if not parent or not parent:exists() then self:destroy(); return end
-    -- следуем за игроком
+    -- СЃР»РµРґСѓРµРј Р·Р° РёРіСЂРѕРєРѕРј
     self.x = parent.x
     self.y = parent.y
 
@@ -112,7 +110,7 @@ obj:onStep(function(self)
 
     self.life = self.life - 1
 
-    -- Выброс врагов прочь раз в 1с (боссов не трогаем)
+    -- Р’С‹Р±СЂРѕСЃ РІСЂР°РіРѕРІ РїСЂРѕС‡СЊ СЂР°Р· РІ 1СЃ (Р±РѕСЃСЃРѕРІ РЅРµ С‚СЂРѕРіР°РµРј)
     self.tt = self.tt + 1
     if self.tt >= TP_TICK then
         self.tt = 0
@@ -126,11 +124,9 @@ obj:onStep(function(self)
     end
 end)
 
-obj:onSerialize(function(self, buffer)
+Object.add_serializers(obj, function(self, buffer)
     buffer:write_byte(self.radius_frame or 0)
-end)
-
-obj:onDeserialize(function(self, buffer)
+end, function(self, buffer)
     self.radius_frame = buffer:read_byte()
 end)
 
@@ -145,31 +141,29 @@ obj:onDestroy(function(self)
     self:instance_destroy_sync()
 end)
 
-local item = Item.new("DeerItems", "RiftBeacon")
+local item = Item.new("RiftBeacon")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.rare)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
-item:clear_callbacks()
-
+item:set_tier(ItemTier.RARE)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 local function ready_stack_count(actor)
-    return actor:item_stack_count(item, Item.STACK_KIND.normal)
-        + actor:item_stack_count(item, Item.STACK_KIND.temporary_blue)
+    return actor:item_count(item, Item.StackKind.NORMAL)
+        + actor:item_count(item, Item.StackKind.TEMPORARY_BLUE)
 end
 
 local function break_item(actor)
-    deactivate = deactivate or Item.find("DeerItems-RiftBeaconDeactivate")
+    deactivate = deactivate or Item.find("RiftBeaconDeactivate", "DeerItems")
 
-    local normal = actor:item_stack_count(item, Item.STACK_KIND.normal)
+    local normal = actor:item_count(item, Item.StackKind.NORMAL)
     if normal > 0 then
-        actor:item_remove(item, 1)
+        actor:item_take(item, 1)
         actor:item_give(deactivate, 1)
         return true
     end
 
-    local temp = actor:item_stack_count(item, Item.STACK_KIND.temporary_blue)
+    local temp = actor:item_count(item, Item.StackKind.TEMPORARY_BLUE)
     if temp > 0 then
-        actor:item_remove(item, 1, Item.STACK_KIND.temporary_blue)
-        actor:item_give(deactivate, 1, Item.STACK_KIND.temporary_blue)
+        actor:item_take(item, 1, Item.StackKind.TEMPORARY_BLUE)
+        actor:item_give(deactivate, 1, Item.StackKind.TEMPORARY_BLUE)
         return true
     end
 
@@ -187,9 +181,9 @@ local function extend_zone(actor)
     end
 end
 
--- Триггер по низкому HP (раз за этап)
+-- РўСЂРёРіРіРµСЂ РїРѕ РЅРёР·РєРѕРјСѓ HP (СЂР°Р· Р·Р° СЌС‚Р°Рї)
 item:onPostStep(function(actor, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
     if stack <= 0 then return end
     local data = actor:get_data("RiftBeacon", GUID)
     if not actor.maxhp or actor.maxhp <= 0 then return end
@@ -215,16 +209,16 @@ item:onPostStep(function(actor, stack)
     data.zone = inst
 end)
 
--- Любое убийство при активном разломе продлевает его на 1с
+-- Р›СЋР±РѕРµ СѓР±РёР№СЃС‚РІРѕ РїСЂРё Р°РєС‚РёРІРЅРѕРј СЂР°Р·Р»РѕРјРµ РїСЂРѕРґР»РµРІР°РµС‚ РµРіРѕ РЅР° 1СЃ
 item:onKillProc(function(actor, victim, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     extend_zone(actor)
 end)
 
--- Перезаряд в начале этапа
+-- РџРµСЂРµР·Р°СЂСЏРґ РІ РЅР°С‡Р°Р»Рµ СЌС‚Р°РїР°
 item:onStageStart(function(actor, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     local data = actor:get_data("RiftBeacon", GUID)
     data.below_stack_gate = nil

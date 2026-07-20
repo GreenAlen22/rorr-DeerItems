@@ -3,17 +3,17 @@
 
 -- Загружаем спрайт предмета
 -- Загружаем звуковой эффект
-local sprite = Resources.sprite_load("DeerItems", "item/GoldBar", PATH.."assets/sprites/items/sWhiteItems/GoldBar.png", 1, 16, 16)
-local sound = Resources.sfx_load("DeerItems", "sound/GoldBar", PATH.."assets/sounds/GoldBar.ogg")
+local sprite = Sprite.new("item/GoldBar", PATH.."assets/sprites/items/sWhiteItems/GoldBar.png", 1, 16, 16)
+local sound = Sound.new("sound/GoldBar", PATH.."assets/sounds/GoldBar.ogg")
 
 -- Создание нового предмета с названием "GoldBar" в категории "DeerItems"
 -- Привязка спрайта к предмету
 -- Установка тира предмета: белый (обычный)
 -- Назначение тега лута: утилитарный предмет
-local item = Item.new("DeerItems", "GoldBar")
+local item = Item.new("GoldBar")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- При начале стадии: воспроизведение звука и начисление золота
 item:onStageStart(function(actor, stack)

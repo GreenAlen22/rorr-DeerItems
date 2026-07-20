@@ -1,5 +1,5 @@
 -- DeerItems-Bramble
--- Тернистый elite: урон из-за пределов зоны в 4 м уменьшается вдвое.
+-- РўРµСЂРЅРёСЃС‚С‹Р№ elite: СѓСЂРѕРЅ РёР·-Р·Р° РїСЂРµРґРµР»РѕРІ Р·РѕРЅС‹ РІ 4 Рј СѓРјРµРЅСЊС€Р°РµС‚СЃСЏ РІРґРІРѕРµ.
 
 local METERS_TO_PIXELS = 32
 local RADIUS = 4 * METERS_TO_PIXELS
@@ -11,29 +11,25 @@ local BRAMBLE_COLOR = Color(0x0e2a15)
 local VINE_SEGMENTS = 28
 local VINE_THORN_LENGTH = 12
 
-local palette = Resources.sprite_load(
-    "DeerItems",
-    "elite/BramblePalette",
+local palette = Sprite.new("elite/BramblePalette",
     PATH.."assets/sprites/elites/sBramble/PaletteBramble.png",
     1,
     0,
     0
 )
-local icon = Resources.sprite_load(
-    "DeerItems",
-    "elite/BrambleIcon",
+local icon = Sprite.new("elite/BrambleIcon",
     PATH.."assets/sprites/elites/sBramble/IconBramble.png",
     1,
     10,
     11
 )
 
-local bramble = Elite.new("DeerItems", "Bramble")
+local bramble = Elite.new("Bramble")
 bramble:set_palette(palette, BRAMBLE_COLOR)
 bramble:set_healthbar_icon(icon)
 gm.elite_generate_palettes()
 
-local slow = Buff.new("DeerItems", "BrambleSlow")
+local slow = Buff.new("BrambleSlow")
 slow.show_icon = false
 slow.icon_stack_subimage = false
 slow.max_stack = 1
@@ -138,9 +134,9 @@ local function draw_zone(actor)
     gm.draw_set_colour(Color.WHITE)
 end
 
--- MonsterCard доступен после инициализации ванильного контента. Этот callback
--- вызывается перед заполнением директором массивов спавна и безопасен для правки карт.
-Callback.add(Callback.TYPE.onDirectorPopulateSpawnArrays, "DeerItems-Bramble-availability", function()
+-- MonsterCard РґРѕСЃС‚СѓРїРµРЅ РїРѕСЃР»Рµ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РІР°РЅРёР»СЊРЅРѕРіРѕ РєРѕРЅС‚РµРЅС‚Р°. Р­С‚РѕС‚ callback
+-- РІС‹Р·С‹РІР°РµС‚СЃСЏ РїРµСЂРµРґ Р·Р°РїРѕР»РЅРµРЅРёРµРј РґРёСЂРµРєС‚РѕСЂРѕРј РјР°СЃСЃРёРІРѕРІ СЃРїР°РІРЅР° Рё Р±РµР·РѕРїР°СЃРµРЅ РґР»СЏ РїСЂР°РІРєРё РєР°СЂС‚.
+Callback.add(Callback.ON_DIRECTOR_POPULATE_SPAWN_ARRAYS, function()
     for _, card in ipairs(MonsterCard.find_all()) do
         local elite_list = List.wrap(card.elite_list)
         if not elite_list:contains(bramble) then
@@ -149,11 +145,11 @@ Callback.add(Callback.TYPE.onDirectorPopulateSpawnArrays, "DeerItems-Bramble-ava
     end
 end)
 
--- Расчёт выполняется до снятия HP. args[6] — актёр, создавший урон: именно его
--- позиция определяет, находится ли игрок в зоне, а не позиция попавшего снаряда.
+-- Р Р°СЃС‡С‘С‚ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РґРѕ СЃРЅСЏС‚РёСЏ HP. args[6] вЂ” Р°РєС‚С‘СЂ, СЃРѕР·РґР°РІС€РёР№ СѓСЂРѕРЅ: РёРјРµРЅРЅРѕ РµРіРѕ
+-- РїРѕР·РёС†РёСЏ РѕРїСЂРµРґРµР»СЏРµС‚, РЅР°С…РѕРґРёС‚СЃСЏ Р»Рё РёРіСЂРѕРє РІ Р·РѕРЅРµ, Р° РЅРµ РїРѕР·РёС†РёСЏ РїРѕРїР°РІС€РµРіРѕ СЃРЅР°СЂСЏРґР°.
 pcall(function()
     gm.pre_script_hook(gm.constants.damager_calculate_damage, function(self, other, result, args)
-        if not gm._mod_net_isHost() then return end
+        if not Net.host then return end
 
         local raw_victim = args[2] and args[2].value
         if not raw_victim then return end
@@ -180,7 +176,7 @@ pcall(function()
     end)
 end)
 
-Callback.add(Callback.TYPE.onDraw, "DeerItems-Bramble-zone", function()
+Callback.add(Callback.ON_DRAW, function()
     for _, actor in ipairs(Instance.find_all(gm.constants.pActor)) do
         if is_bramble(actor) then draw_zone(actor) end
     end

@@ -4,8 +4,8 @@
 --   (b) Раз за этап первый сундук бесплатный, доп. стаки дают +10% к следующему бесплатному сундуку.
 
 -- Иконка предмета (заглушка-шаблон — замени текстуру по этому пути)
-local sprite = Resources.sprite_load("DeerItems", "item/CashbackChip", PATH.."assets/sprites/items/sGreenItems/CashbackChip.png", 1, 18, 18)
-local sound = Resources.sfx_load("DeerItems", "sound/GoldBar", PATH.."assets/sounds/GoldBar.ogg")
+local sprite = Sprite.new("item/CashbackChip", PATH.."assets/sprites/items/sGreenItems/CashbackChip.png", 1, 18, 18)
+local sound = Sound.new("sound/GoldBar", PATH.."assets/sounds/GoldBar.ogg")
 
 -- Настройки баланса
 local CASHBACK_BASE = 0.10
@@ -15,12 +15,10 @@ local FREE_CHEST_STACK_CHANCE = 0.10
 -- Сколько бесплатных сундуков уже использовано в этом этапе у каждого игрока: [actor.id] → число
 local free_used = {}
 
-local item = Item.new("DeerItems", "CashbackChip")
+local item = Item.new("CashbackChip")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
-item:clear_callbacks()
-
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 -- Начисление золота ЛОКАЛЬНОМУ игроку через HUD (как все денежные предметы мода: GoldBar/BloodyDividends/BountyTag)
 local function give_gold(amount)
     if amount <= 0 then return end

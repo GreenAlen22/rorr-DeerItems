@@ -1,32 +1,29 @@
 -- DeerItems-FacetedJade
--- Граненый нефрит: если не получать урон 5 секунд — даёт +45 брони за стак.
--- После удара активный бонус держится ещё 3 секунды, затем восстанавливается снова после 5 секунд покоя.
--- (Адаптация Oddly-shaped Opal из RoR2: щит «вне опасности», только через броню.)
+-- Р“СЂР°РЅРµРЅС‹Р№ РЅРµС„СЂРёС‚: РµСЃР»Рё РЅРµ РїРѕР»СѓС‡Р°С‚СЊ СѓСЂРѕРЅ 5 СЃРµРєСѓРЅРґ вЂ” РґР°С‘С‚ +45 Р±СЂРѕРЅРё Р·Р° СЃС‚Р°Рє.
+-- РџРѕСЃР»Рµ СѓРґР°СЂР° Р°РєС‚РёРІРЅС‹Р№ Р±РѕРЅСѓСЃ РґРµСЂР¶РёС‚СЃСЏ РµС‰С‘ 3 СЃРµРєСѓРЅРґС‹, Р·Р°С‚РµРј РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ СЃРЅРѕРІР° РїРѕСЃР»Рµ 5 СЃРµРєСѓРЅРґ РїРѕРєРѕСЏ.
+-- (РђРґР°РїС‚Р°С†РёСЏ Oddly-shaped Opal РёР· RoR2: С‰РёС‚ В«РІРЅРµ РѕРїР°СЃРЅРѕСЃС‚РёВ», С‚РѕР»СЊРєРѕ С‡РµСЂРµР· Р±СЂРѕРЅСЋ.)
 
--- Спрайт предмета
--- Спрайт-щит, который рисуется вокруг тела, пока бонус активен
--- Звук восстановления щита
-local sprite = Resources.sprite_load("DeerItems", "item/FacetedJade", PATH.."assets/sprites/items/sWhiteItems/FacetedJade.png", 1, 18, 18)
-local shieldSprite = Resources.sprite_load("DeerItems", "particle/FacetedJadeShield", PATH.."assets/sprites/particle/FacetedJadeShield.png", 1, 24, 24)  -- 48x48, origin по центру
-local restoreSound = Resources.sfx_load("DeerItems", "sound/FacetedJade", PATH.."assets/sounds/FacetedJade.ogg")
+-- РЎРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
+-- РЎРїСЂР°Р№С‚-С‰РёС‚, РєРѕС‚РѕСЂС‹Р№ СЂРёСЃСѓРµС‚СЃСЏ РІРѕРєСЂСѓРі С‚РµР»Р°, РїРѕРєР° Р±РѕРЅСѓСЃ Р°РєС‚РёРІРµРЅ
+-- Р—РІСѓРє РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ С‰РёС‚Р°
+local sprite = Sprite.new("item/FacetedJade", PATH.."assets/sprites/items/sWhiteItems/FacetedJade.png", 1, 18, 18)
+local shieldSprite = Sprite.new("particle/FacetedJadeShield", PATH.."assets/sprites/particle/FacetedJadeShield.png", 1, 24, 24)  -- 48x48, origin РїРѕ С†РµРЅС‚СЂСѓ
+local restoreSound = Sound.new("sound/FacetedJade", PATH.."assets/sounds/FacetedJade.ogg")
 
--- guid мода выносим один раз, чтобы get_data не искал его через debug-стек каждый кадр
+-- guid РјРѕРґР° РІС‹РЅРѕСЃРёРј РѕРґРёРЅ СЂР°Р·, С‡С‚РѕР±С‹ get_data РЅРµ РёСЃРєР°Р» РµРіРѕ С‡РµСЂРµР· debug-СЃС‚РµРє РєР°Р¶РґС‹Р№ РєР°РґСЂ
 local GUID = _ENV["!guid"]
 
--- Балансные константы
-local SAFE_FRAMES     = 5 * 60   -- сколько кадров без урона нужно, чтобы щит «зарядился» (5 сек)
-local GRACE_FRAMES    = 3 * 60   -- сколько кадров бонус держится после удара
-local ARMOR_PER_STACK = 45       -- +45 брони за стак, пока щит активен
+-- Р‘Р°Р»Р°РЅСЃРЅС‹Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹
+local SAFE_FRAMES     = 5 * 60   -- СЃРєРѕР»СЊРєРѕ РєР°РґСЂРѕРІ Р±РµР· СѓСЂРѕРЅР° РЅСѓР¶РЅРѕ, С‡С‚РѕР±С‹ С‰РёС‚ В«Р·Р°СЂСЏРґРёР»СЃСЏВ» (5 СЃРµРє)
+local GRACE_FRAMES    = 3 * 60   -- СЃРєРѕР»СЊРєРѕ РєР°РґСЂРѕРІ Р±РѕРЅСѓСЃ РґРµСЂР¶РёС‚СЃСЏ РїРѕСЃР»Рµ СѓРґР°СЂР°
+local ARMOR_PER_STACK = 45       -- +45 Р±СЂРѕРЅРё Р·Р° СЃС‚Р°Рє, РїРѕРєР° С‰РёС‚ Р°РєС‚РёРІРµРЅ
 
--- Создание предмета: белый тир, тег «утилита» (защитный)
-local item = Item.new("DeerItems", "FacetedJade")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р°: Р±РµР»С‹Р№ С‚РёСЂ, С‚РµРі В«СѓС‚РёР»РёС‚Р°В» (Р·Р°С‰РёС‚РЅС‹Р№)
+local item = Item.new("FacetedJade")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
-
-item:clear_callbacks()
-
--- «Вне опасности», если с последнего полученного урона прошло >= SAFE_FRAMES кадров
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
+-- В«Р’РЅРµ РѕРїР°СЃРЅРѕСЃС‚РёВ», РµСЃР»Рё СЃ РїРѕСЃР»РµРґРЅРµРіРѕ РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ СѓСЂРѕРЅР° РїСЂРѕС€Р»Рѕ >= SAFE_FRAMES РєР°РґСЂРѕРІ
 local function is_safe(data)
     return (Global._current_frame - (data.fj_last_hit or -math.huge)) >= SAFE_FRAMES
 end
@@ -35,12 +32,11 @@ local function is_bonus_active(data)
     return is_safe(data) or (data.fj_grace_until or -math.huge) > Global._current_frame
 end
 
--- Спрайт-щит рисуем ОТДЕЛЬНЫМ объектом ЗА игроком (depth = parent.depth+1 → за спиной),
--- с видимостью 35% (прозрачность 65%). Спрайт центрируется на игроке (origin 24,24 для 48x48).
+-- РЎРїСЂР°Р№С‚-С‰РёС‚ СЂРёСЃСѓРµРј РћРўР”Р•Р›Р¬РќР«Рњ РѕР±СЉРµРєС‚РѕРј Р—Рђ РёРіСЂРѕРєРѕРј (depth = parent.depth+1 в†’ Р·Р° СЃРїРёРЅРѕР№),
+-- СЃ РІРёРґРёРјРѕСЃС‚СЊСЋ 35% (РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ 65%). РЎРїСЂР°Р№С‚ С†РµРЅС‚СЂРёСЂСѓРµС‚СЃСЏ РЅР° РёРіСЂРѕРєРµ (origin 24,24 РґР»СЏ 48x48).
 local SHIELD_ALPHA = 0.35
-local objShield = Object.new("DeerItems", "FacetedJadeShield")
+local objShield = Object.new("FacetedJadeShield")
 objShield:set_sprite(shieldSprite)
-objShield:clear_callbacks()
 objShield:onCreate(function(self)
     self.parent      = -4
     self.image_alpha = SHIELD_ALPHA
@@ -48,26 +44,24 @@ objShield:onCreate(function(self)
 end)
 objShield:onStep(function(self)
     if not Instance.exists(self.parent) then
-        if gm._mod_net_isClient() then return end
+        if Net.client then return end
         self:destroy()
         return
     end
     self.x           = self.parent.x
     self.y           = self.parent.y
-    self.depth       = self.parent.depth + 1   -- больше depth → рисуется ЗА игроком
+    self.depth       = self.parent.depth + 1   -- Р±РѕР»СЊС€Рµ depth в†’ СЂРёСЃСѓРµС‚СЃСЏ Р—Рђ РёРіСЂРѕРєРѕРј
     self.image_alpha = SHIELD_ALPHA
 end)
 
--- Включить/выключить щит-объект у владельца (идемпотентно — можно звать каждый кадр)
+-- Р’РєР»СЋС‡РёС‚СЊ/РІС‹РєР»СЋС‡РёС‚СЊ С‰РёС‚-РѕР±СЉРµРєС‚ Сѓ РІР»Р°РґРµР»СЊС†Р° (РёРґРµРјРїРѕС‚РµРЅС‚РЅРѕ вЂ” РјРѕР¶РЅРѕ Р·РІР°С‚СЊ РєР°Р¶РґС‹Р№ РєР°РґСЂ)
 objShield:onDestroy(function(self)
     self:instance_destroy_sync()
 end)
 
-objShield:onSerialize(function(self, buffer)
+Object.add_serializers(objShield, function(self, buffer)
     buffer:write_instance(self.parent)
-end)
-
-objShield:onDeserialize(function(self, buffer)
+end, function(self, buffer)
     self.parent = buffer:read_instance()
 end)
 
@@ -85,7 +79,7 @@ local function set_shield(actor, data, on)
     end
 end
 
--- При получении предмета запускаем таймер покоя (щит зарядится через 5 сек после подбора)
+-- РџСЂРё РїРѕР»СѓС‡РµРЅРёРё РїСЂРµРґРјРµС‚Р° Р·Р°РїСѓСЃРєР°РµРј С‚Р°Р№РјРµСЂ РїРѕРєРѕСЏ (С‰РёС‚ Р·Р°СЂСЏРґРёС‚СЃСЏ С‡РµСЂРµР· 5 СЃРµРє РїРѕСЃР»Рµ РїРѕРґР±РѕСЂР°)
 item:onAcquire(function(actor, stack)
     local data = actor:get_data("FacetedJade", GUID)
     data.fj_last_hit = Global._current_frame
@@ -93,11 +87,11 @@ item:onAcquire(function(actor, stack)
     data.fj_grace_until = nil
 end)
 
--- Запоминаем кадр последнего полученного урона (это сбрасывает «вне опасности»)
+-- Р—Р°РїРѕРјРёРЅР°РµРј РєР°РґСЂ РїРѕСЃР»РµРґРЅРµРіРѕ РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ СѓСЂРѕРЅР° (СЌС‚Рѕ СЃР±СЂР°СЃС‹РІР°РµС‚ В«РІРЅРµ РѕРїР°СЃРЅРѕСЃС‚РёВ»)
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
-    -- Игнорируем урон от самого себя (чужие самоповреждающие эффекты не должны сбивать щит)
+    -- РРіРЅРѕСЂРёСЂСѓРµРј СѓСЂРѕРЅ РѕС‚ СЃР°РјРѕРіРѕ СЃРµР±СЏ (С‡СѓР¶РёРµ СЃР°РјРѕРїРѕРІСЂРµР¶РґР°СЋС‰РёРµ СЌС„С„РµРєС‚С‹ РЅРµ РґРѕР»Р¶РЅС‹ СЃР±РёРІР°С‚СЊ С‰РёС‚)
     if attacker and actor:same(attacker) then return end
     local data = actor:get_data("FacetedJade", GUID)
     if is_bonus_active(data) then
@@ -106,9 +100,9 @@ item:onDamagedProc(function(actor, attacker, stack, hit_info)
     data.fj_last_hit = Global._current_frame
 end)
 
--- Пока «вне опасности» — даём броню (применяется при каждом пересчёте статов)
+-- РџРѕРєР° В«РІРЅРµ РѕРїР°СЃРЅРѕСЃС‚РёВ» вЂ” РґР°С‘Рј Р±СЂРѕРЅСЋ (РїСЂРёРјРµРЅСЏРµС‚СЃСЏ РїСЂРё РєР°Р¶РґРѕРј РїРµСЂРµСЃС‡С‘С‚Рµ СЃС‚Р°С‚РѕРІ)
 item:onPostStatRecalc(function(actor, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     if stack <= 0 then return end
     if is_bonus_active(actor:get_data("FacetedJade", GUID)) then
@@ -116,10 +110,10 @@ item:onPostStatRecalc(function(actor, stack)
     end
 end)
 
--- Каждый кадр ловим переход «опасно <-> безопасно»: порог завязан на ВРЕМЯ, а не на событие,
--- поэтому форсим пересчёт статов вручную, чтобы +броня включалась/выключалась вовремя.
+-- РљР°Р¶РґС‹Р№ РєР°РґСЂ Р»РѕРІРёРј РїРµСЂРµС…РѕРґ В«РѕРїР°СЃРЅРѕ <-> Р±РµР·РѕРїР°СЃРЅРѕВ»: РїРѕСЂРѕРі Р·Р°РІСЏР·Р°РЅ РЅР° Р’Р Р•РњРЇ, Р° РЅРµ РЅР° СЃРѕР±С‹С‚РёРµ,
+-- РїРѕСЌС‚РѕРјСѓ С„РѕСЂСЃРёРј РїРµСЂРµСЃС‡С‘С‚ СЃС‚Р°С‚РѕРІ РІСЂСѓС‡РЅСѓСЋ, С‡С‚РѕР±С‹ +Р±СЂРѕРЅСЏ РІРєР»СЋС‡Р°Р»Р°СЃСЊ/РІС‹РєР»СЋС‡Р°Р»Р°СЃСЊ РІРѕРІСЂРµРјСЏ.
 item:onPostStep(function(actor, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     if stack <= 0 then return end
     local data = actor:get_data("FacetedJade", GUID)
@@ -132,13 +126,13 @@ item:onPostStep(function(actor, stack)
         end
         data.fj_was_active = active
     end
-    -- Держим щит-объект в актуальном состоянии (за спиной игрока, пока бонус активен)
+    -- Р”РµСЂР¶РёРј С‰РёС‚-РѕР±СЉРµРєС‚ РІ Р°РєС‚СѓР°Р»СЊРЅРѕРј СЃРѕСЃС‚РѕСЏРЅРёРё (Р·Р° СЃРїРёРЅРѕР№ РёРіСЂРѕРєР°, РїРѕРєР° Р±РѕРЅСѓСЃ Р°РєС‚РёРІРµРЅ)
     set_shield(actor, data, active)
 end)
 
--- При потере предмета — убираем объект-щит (иначе остался бы висеть)
+-- РџСЂРё РїРѕС‚РµСЂРµ РїСЂРµРґРјРµС‚Р° вЂ” СѓР±РёСЂР°РµРј РѕР±СЉРµРєС‚-С‰РёС‚ (РёРЅР°С‡Рµ РѕСЃС‚Р°Р»СЃСЏ Р±С‹ РІРёСЃРµС‚СЊ)
 item:onRemove(function(actor, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     set_shield(actor, actor:get_data("FacetedJade", GUID), false)
 end)

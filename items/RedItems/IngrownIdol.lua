@@ -1,9 +1,9 @@
 -- DeerItems-IngrownIdol
--- Убийства питают идол. Когда накоплен порог, он призывает или обновляет одного
--- Цернунна для команды.
+-- РЈР±РёР№СЃС‚РІР° РїРёС‚Р°СЋС‚ РёРґРѕР». РљРѕРіРґР° РЅР°РєРѕРїР»РµРЅ РїРѕСЂРѕРі, РѕРЅ РїСЂРёР·С‹РІР°РµС‚ РёР»Рё РѕР±РЅРѕРІР»СЏРµС‚ РѕРґРЅРѕРіРѕ
+-- Р¦РµСЂРЅСѓРЅРЅР° РґР»СЏ РєРѕРјР°РЅРґС‹.
 
-local sprite = Resources.sprite_load("DeerItems", "item/IngrownIdol", PATH.."assets/sprites/items/sRedItems/IngrownIdol.png", 1, 16, 16)
-local indicatorSprite = Resources.sprite_load("DeerItems", "particle/IngrownIdolIndicator", PATH.."assets/sprites/particle/IngrownIdolIndicator.png", 15, 0, 0)
+local sprite = Sprite.new("item/IngrownIdol", PATH.."assets/sprites/items/sRedItems/IngrownIdol.png", 1, 16, 16)
+local indicatorSprite = Sprite.new("particle/IngrownIdolIndicator", PATH.."assets/sprites/particle/IngrownIdolIndicator.png", 15, 0, 0)
 
 local GUID = _ENV["!guid"]
 
@@ -49,17 +49,15 @@ local function offering_for(victim)
     return late and 0.5 or 1
 end
 
-local item = Item.new("DeerItems", "IngrownIdol")
+local item = Item.new("IngrownIdol")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.rare)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
-item:clear_callbacks()
-
+item:set_tier(ItemTier.RARE)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 local function total_team_stacks(team)
     local total = 0
     for _, player in ipairs(Instance.find_all(gm.constants.oP)) do
         if actor_exists(player) and player.team == team then
-            total = total + (player:item_stack_count(item, Item.STACK_KIND.any) or 0)
+            total = total + (player:item_count(item, Item.StackKind.ANY) or 0)
         end
     end
     return math.max(1, total)
@@ -77,7 +75,7 @@ item:onPostStep(function(actor, stack)
     if (data.fed or 0) < THRESHOLD then return end
     data.fed = data.fed - THRESHOLD
 
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
     if not DeerItemsCernunnos or not DeerItemsCernunnos.spawn then
         error("IngrownIdol requires actor/Cernunnos.lua to be loaded before items")
     end
@@ -113,7 +111,7 @@ gm.post_script_hook(gm.constants.draw_hud, function()
 
     local player = Player.get_client()
     if not actor_exists(player) then return end
-    if (player:item_stack_count(item, Item.STACK_KIND.any) or 0) <= 0 then return end
+    if (player:item_count(item, Item.StackKind.ANY) or 0) <= 0 then return end
 
     local data = player:get_data("IngrownIdol", GUID)
     local fed = data.fed or 0

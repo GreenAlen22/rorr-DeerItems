@@ -3,17 +3,17 @@
 
 -- Загружаем спрайт предмета
 -- Загружаем звуковой эффект
-local sprite = Resources.sprite_load("DeerItems", "item/SeaFossil", PATH.."assets/sprites/items/sGreenItems/SeaFossil.png", 1, 16, 16)
-local sound = Resources.sfx_load("DeerItems", "sound/SeaFossil", PATH.."assets/sounds/SeaFossil.ogg")
+local sprite = Sprite.new("item/SeaFossil", PATH.."assets/sprites/items/sGreenItems/SeaFossil.png", 1, 16, 16)
+local sound = Sound.new("sound/SeaFossil", PATH.."assets/sounds/SeaFossil.ogg")
 
 -- Создание предмета SeaFossil
 -- Привязка спрайта к предмету
 -- Установка тира предмета: зелёный (необычный)
 -- Назначение тега лута: предмет, повышающий живучесть
-local item = Item.new("DeerItems", "SeaFossil")
+local item = Item.new("SeaFossil")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
 -- При использовании экипировки: воспроизводим звук и восстанавливаем HP
 item:onEquipmentUse(function(actor, stack)

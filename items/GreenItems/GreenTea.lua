@@ -2,16 +2,16 @@
 -- Увеличивает макс. HP на 6.8% за стак, восстанавливает разницу HP при перерасчёте и даёт регенерацию.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/GreenTea", PATH.."assets/sprites/items/sGreenItems/GreenTea.png", 1, 18, 18)
+local sprite = Sprite.new("item/GreenTea", PATH.."assets/sprites/items/sGreenItems/GreenTea.png", 1, 18, 18)
 
 -- Создание предмета GreenTea
 -- Привязка спрайта к предмету
 -- Установка тира предмета: зелёный (необычный)
 -- Назначение тега лута: предмет, связанный с лечением
-local item = Item.new("DeerItems", "GreenTea")
+local item = Item.new("GreenTea")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
 -- Переменные для сохранения значений до перерасчёта
 local maxhp_old

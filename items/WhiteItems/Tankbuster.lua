@@ -1,33 +1,30 @@
 -- DeerItems-Tankbuster
--- Tankbuster: не чаще раза в 7 секунд при попадании наносит тяжёлый добавочный удар —
--- 40% (+20% за стак) от урона игрока ПЛЮС 2% (+1% за стак) от макс. HP цели.
--- (Альтернатива Armor-Piercing Rounds: вместо «только боссам» — анти-танковый удар по любому жирному.)
+-- Tankbuster: РЅРµ С‡Р°С‰Рµ СЂР°Р·Р° РІ 7 СЃРµРєСѓРЅРґ РїСЂРё РїРѕРїР°РґР°РЅРёРё РЅР°РЅРѕСЃРёС‚ С‚СЏР¶С‘Р»С‹Р№ РґРѕР±Р°РІРѕС‡РЅС‹Р№ СѓРґР°СЂ вЂ”
+-- 40% (+20% Р·Р° СЃС‚Р°Рє) РѕС‚ СѓСЂРѕРЅР° РёРіСЂРѕРєР° РџР›Р®РЎ 2% (+1% Р·Р° СЃС‚Р°Рє) РѕС‚ РјР°РєСЃ. HP С†РµР»Рё.
+-- (РђР»СЊС‚РµСЂРЅР°С‚РёРІР° Armor-Piercing Rounds: РІРјРµСЃС‚Рѕ В«С‚РѕР»СЊРєРѕ Р±РѕСЃСЃР°РјВ» вЂ” Р°РЅС‚Рё-С‚Р°РЅРєРѕРІС‹Р№ СѓРґР°СЂ РїРѕ Р»СЋР±РѕРјСѓ Р¶РёСЂРЅРѕРјСѓ.)
 
--- Спрайт предмета (без партиклов и звука по ТЗ)
-local sprite = Resources.sprite_load("DeerItems", "item/Tankbuster", PATH.."assets/sprites/items/sWhiteItems/Tankbuster.png", 1, 18, 18)
+-- РЎРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р° (Р±РµР· РїР°СЂС‚РёРєР»РѕРІ Рё Р·РІСѓРєР° РїРѕ РўР—)
+local sprite = Sprite.new("item/Tankbuster", PATH.."assets/sprites/items/sWhiteItems/Tankbuster.png", 1, 18, 18)
 
 local GUID = _ENV["!guid"]
 
--- Балансные константы
-local COOLDOWN_FRAMES  = 5 * 60   -- перезарядка 5 секунд
-local PLAYER_DMG_BASE  = 1.00     -- 100% урона игрока
-local PLAYER_DMG_STACK = 0.70     -- +70% за стак
-local MAXHP_BASE       = 0.04     -- 4% макс. HP цели
-local MAXHP_STACK      = 0.02     -- +2% за стак
+-- Р‘Р°Р»Р°РЅСЃРЅС‹Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹
+local COOLDOWN_FRAMES  = 5 * 60   -- РїРµСЂРµР·Р°СЂСЏРґРєР° 5 СЃРµРєСѓРЅРґ
+local PLAYER_DMG_BASE  = 1.00     -- 100% СѓСЂРѕРЅР° РёРіСЂРѕРєР°
+local PLAYER_DMG_STACK = 0.70     -- +70% Р·Р° СЃС‚Р°Рє
+local MAXHP_BASE       = 0.04     -- 4% РјР°РєСЃ. HP С†РµР»Рё
+local MAXHP_STACK      = 0.02     -- +2% Р·Р° СЃС‚Р°Рє
 
--- Создание предмета: белый тир, тег «урон»
-local item = Item.new("DeerItems", "Tankbuster")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р°: Р±РµР»С‹Р№ С‚РёСЂ, С‚РµРі В«СѓСЂРѕРЅВ»
+local item = Item.new("Tankbuster")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_damage)
-
-item:clear_callbacks()
-
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 item:onHitProc(function(actor, victim, stack, hit_info)
-    if not gm._mod_net_isHost() then return end
+    if not Net.host then return end
     if stack <= 0 then return end
 
-    -- Внутренний кулдаун 7 секунд (на игрока)
+    -- Р’РЅСѓС‚СЂРµРЅРЅРёР№ РєСѓР»РґР°СѓРЅ 7 СЃРµРєСѓРЅРґ (РЅР° РёРіСЂРѕРєР°)
     local data = actor:get_data("Tankbuster", GUID)
     local now = Global._current_frame
     if (now - (data.tb_last or -COOLDOWN_FRAMES)) < COOLDOWN_FRAMES then return end
@@ -36,10 +33,10 @@ item:onHitProc(function(actor, victim, stack, hit_info)
     if base <= 0 then return end
     local target_maxhp = victim.maxhp or 0
 
-    -- Плоский добавочный урон = доля урона игрока + доля макс. HP цели
+    -- РџР»РѕСЃРєРёР№ РґРѕР±Р°РІРѕС‡РЅС‹Р№ СѓСЂРѕРЅ = РґРѕР»СЏ СѓСЂРѕРЅР° РёРіСЂРѕРєР° + РґРѕР»СЏ РјР°РєСЃ. HP С†РµР»Рё
     local flat = base * (PLAYER_DMG_BASE + PLAYER_DMG_STACK * (stack - 1))
                + target_maxhp * (MAXHP_BASE + MAXHP_STACK * (stack - 1))
-    -- Переводим плоскую величину в коэффициент fire_direct (×actor.damage)
+    -- РџРµСЂРµРІРѕРґРёРј РїР»РѕСЃРєСѓСЋ РІРµР»РёС‡РёРЅСѓ РІ РєРѕСЌС„С„РёС†РёРµРЅС‚ fire_direct (Г—actor.damage)
     local coef = flat / base
     actor:fire_direct(victim, coef, nil, nil, nil, nil, false)
 

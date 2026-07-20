@@ -1,44 +1,44 @@
 -- DeerItems-ShadowShield
--- Даёт бафф в начале этапа: увеличивает броню и скорость, но исчезает при атаке. Длительность — 20 + 10 сек за стак.
+-- Р”Р°С‘С‚ Р±Р°С„С„ РІ РЅР°С‡Р°Р»Рµ СЌС‚Р°РїР°: СѓРІРµР»РёС‡РёРІР°РµС‚ Р±СЂРѕРЅСЋ Рё СЃРєРѕСЂРѕСЃС‚СЊ, РЅРѕ РёСЃС‡РµР·Р°РµС‚ РїСЂРё Р°С‚Р°РєРµ. Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ вЂ” 20 + 10 СЃРµРє Р·Р° СЃС‚Р°Рє.
 
--- Загружаем спрайт предмета
--- Загружаем спрайт баффа
--- Загружаем звуковой эффект
-local sprite = Resources.sprite_load("DeerItems", "item/ShadowShield", PATH.."assets/sprites/items/sGreenItems/ShadowShield.png", 1, 16, 16)
-local buff_sprite = Resources.sprite_load("DeerItems", "buff/ShadowShield", PATH.."assets/sprites/buffs/ShadowShield.png", 1, 7.5, 7.5)
-local sound = Resources.sfx_load("DeerItems", "sound/ShadowShield", PATH.."assets/sounds/ShadowShield.ogg")
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
+-- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ Р±Р°С„С„Р°
+-- Р—Р°РіСЂСѓР¶Р°РµРј Р·РІСѓРєРѕРІРѕР№ СЌС„С„РµРєС‚
+local sprite = Sprite.new("item/ShadowShield", PATH.."assets/sprites/items/sGreenItems/ShadowShield.png", 1, 16, 16)
+local buff_sprite = Sprite.new("buff/ShadowShield", PATH.."assets/sprites/buffs/ShadowShield.png", 1, 7.5, 7.5)
+local sound = Sound.new("sound/ShadowShield", PATH.."assets/sounds/ShadowShield.ogg")
 local SHADOW_ALPHA = 0.85
 
--- Создание предмета и баффа ShadowShield
-local item = Item.new("DeerItems", "ShadowShield")
-local buff = Buff.new("DeerItems", "ShadowShield")
+-- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р° Рё Р±Р°С„С„Р° ShadowShield
+local item = Item.new("ShadowShield")
+local buff = Buff.new("ShadowShield")
 
--- Привязка спрайта к предмету
--- Установка тира предмета: зелёный (необычный)
--- Назначение тега лута: утилитарный предмет
+-- РџСЂРёРІСЏР·РєР° СЃРїСЂР°Р№С‚Р° Рє РїСЂРµРґРјРµС‚Сѓ
+-- РЈСЃС‚Р°РЅРѕРІРєР° С‚РёСЂР° РїСЂРµРґРјРµС‚Р°: Р·РµР»С‘РЅС‹Р№ (РЅРµРѕР±С‹С‡РЅС‹Р№)
+-- РќР°Р·РЅР°С‡РµРЅРёРµ С‚РµРіР° Р»СѓС‚Р°: СѓС‚РёР»РёС‚Р°СЂРЅС‹Р№ РїСЂРµРґРјРµС‚
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.uncommon)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_tier(ItemTier.UNCOMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
--- В начале этапа даёт временный бафф
+-- Р’ РЅР°С‡Р°Р»Рµ СЌС‚Р°РїР° РґР°С‘С‚ РІСЂРµРјРµРЅРЅС‹Р№ Р±Р°С„С„
 item:onStageStart(function(actor, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
-    -- Длительность: 20 + 10 сек за стак
+    -- Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ: 20 + 10 СЃРµРє Р·Р° СЃС‚Р°Рє
     actor:buff_apply(buff, 60 * (20 + 10 * stack), stack)
 end)
 
--- При ударе бафф исчезает полностью
+-- РџСЂРё СѓРґР°СЂРµ Р±Р°С„С„ РёСЃС‡РµР·Р°РµС‚ РїРѕР»РЅРѕСЃС‚СЊСЋ
 item:onHitProc(function(actor, victim, stack, hit_info)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
-    if actor:buff_stack_count(buff) >= 1 then
+    if actor:buff_count(buff) >= 1 then
         actor:buff_remove(buff, stack)
     end
 end)
 
--- Настройки баффа
+-- РќР°СЃС‚СЂРѕР№РєРё Р±Р°С„С„Р°
 buff.icon_sprite = buff_sprite
 buff.icon_stack_subimage = false
 buff.draw_stack_number = false
@@ -75,17 +75,15 @@ local function draw_shadow(actor)
     end
 end
 
--- Очистка всех старых коллбеков
-buff:clear_callbacks()
-
+-- РћС‡РёСЃС‚РєР° РІСЃРµС… СЃС‚Р°СЂС‹С… РєРѕР»Р»Р±РµРєРѕРІ
 buff:onPostDraw(function(actor, stack)
     draw_shadow(actor)
 end)
 
--- Эффекты баффа: скорость и броня
+-- Р­С„С„РµРєС‚С‹ Р±Р°С„С„Р°: СЃРєРѕСЂРѕСЃС‚СЊ Рё Р±СЂРѕРЅСЏ
 buff:onStatRecalc(function(actor, stack)
-    -- Увеличение скорости передвижения
+    -- РЈРІРµР»РёС‡РµРЅРёРµ СЃРєРѕСЂРѕСЃС‚Рё РїРµСЂРµРґРІРёР¶РµРЅРёСЏ
     actor.pHmax = actor.pHmax + (0.28 + 0.27 * stack)
-    -- Увеличение брони
+    -- РЈРІРµР»РёС‡РµРЅРёРµ Р±СЂРѕРЅРё
     actor.armor = actor.armor + (40 + 20 * stack)
 end)

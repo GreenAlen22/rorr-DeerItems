@@ -1,8 +1,6 @@
--- Артефакт победы: воскрешает игроков после окончания фазы босса у телепорта.
+-- РђСЂС‚РµС„Р°РєС‚ РїРѕР±РµРґС‹: РІРѕСЃРєСЂРµС€Р°РµС‚ РёРіСЂРѕРєРѕРІ РїРѕСЃР»Рµ РѕРєРѕРЅС‡Р°РЅРёСЏ С„Р°Р·С‹ Р±РѕСЃСЃР° Сѓ С‚РµР»РµРїРѕСЂС‚Р°.
 
-local sprite = Resources.sprite_load(
-    "DeerItems",
-    "artifact/Victory",
+local sprite = Sprite.new("artifact/Victory",
     PATH.."assets/sprites/artifacts/ArtifactOfVictory.png",
     3,
     16,
@@ -12,7 +10,7 @@ local sprite = Resources.sprite_load(
 local REVIVE_INVINCIBILITY_FRAMES = 60
 local PLAYER_DRONE_OBJECT = gm.constants.oPDrone
 
-local artifact = Artifact.new("DeerItems", "Victory")
+local artifact = Artifact.new("Victory")
 artifact:set_sprites(sprite, sprite)
 artifact:set_text(
     "artifact.Victory.name",
@@ -23,7 +21,7 @@ artifact:set_text(
 local dead_players = {}
 local event_active_last_step = false
 local boss_phase_seen = false
-local packet_revive = Packet.new()
+local packet_revive = Packet.new("ArtifactOfVictory-packet_revive")
 
 local function truthy(value)
     return value == true or value == 1 or value == 1.0
@@ -42,8 +40,8 @@ local function reset_event_state()
 end
 
 local function restore_player(player)
-    -- Игра сохраняет экземпляр игрока для смерти и контрольных точек. Возвращаем
-    -- это состояние, чтобы не потерять управление, инвентарь и сетевой ID.
+    -- РРіСЂР° СЃРѕС…СЂР°РЅСЏРµС‚ СЌРєР·РµРјРїР»СЏСЂ РёРіСЂРѕРєР° РґР»СЏ СЃРјРµСЂС‚Рё Рё РєРѕРЅС‚СЂРѕР»СЊРЅС‹С… С‚РѕС‡РµРє. Р’РѕР·РІСЂР°С‰Р°РµРј
+    -- СЌС‚Рѕ СЃРѕСЃС‚РѕСЏРЅРёРµ, С‡С‚РѕР±С‹ РЅРµ РїРѕС‚РµСЂСЏС‚СЊ СѓРїСЂР°РІР»РµРЅРёРµ, РёРЅРІРµРЅС‚Р°СЂСЊ Рё СЃРµС‚РµРІРѕР№ ID.
     if not player or not Instance.exists(player) then return false end
 
     player.dead = false
@@ -65,7 +63,7 @@ local function restore_player(player)
         player.dead_body:destroy()
     end
 
-    -- oPDrone — временный аватар мёртвого игрока. m_id связывает его с восстановленным oP.
+    -- oPDrone вЂ” РІСЂРµРјРµРЅРЅС‹Р№ Р°РІР°С‚Р°СЂ РјС‘СЂС‚РІРѕРіРѕ РёРіСЂРѕРєР°. m_id СЃРІСЏР·С‹РІР°РµС‚ РµРіРѕ СЃ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Рј oP.
     local player_m_id = player.m_id
     if player_m_id then
         for _, drone in ipairs(Instance.find_all(PLAYER_DRONE_OBJECT)) do
@@ -75,14 +73,16 @@ local function restore_player(player)
         end
     end
 
-    if gm._mod_net_isHost() then player:instance_resync() end
+    if Net.host then player:instance_resync() end
     return true
 end
 
-packet_revive:onReceived(function(message)
-    if not gm._mod_net_isClient() then return end
+packet_revive:set_serializers(function(buffer, player)
+    buffer:write_instance(player)
+end, function(buffer)
+    if not Net.client then return end
 
-    local player = message:read_instance()
+    local player = buffer:read_instance()
     if Instance.exists(player) and player:same(Player.get_client()) then
         restore_player(player)
     end
@@ -92,16 +92,14 @@ local function revive_dead_players()
     for player_id, _ in pairs(dead_players) do
         local player = Instance.wrap(player_id)
         if restore_player(player) and not player:same(Player.get_client()) then
-            local message = packet_revive:message_begin()
-            message:write_instance(player)
-            message:send_to_all()
+            packet_revive:send_to_all(player)
         end
     end
 
     reset_event_state()
 end
 
-Callback.add(Callback.TYPE.onGameStart, "DeerItems-Victory-resetRunState", function()
+Callback.add(Callback.ON_GAME_START, function()
     reset_event_state()
     event_active_last_step = false
 end)
@@ -111,8 +109,8 @@ DeerItemsPlayerDeath.on_host(function(player)
     dead_players[player.id] = true
 end)
 
-Callback.add(Callback.TYPE.postStep, "DeerItems-Victory-revivePlayers", function()
-    if gm._mod_net_isClient() or not artifact.active then return end
+Callback.add(Callback.POST_STEP, function()
+    if Net.client or not artifact.active then return end
 
     local teleporter = DeerItemsTeleporter.find_active()
     if not teleporter then

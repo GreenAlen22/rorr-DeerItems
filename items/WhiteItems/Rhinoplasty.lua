@@ -1,7 +1,7 @@
 -- DeerItems-Rhinoplasty
 
-local sprite = Resources.sprite_load("DeerItems", "item/Rhinoplasty", PATH.."assets/sprites/items/sWhiteItems/Rhinoplasty.png", 1, 16, 16)
-local spriteBuff = Resources.sprite_load("DeerItems", "buff/Rhinoplasty", PATH.."assets/sprites/buffs/Rhinoplasty.png", 1, 6, 8)
+local sprite = Sprite.new("item/Rhinoplasty", PATH.."assets/sprites/items/sWhiteItems/Rhinoplasty.png", 1, 16, 16)
+local spriteBuff = Sprite.new("buff/Rhinoplasty", PATH.."assets/sprites/buffs/Rhinoplasty.png", 1, 6, 8)
 
 local GUID = _ENV["!guid"]
 local HEAL_PER_SKIN = 40
@@ -11,12 +11,12 @@ local SKINS_PER_EXTRA_ITEM = 2
 local KILLS_PER_SKIN = 3
 local SKIN_DURATION = 10 * 60
 
-local item = Item.new("DeerItems", "Rhinoplasty")
+local item = Item.new("Rhinoplasty")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
-local buff = Buff.new("DeerItems", "Rhinoplasty")
+local buff = Buff.new("Rhinoplasty")
 buff.icon_sprite = spriteBuff
 buff.icon_stack_subimage = false
 buff.draw_stack_number = true
@@ -24,7 +24,7 @@ buff.max_stack = 999
 buff.is_timed = false
 
 local function item_stack_count(actor)
-    return math.max(1, actor:item_stack_count(item) or 1)
+    return math.max(1, actor:item_count(item) or 1)
 end
 
 local function skin_cap(actor)
@@ -36,15 +36,15 @@ local function heal_per_skin(actor)
 end
 
 item:onKillProc(function(actor, victim, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     local data = actor:get_data("Rhinoplasty", GUID)
     data.kills = (data.kills or 0) + 1
 end)
 
--- У каждой кожи свой таймер: новая кожа не обновляет и не тратит старые.
+-- РЈ РєР°Р¶РґРѕР№ РєРѕР¶Рё СЃРІРѕР№ С‚Р°Р№РјРµСЂ: РЅРѕРІР°СЏ РєРѕР¶Р° РЅРµ РѕР±РЅРѕРІР»СЏРµС‚ Рё РЅРµ С‚СЂР°С‚РёС‚ СЃС‚Р°СЂС‹Рµ.
 item:onPostStep(function(actor, stack)
-    if gm._mod_net_isClient() then return end
+    if Net.client then return end
 
     local data = actor:get_data("Rhinoplasty", GUID)
     data.kills = data.kills or 0
@@ -73,18 +73,18 @@ item:onPostStep(function(actor, stack)
         actor:buff_apply(buff, 1, 1)
     end
 
-    -- После лимита не копим готовые кожи: сохраняем только неполный прогресс убийств.
+    -- РџРѕСЃР»Рµ Р»РёРјРёС‚Р° РЅРµ РєРѕРїРёРј РіРѕС‚РѕРІС‹Рµ РєРѕР¶Рё: СЃРѕС…СЂР°РЅСЏРµРј С‚РѕР»СЊРєРѕ РЅРµРїРѕР»РЅС‹Р№ РїСЂРѕРіСЂРµСЃСЃ СѓР±РёР№СЃС‚РІ.
     if #timers >= cap then
         data.kills = data.kills % KILLS_PER_SKIN
     end
 end)
 
 item:onRemove(function(actor, stack)
-    if gm._mod_net_isClient() or stack > 1 then return end
+    if Net.client or stack > 1 then return end
 
     local data = actor:get_data("Rhinoplasty", GUID)
     data.kills = 0
     data.skin_timers = {}
-    local skins = actor:buff_stack_count(buff)
+    local skins = actor:buff_count(buff)
     if skins > 0 then actor:buff_remove(buff, skins) end
 end)

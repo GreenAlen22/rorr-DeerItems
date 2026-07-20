@@ -4,7 +4,7 @@
 -- (Альтернатива Roll of Pennies: вместо «страдай = богатей» — «играй чисто = богатей».)
 
 -- Спрайт предмета (без партиклов и звука по ТЗ)
-local sprite = Resources.sprite_load("DeerItems", "item/BountyTag", PATH.."assets/sprites/items/sWhiteItems/BountyTag.png", 1, 18, 18)
+local sprite = Sprite.new("item/BountyTag", PATH.."assets/sprites/items/sWhiteItems/BountyTag.png", 1, 18, 18)
 
 local GUID = _ENV["!guid"]
 
@@ -14,13 +14,10 @@ local STREAK_BONUS   = 1    -- +1 золота за каждое убийств�
 local STREAK_CAP     = 10   -- максимум бонуса от серии
 
 -- Создание предмета: белый тир, тег «утилита»
-local item = Item.new("DeerItems", "BountyTag")
+local item = Item.new("BountyTag")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
-
-item:clear_callbacks()
-
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 -- Получение урона обнуляет серию
 item:onDamagedProc(function(actor, attacker, stack, hit_info)
     if attacker and actor:same(attacker) then return end

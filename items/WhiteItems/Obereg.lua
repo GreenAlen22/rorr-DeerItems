@@ -3,17 +3,17 @@
 
 -- Загружаем спрайт предмета
 -- Загружаем спрайт партикла, отображаемого над игроком, пока предмет активен
-local sprite = Resources.sprite_load("DeerItems", "item/Obereg", PATH.."assets/sprites/items/sWhiteItems/Obereg.png", 1, 16, 16)
-local oberegParticle = Resources.sprite_load("DeerItems", "particle/Obereg", PATH.."assets/sprites/buffs/Obereg.png", 1, 7.5, 7.5)
+local sprite = Sprite.new("item/Obereg", PATH.."assets/sprites/items/sWhiteItems/Obereg.png", 1, 16, 16)
+local oberegParticle = Sprite.new("particle/Obereg", PATH.."assets/sprites/buffs/Obereg.png", 1, 7.5, 7.5)
 
 -- Создание предмета Obereg
 -- Привязка спрайта к предмету
 -- Установка тира предмета: белый (обычный)
 -- Назначение тега лута: предмет, связанный с лечением
-local item = Item.new("DeerItems", "Obereg")
+local item = Item.new("Obereg")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.common)
-item:set_loot_tags(Item.LOOT_TAG.category_healing)
+item:set_tier(ItemTier.COMMON)
+item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
 -- Пересчёт брони после базового расчёта статистики
 item:onPostStatRecalc(function(actor, stack)

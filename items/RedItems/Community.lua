@@ -2,20 +2,18 @@
 -- Увеличивает все характеристики пропорционально общему количеству предметов. Масштабируется на 1% за предмет * кол-во стаков.
 
 -- Загружаем спрайт предмета
-local sprite = Resources.sprite_load("DeerItems", "item/Community", PATH.."assets/sprites/items/sRedItems/Community.png", 1, 16, 16)
+local sprite = Sprite.new("item/Community", PATH.."assets/sprites/items/sRedItems/Community.png", 1, 16, 16)
 
 -- Создание предмета Community
 -- Привязка спрайта к предмету
 -- Установка тира предмета: красный (легендарный)
 -- Назначение тега лута: утилитарный предмет
-local item = Item.new("DeerItems", "Community")
+local item = Item.new("Community")
 item:set_sprite(sprite)
-item:set_tier(Item.TIER.rare)
-item:set_loot_tags(Item.LOOT_TAG.category_utility)
+item:set_tier(ItemTier.RARE)
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Очистка старых коллбеков
-item:clear_callbacks()
-
 -- Список всех предметов игры фиксирован после загрузки модов — ищем его один раз и кэшируем.
 -- У игрока меняется лишь количество, поэтому item_stack_count пересчитываем при каждом вызове.
 local all_items
@@ -23,7 +21,7 @@ local function count_total_items(actor)
     all_items = all_items or Item.find_all()
     local total = 0
     for _, it in ipairs(all_items) do
-        total = total + actor:item_stack_count(it, Item.STACK_KIND.any)
+        total = total + actor:item_count(it, Item.StackKind.ANY)
     end
     return total
 end
