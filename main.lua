@@ -8,21 +8,16 @@ mods["ReturnsAPI-ReturnsAPI"].auto{
 }
 PATH = _ENV["!plugins_mod_folder_path"].."/"
 
--- Manifest is the single source of truth for item files and availability.
 require("./settings/ItemManifest")
 require("./settings/ItemConfig")
 local item_config = DeerItemsItemConfig
 if not item_config then error("DeerItems failed to load item config") end
 
--- Loads every item declared by the manifest, including hidden dependency items.
+-- Keep the original loader semantics: the item directory is the source of
+-- executable content, while ItemManifest controls availability settings.
 local function require_items()
-    for _, category in ipairs(DeerItemsItemManifest.categories) do
-        for _, item in ipairs(category.items) do
-            require("./items/"..category.key.."/"..item.id)
-            for _, dependency in ipairs(item.dependencies or {}) do
-                require("./items/"..category.key.."/"..dependency)
-            end
-        end
+    for _, file in ipairs(path.get_files(PATH.."items")) do
+        require(file)
     end
 end
 
