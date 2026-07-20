@@ -654,9 +654,11 @@ return {
             description = "Lightning strikes near the players. Lightning strikes take away 5% of your maximum health. Items enhance the storm."
         }
     },
-    DeerItems = {
-        header = "Deer Items",
-        items = {
+    ui = {
+        options = {
+            DeerItems = {
+                header = "Deer Items",
+                items = {
             header = "Items",
             all = "Enable Deer Items",
             enableAll = "Enable All Items",
@@ -741,6 +743,8 @@ return {
                 SoulJar = "Soul Jar",
                 OneArmyMan = "One Army Man",
                 TacticalVisor = "Tactical Visor"
+            }
+                }
             }
         }
     }

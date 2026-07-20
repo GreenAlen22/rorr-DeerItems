@@ -654,9 +654,11 @@ return {
             description = "Молнии бьют рядом с игроками. Попадание молнии отнимает 5% максимального здоровья. Предметы усиливают шторм."
         }
     },
-    DeerItems = {
-        header = "Deer Items",
-        items = {
+    ui = {
+        options = {
+            DeerItems = {
+                header = "Deer Items",
+                items = {
             header = "Предметы",
             all = "Включить предметы Deer Items",
             enableAll = "Включить все предметы",
@@ -741,6 +743,8 @@ return {
                 SoulJar = "Урна душ",
                 OneArmyMan = "Один в поле воин",
                 TacticalVisor = "Тактический визор"
+            }
+                }
             }
         }
     }
