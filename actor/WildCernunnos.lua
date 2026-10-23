@@ -1,5 +1,5 @@
 -- DeerItems-WildCernunnos
--- Босс телепорта: дикий Цернуннос на ванильном ИИ, вплотную бьёт когтями, издали бросается рывком.
+-- Босс телепорта: дикий Цернуннос на ванильном ИИ, вплотную бьёт когтями, издали бросается рывком, рёвом поднимает корни под игроками.
 
 local GUID = _ENV["!guid"]
 local SPRITE_PATH = PATH.."assets/sprites/actor/sWildCernunnos/"
@@ -19,10 +19,13 @@ local sprite_death     = Sprite.new("actor/WildCernunnosDeath", SPRITE_PATH.."de
 local sprite_shoot1    = Sprite.new("actor/WildCernunnosShoot1", SPRITE_PATH.."shoot1.png", 7, 64, 128)
 -- Рога вперёд и вытянутый бег шире 128, как и лежащее тело.
 local sprite_charge    = Sprite.new("actor/WildCernunnosCharge", SPRITE_PATH.."charge.png", 12, 80, 128)
+local sprite_roar      = Sprite.new("actor/WildCernunnosRoar", SPRITE_PATH.."roar.png", 10, 64, 128)
+-- Кадр корней хелпер шипов выбирает сам по возрасту шипа: скорость ленты ему не нужна.
+local sprite_roots     = Sprite.new("actor/WildCernunnosRoots", SPRITE_PATH.."roots.png", 19, 32, 64)
 
--- Sprite.new скорость не берёт; 0.5 — как у союзника, ленты те же. Рывок туда же:
+-- Sprite.new скорость не берёт; 0.5 — как у союзника, ленты те же. Рывок и рёв туда же:
 -- скорости в состояниях босса считаются от одной базы.
-for _, s in ipairs({sprite_spawn, sprite_idle, sprite_walk, sprite_death, sprite_shoot1, sprite_charge}) do
+for _, s in ipairs({sprite_spawn, sprite_idle, sprite_walk, sprite_death, sprite_shoot1, sprite_charge, sprite_roar}) do
     s:set_speed(0.5)
 end
 
@@ -32,6 +35,13 @@ gm.elite_generate_palettes(sprite_palette.value)
 local snd_spawn = Sound.new("WildCernunnos/spawn", PATH.."assets/sounds/CernunnosSpawn.ogg")
 local snd_hit   = Sound.new("WildCernunnos/hit", PATH.."assets/sounds/CernunnosHit.ogg")
 local snd_death = Sound.new("WildCernunnos/death", PATH.."assets/sounds/CernunnosDeath.ogg")
+-- Рёв союзника, пока у босса нет своего.
+local snd_roar  = Sound.new("WildCernunnos/roar", PATH.."assets/sounds/IngrownIdol.ogg")
+
+-- Тот же замедлитель, что даёт Taser: минус скорость, без своего баффа.
+local snare = Buff.find("snare", "ror")
+-- log.error бросает: без баффа корни молча били бы без замедления.
+if not snare then log.error("DeerItems: buff ror-snare not found, WildCernunnos roots would not snare") end
 
 local SPEED = 2.4
 local CLAWS_RANGE = 120
@@ -60,6 +70,13 @@ local CHARGE_KNOCK_FRAMES = 20
 local CHARGE_KNOCK_FORCE = 6
 -- Пол под ногами касается низа bbox; без отступа он читался бы стеной.
 local CHARGE_WALL_FLOOR_GAP = 2
+
+local ROAR_RANGE = 900
+local ROAR_FRAME = 4
+local ROAR_ANIM = 0.2
+local ROAR_SHAKE = 4
+local ROOTS_DAMAGE = 1.2
+local SNARE_FRAMES = 90
 
 local PHASE_WINDUP = 0
 local PHASE_RUN = 1
@@ -94,6 +111,11 @@ charge.damage = 2.5
 
 local state_charge = ActorState.new("WildCernunnosCharge")
 
+local roar = Skill.new("WildCernunnosRoar")
+roar.cooldown = 600
+
+local state_roar = ActorState.new("WildCernunnosRoar")
+
 Callback.add(wild.on_create, function(actor)
     actor.sprite_palette = sprite_palette
     actor.sprite_spawn = sprite_spawn
@@ -117,6 +139,8 @@ Callback.add(wild.on_create, function(actor)
     actor:set_default_skill(Skill.Slot.PRIMARY, claws)
     actor.x_range = CHARGE_RANGE
     actor:set_default_skill(Skill.Slot.SECONDARY, charge)
+    actor.c_range = ROAR_RANGE
+    actor:set_default_skill(Skill.Slot.UTILITY, roar)
 
     actor:init_actor_late()
 end)
@@ -276,6 +300,80 @@ Callback.add(state_charge.on_step, function(actor, data)
         actor:actor_animation_set(sprite_charge, CHARGE_BRAKE_ANIM)
         actor:skill_util_exit_state_on_anim_end()
     end
+end)
+
+-- Проверка Rusted; object_index — не Lua-число (knowledge/objects.md), отсюда tonumber.
+local function is_player(actor)
+    return exists(actor) and tonumber(actor.object_index) == gm.constants.oP
+end
+
+-- Мёртвый игрок остаётся инстансом oP: мёртвым его помечает поле dead (actor_set_dead).
+local function player_alive(player)
+    return not Util.bool(player.dead) and tonumber(player.hp) > 0
+end
+
+local roots = DeerItemsGroundSpikes.kind("WildCernunnosRoots", {
+    sprite = sprite_roots,
+    sound = snd_hit,
+    damage = ROOTS_DAMAGE,
+    -- Корни переживают босса: убитый или исчезнувший больше не бьёт.
+    -- object_index инстанса — объект-носитель, свой объект отдаёт get_object_index.
+    can_fire = function(owner)
+        return exists(owner) and owner:get_object_index() == wild.value and tonumber(owner.hp) > 0
+    end,
+    -- Хелпер зовёт on_hit на любую жертву удара корней, а замедление — только игрокам.
+    on_hit = function(hit_info)
+        local victim = hit_info.target
+        if not is_player(victim) then return end
+        -- У snare max_stack 1: на висящем баффе buff_apply стака не прибавит, но таймер
+        -- поставит max(остаток, 90) и пакетом донесёт клиенту, то есть обновит, как Taser.
+        -- Снимать перед наложением нельзя: у snare client_handles_removal, снятие не синхронно.
+        victim:buff_apply(snare, SNARE_FRAMES)
+    end,
+})
+
+-- Флаг рёва — в данных инстанса, как у рывка: булево в структуре состояния
+-- может вернуться числом.
+local function roar_data(actor)
+    return Instance.get_data(actor, "WildCernunnosRoar", GUID)
+end
+
+-- Хост: корни под каждым живым игроком в радиусе, клиентам их донесёт пакет хелпера.
+local function roar_spawn_roots(actor)
+    for _, player in ipairs(Instance.find_all(gm.constants.oP)) do
+        if player_alive(player)
+            and gm.point_distance(actor.x, actor.y, player.x, player.y) <= ROAR_RANGE then
+            roots:spawn(actor, player.x, player.bbox_bottom)
+        end
+    end
+end
+
+Callback.add(roar.on_activate, function(actor, skill, slot)
+    actor:set_state(state_roar)
+end)
+
+Callback.add(state_roar.on_enter, function(actor, data)
+    actor.image_index = 0
+    roar_data(actor).fired = false
+end)
+
+Callback.add(state_roar.on_step, function(actor, data)
+    actor:skill_util_fix_hspeed()
+    actor:actor_animation_set(sprite_roar, ROAR_ANIM)
+
+    local roar_state = roar_data(actor)
+    if not roar_state.fired and tonumber(actor.image_index) >= ROAR_FRAME then
+        roar_state.fired = true
+        -- Звук и тряска локальны, каждая машина делает их себе.
+        actor:sound_play(snd_roar, 1.0, 1.0)
+        actor:screen_shake(ROAR_SHAKE)
+        -- kind:spawn и сам откажет клиенту; проверка здесь — чтобы роль была видна.
+        if Net.host then
+            roar_spawn_roots(actor)
+        end
+    end
+
+    actor:skill_util_exit_state_on_anim_end()
 end)
 
 local card = MonsterCard.new("WildCernunnos")
