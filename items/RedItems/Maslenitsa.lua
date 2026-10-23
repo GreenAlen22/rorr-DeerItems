@@ -8,11 +8,11 @@ local sprite = Sprite.new("item/Maslenitsa", PATH.."assets/sprites/items/sRedIte
 -- Создание предмета Maslenitsa
 -- Привязка спрайта к предмету
 -- Установка тира предмета: красный (легендарный)
--- Назначение тега лута: предмет, повышающий живучесть
+-- Назначение тега лута: утилита — броня, как у ванильных Tough Times и Repulsion Armor
 local item = Item.new("Maslenitsa")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.RARE)
-item.loot_tags = Item.LootTag.CATEGORY_HEALING
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- Очистка старых коллбеков
 -- ленивый кэш ссылок на предметы: ищем один раз при первом пересчёте
@@ -20,7 +20,7 @@ item.loot_tags = Item.LootTag.CATEGORY_HEALING
 local bonus_items
 
 -- Перерасчёт брони
-DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack, api)
     -- Список предметов, усиливающих бонус (ищем один раз и кэшируем)
     if not bonus_items then
         bonus_items = {
@@ -42,5 +42,5 @@ DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
 
     -- Базовая броня: +15 за стак
     -- Дополнительная броня: +2 (+3 за стак) за каждый предмет из списка на каждый стак после первого
-    actor.armor = actor.armor + (15 * stack) + bonusCount * (1 +(2* (stack - 1)))
+    api.armor_add((15 * stack) + bonusCount * (1 +(2* (stack - 1))))
 end)

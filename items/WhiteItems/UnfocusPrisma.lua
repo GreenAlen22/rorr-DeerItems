@@ -1,18 +1,18 @@
 -- DeerItems-UnfocusPrisma
--- РЈРІРµР»РёС‡РёРІР°РµС‚ СѓСЂРѕРЅ РїРѕ РІСЂР°РіР°Рј РЅР° СЂР°СЃСЃС‚РѕСЏРЅРёРё Р±РѕР»РµРµ 8 РјРµС‚СЂРѕРІ РЅР° 25% (+25% Р·Р° СЃС‚Р°Рє).
+-- Увеличивает урон по врагам на расстоянии более 8 метров на 25% (+25% за стак).
 
--- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
+-- Загружаем спрайт предмета
 local sprite = Sprite.new("item/UnfocusPrisma", PATH.."assets/sprites/items/sWhiteItems/UnfocusPrisma.png", 1, 16, 16)
 
--- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р° UnfocusPrisma
--- РџСЂРёРІСЏР·РєР° СЃРїСЂР°Р№С‚Р° Рє РїСЂРµРґРјРµС‚Сѓ
--- РќР°Р·РЅР°С‡РµРЅРёРµ С‚РµРіР° Р»СѓС‚Р°: РїСЂРµРґРјРµС‚, СѓСЃРёР»РёРІР°СЋС‰РёР№ СѓСЂРѕРЅ
+-- Создание предмета UnfocusPrisma
+-- Привязка спрайта к предмету
+-- Назначение тега лута: предмет, усиливающий урон
 local item = Item.new("UnfocusPrisma")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 
--- РџРѕСЂРѕРі РґР°Р»СЊРЅРѕСЃС‚Рё, СЃ РєРѕС‚РѕСЂРѕРіРѕ РЅР°С‡РёРЅР°РµС‚ РґРµР№СЃС‚РІРѕРІР°С‚СЊ Р±РѕРЅСѓСЃ: 8 РјРµС‚СЂРѕРІ (1 РјРµС‚СЂ = 32 РїРёРєСЃРµР»СЏ)
+-- Порог дальности, с которого начинает действовать бонус: 8 метров (1 метр = 32 пикселя)
 local RANGE = 8 * 32
 local PRISM_COLOR = Color(0x8ee7ff)
 local PRISM_SIDES = 6
@@ -52,7 +52,7 @@ local function draw_prism_boundary(actor)
     gm.draw_set_alpha(1)
 end
 
--- РџСЂРё РїРѕРїР°РґР°РЅРёРё: РµСЃР»Рё С†РµР»СЊ РґР°Р»СЊС€Рµ 8 РјРµС‚СЂРѕРІ вЂ” СѓСЃРёР»РёРІР°РµРј СѓСЂРѕРЅ РїРѕ РЅРµР№
+-- При попадании: если цель дальше 8 метров — усиливаем урон по ней
 DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
 
@@ -60,19 +60,24 @@ DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not hit_info or not hit_info.damage or hit_info.damage <= 0 then return end
     if not Instance.exists(victim) then return end
 
-    -- Р”РёСЃС‚Р°РЅС†РёСЏ РјРµР¶РґСѓ РёРіСЂРѕРєРѕРј Рё С†РµР»СЊСЋ
+    -- Дистанция между игроком и целью
     local dx = victim.x - actor.x
     local dy = victim.y - actor.y
     local dist = math.sqrt(dx * dx + dy * dy)
 
-    -- Р‘РѕРЅСѓСЃ С‚РѕР»СЊРєРѕ РїРѕ РґР°Р»СЊРЅРёРј С†РµР»СЏРј: +40% СѓСЂРѕРЅР° Р·Р° РєР°Р¶РґС‹Р№ СЃС‚Р°Рє
+    -- Бонус только по дальним целям: +40% урона за каждый стак
     if dist > RANGE then
         local mult = 1 + 0.40 * stack
-        hit_info:set_damage(hit_info.damage * mult)
+        -- У HitInfo в ReturnsAPI нет set_damage: урон удара — три поля, как масштабировал RoMT.
+        -- attack_info.damage RoMT тоже переписывал, но attack_info один на все цели атаки,
+        -- и у многоцелевой атаки бонус копился бы; проки от attack_info.damage идут без +40%.
+        hit_info.damage      = hit_info.damage * mult
+        hit_info.damage_true = hit_info.damage_true * mult
+        hit_info.damage_fake = hit_info.damage_fake * mult
     end
 end)
 
--- Р“СЂР°РЅС‘РЅР°СЏ РіСЂР°РЅРёС†Р° РѕС‚РјРµС‡Р°РµС‚ Р·РѕРЅСѓ, РІ РєРѕС‚РѕСЂРѕР№ Р±РѕРЅСѓСЃ Рє РґР°Р»СЊРЅРµРјСѓ СѓСЂРѕРЅСѓ РЅРµ РґРµР№СЃС‚РІСѓРµС‚.
+-- Гранёная граница отмечает зону, в которой бонус к дальнему урону не действует.
 DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     if stack <= 0 then return end
     draw_prism_boundary(actor)

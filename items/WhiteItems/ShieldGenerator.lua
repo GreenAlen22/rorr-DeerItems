@@ -21,7 +21,7 @@ end
 local item = Item.new("ShieldGenerator")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
-item.loot_tags = Item.LootTag.CATEGORY_HEALING
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 local team_stacks = {}
 local team_state_frame = -1
 local pending_recalculate = {}
@@ -80,7 +80,7 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
         return
     end
 
-    local data = actor:get_data("ShieldGenerator", GUID)
+    local data = Instance.get_data(actor, "ShieldGenerator", GUID)
     data.sg_tick = (data.sg_tick or 0) + 1
     if data.sg_tick >= COUNT_PERIOD then
         data.sg_tick = 0
@@ -105,7 +105,7 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
 
     refresh_team_stacks()
     local stack = team_stacks[self.team] or 0
-    local data = Instance.wrap(self):get_data("ShieldGenerator", GUID)
+    local data = Instance.get_data(Instance.wrap(self), "ShieldGenerator", GUID)
     if stack <= 0 then
         data.sg_bonus = nil
         self.shield = math.min(self.shield or 0, self.maxshield or 0)

@@ -85,7 +85,7 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     end
     if stack <= 0 then return end
 
-    local data = actor:get_data("GlassMagnifier", GUID)
+    local data = Instance.get_data(actor, "GlassMagnifier", GUID)
     local team_stack = g_team_stack[actor.team] or 0
     if data.gm_last_stack ~= team_stack then
         data.gm_last_stack = team_stack

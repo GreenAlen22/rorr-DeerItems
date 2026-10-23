@@ -13,9 +13,8 @@ item:set_sprite(sprite)
 item:set_tier(ItemTier.RARE)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
--- Очистка старых коллбеков
 -- Список всех предметов игры фиксирован после загрузки модов — ищем его один раз и кэшируем.
--- У игрока меняется лишь количество, поэтому item_stack_count пересчитываем при каждом вызове.
+-- У игрока меняется лишь количество, поэтому item_count пересчитываем при каждом вызове.
 local all_items
 local function count_total_items(actor)
     all_items = all_items or Item.find_all()
@@ -25,41 +24,19 @@ local function count_total_items(actor)
     end
     return total
 end
--- Перерасчёт основных характеристик
-DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
-    -- Подсчёт предметов у игрока (список реестра кэшируется)
+
+-- Прирост maxhp ваниль доливает в hp сама (recalculate_stats: hp + maxhp - maxhp_old).
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack, api)
     local total_items = count_total_items(actor)
 
     -- Множитель: +1% за каждый предмет * количество стаков
     local mult = 1.0 + (0.01 * total_items * (stack or 1))
 
-    actor.attack_speed    = actor.attack_speed * mult
-    actor.critical_chance = actor.critical_chance * mult * 2 -- крит дополнительно удваивается
-    actor.damage          = actor.damage * mult
-    actor.armor           = actor.armor + total_items        -- по 1 ед. брони за каждый предмет
-    actor.pHmax           = actor.pHmax * mult
-    actor.hp_regen        = actor.hp_regen * mult * 2        -- реген усиливается дополнительно
-    actor.maxhp           = math.ceil(actor.maxhp * mult)
-end)
-
--- До пересчёта: сохраняем старые значения maxhp и текущего HP
-local maxhp_old
-local hp_old
-gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
-	maxhp_old = self.maxhp
-	hp_old = self.hp
-end)
-
--- После пересчёта: компенсируем изменение maxhp, чтобы не потерять здоровье
-DeerItemsCallbacks.item_post_stat_recalc(item, function(actor, stack)
-	local total_items = count_total_items(actor)
-
-    local mult = 1.0 + (0.01 * total_items * (stack or 1))
-
-    -- Повторно задаём maxhp для восстановления пропущенного изменения
-	actor.maxhp = math.ceil(actor.maxhp * mult)
-
-    -- Компенсация HP: текущий HP + разница между новым и старым maxhp
-	local hp_restore = hp_old - actor.hp
-	actor.hp = math.min(actor.maxhp, actor.hp + math.max(0, actor.maxhp - maxhp_old + hp_restore))
+    api.attack_speed_mult(mult)
+    api.critical_chance_mult(mult * 2) -- крит дополнительно удваивается
+    api.damage_mult(mult)
+    api.armor_add(total_items)         -- по 1 ед. брони за каждый предмет
+    api.pHmax_mult(mult)
+    api.hp_regen_mult(mult * 2)        -- реген усиливается дополнительно
+    api.maxhp_mult(mult)
 end)

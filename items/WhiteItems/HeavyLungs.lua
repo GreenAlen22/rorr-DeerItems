@@ -104,7 +104,7 @@ DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
     -- Актуализируем стаки команды для усиления дронов (см. глобальный хук ниже)
     refresh_team_stacks()
 
-    actor:get_data("DeerItems", GUID).hl_drones = count_drones(actor)
+    Instance.get_data(actor, "DeerItems", GUID).hl_drones = count_drones(actor)
 
 end)
 
@@ -125,7 +125,7 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
 
     -- Держим стаки команды свежими (на случай, если пересчёт давно не вызывался)
-    local data = actor:get_data("DeerItems", GUID)
+    local data = Instance.get_data(actor, "DeerItems", GUID)
 
     -- Изменилось число стаков предмета (новый подбор) → множитель дронов другой,
     -- но сами дроны об этом не знают. Пересчитываем их статы.

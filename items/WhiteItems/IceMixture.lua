@@ -1,43 +1,43 @@
 -- DeerItems-IceMixture
--- РџСЂРё РїРѕРїР°РґР°РЅРёРё СЃ С€Р°РЅСЃРѕРј РЅР°РєР»Р°РґС‹РІР°РµС‚ РґРµР±Р°С„С„, СЃРЅРёР¶Р°СЋС‰РёР№ СЃРєРѕСЂРѕСЃС‚СЊ РїРµСЂРµРґРІРёР¶РµРЅРёСЏ Рё Р°С‚Р°РєРё РЅР° 30% РЅР° 3 СЃРµРєСѓРЅРґС‹.
+-- При попадании с шансом накладывает дебафф, снижающий скорость передвижения и атаки на 30% на 3 секунды.
 
--- Р—Р°РіСЂСѓР¶Р°РµРј СЃРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р°
--- Р—Р°РіСЂСѓР¶Р°РµРј Р·РІСѓРєРѕРІРѕР№ СЌС„С„РµРєС‚
+-- Загружаем спрайт предмета
+-- Загружаем звуковой эффект
 local sprite = Sprite.new("item/IceMixture", PATH.."assets/sprites/items/sWhiteItems/IceMixture.png", 1, 16, 16)
 local sound = Sound.new("sound/IceMixture", PATH.."assets/sounds/IceMixture.ogg")
 
--- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р° IceMixture
--- РџСЂРёРІСЏР·РєР° СЃРїСЂР°Р№С‚Р° Рє РїСЂРµРґРјРµС‚Сѓ
--- РЈСЃС‚Р°РЅРѕРІРєР° С‚РёСЂР° РїСЂРµРґРјРµС‚Р°: Р±РµР»С‹Р№ (РѕР±С‹С‡РЅС‹Р№)
--- РќР°Р·РЅР°С‡РµРЅРёРµ С‚РµРіР° Р»СѓС‚Р°: РїСЂРµРґРјРµС‚, СѓСЃРёР»РёРІР°СЋС‰РёР№ СѓСЂРѕРЅ
+-- Создание предмета IceMixture
+-- Привязка спрайта к предмету
+-- Установка тира предмета: белый (обычный)
+-- Назначение тега лута: утилита — замедление при ударе, как у ванильных Prison Shackles
 local item = Item.new("IceMixture")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
-item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
--- guid РјРѕРґР° (СѓСЃРєРѕСЂСЏРµС‚ get_data) Рё Р»РµРЅРёРІС‹Р№ РєСЌС€ СЃСЃС‹Р»РєРё РЅР° РґРµР±Р°С„С„
+-- guid мода (ускоряет get_data) и ленивый кэш ссылки на дебафф
 local GUID = _ENV["!guid"]
 local iceBuff
 
--- РћС‡РёСЃС‚РєР° СЃС‚Р°СЂС‹С… РєРѕР»Р»Р±РµРєРѕРІ
--- РџСЂРё РїРѕРїР°РґР°РЅРёРё Р°С‚Р°РєРѕР№ СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ С€Р°РЅСЃ РЅР°Р»РѕР¶РёС‚СЊ Р·Р°РјРµРґР»СЏСЋС‰РёР№ РґРµР±Р°С„С„
+-- Очистка старых коллбеков
+-- При попадании атакой срабатывает шанс наложить замедляющий дебафф
 DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
 
-    -- РЁР°РЅСЃ 7% (2+5) Рё + 5% Р·Р° СЃС‚Р°Рє
+    -- Шанс 7% (2+5) и + 5% за стак
 	if math.random() <= 0.02 + (0.05 * stack) then
-        -- Р—РІСѓРє РЅР° С†РµР»Рё РїСЂРё РЅР°Р»РѕР¶РµРЅРёРё: РІСЃРµРіРґР° СЃР»СѓС‡Р°Р№РЅС‹Рµ РіСЂРѕРјРєРѕСЃС‚СЊ Рё РёРЅС‚РѕРЅР°С†РёСЏ
+        -- Звук на цели при наложении: всегда случайные громкость и интонация
         victim:sound_play(sound, 0.8 + math.random() * 0.6, 0.7 + math.random() * 0.6)
-        -- РџСЂРёРјРµРЅРµРЅРёРµ РґРµР±Р°С„С„Р°
+        -- Применение дебаффа
         iceBuff = iceBuff or Buff.find("IceMixture", "DeerItems")
         victim:buff_apply(iceBuff, 1)
     end
 end)
 
--- Р”РµР±Р°С„С„ РїСЂРµРґРјРµС‚Р° IceMixture.
--- Р”РµР±Р°С„С„, Р·Р°РјРµРґР»СЏСЋС‰РёР№ РїРµСЂРµРґРІРёР¶РµРЅРёРµ Рё СЃРєРѕСЂРѕСЃС‚СЊ Р°С‚Р°РєРё РЅР° 30% РІ С‚РµС‡РµРЅРёРµ 3 СЃРµРєСѓРЅРґ
+-- Дебафф предмета IceMixture.
+-- Дебафф, замедляющий передвижение и скорость атаки на 30% в течение 3 секунд
 
--- РЎРѕР·РґР°РЅРёРµ РґРµР±Р°С„С„Р°
+-- Создание дебаффа
 local buff = Buff.new("IceMixture")
 buff.show_icon = false
 buff.icon_stack_subimage = false
@@ -45,22 +45,22 @@ buff.max_stack = 1
 buff.is_timed = false
 buff.is_debuff = true
 
--- РџСЂРё РїСЂРёРјРµРЅРµРЅРёРё вЂ” Р·Р°РїСѓСЃРєР°РµРј С‚Р°Р№РјРµСЂ Рё РјРµРЅСЏРµРј РІРёР·СѓР°Р»
+-- При применении — запускаем таймер и меняем визуал
 DeerItemsCallbacks.buff_apply(buff, function(actor, stack)
-    local actorData = actor:get_data("IceMixture", GUID)
+    local actorData = Instance.get_data(actor, "IceMixture", GUID)
     if not actorData.timers then
         actorData.timers = {}
     end
-    -- РљР°Р¶РґС‹Р№ СЃС‚Р°Рє РёРјРµРµС‚ 3 СЃРµРєСѓРЅРґС‹ РґР»РёС‚РµР»СЊРЅРѕСЃС‚Рё
+    -- Каждый стак имеет 3 секунды длительности
     table.insert(actorData.timers, 3 * 60.0)
-    -- Р­С„С„РµРєС‚ Р·Р°С‚РµРјРЅРµРЅРёСЏ
+    -- Эффект затемнения
     actor.image_blend = Color(0xa8dbff)
 end)
 
--- РћР±РЅРѕРІР»РµРЅРёРµ С‚Р°Р№РјРµСЂРѕРІ РєР°Р¶РґРѕРіРѕ СЃС‚РµРєР°
+-- Обновление таймеров каждого стека
 DeerItemsCallbacks.buff_post_step(buff, function(actor, stack)
-    local actorData = actor:get_data("IceMixture", GUID) or {}
-    -- РћР±РЅРѕРІР»СЏРµРј С‚Р°Р№РјРµСЂС‹ Рё СѓРґР°Р»СЏРµРј РёСЃС‚РµРєС€РёРµ
+    local actorData = Instance.get_data(actor, "IceMixture", GUID) or {}
+    -- Обновляем таймеры и удаляем истекшие
     if actorData.timers then
         for i = #actorData.timers, 1, -1 do
             actorData.timers[i] = actorData.timers[i] - 1
@@ -69,7 +69,7 @@ DeerItemsCallbacks.buff_post_step(buff, function(actor, stack)
             end
         end
     end
-    -- РЈРґР°Р»СЏРµРј Р»РёС€РЅРёРµ СЃС‚Р°РєРё, РµСЃР»Рё РёС… Р±РѕР»СЊС€Рµ, С‡РµРј РѕСЃС‚Р°РІС€РёС…СЃСЏ С‚Р°Р№РјРµСЂРѕРІ
+    -- Удаляем лишние стаки, если их больше, чем оставшихся таймеров
     local diff = stack - #(actorData.timers or {})
     if diff > 0 then
         actor:buff_remove(buff, diff)
@@ -77,13 +77,13 @@ DeerItemsCallbacks.buff_post_step(buff, function(actor, stack)
     end
 end)
 
--- РџСЂРё СЃРЅСЏС‚РёРё РґРµР±Р°С„С„Р° вЂ” РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј С†РІРµС‚
+-- При снятии дебаффа — восстанавливаем цвет
 DeerItemsCallbacks.buff_remove(buff, function(actor, stacks_removed)
     actor.image_blend = Color(0xFFFFFF)
 end)
 
--- РР·РјРµРЅРµРЅРёРµ СЃС‚Р°С‚РѕРІ РїРѕРґ РґРµР№СЃС‚РІРёРµРј РґРµР±Р°С„С„Р°
-DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
-    actor.pHmax = actor.pHmax * 0.70          -- РјРёРЅСѓСЃ 30% Рє СЃРєРѕСЂРѕСЃС‚Рё РїРµСЂРµРґРІРёР¶РµРЅРёСЏ
-    actor.attack_speed = actor.attack_speed * 0.70 -- РјРёРЅСѓСЃ 30% Рє СЃРєРѕСЂРѕСЃС‚Рё Р°С‚Р°РєРё
+-- Изменение статов под действием дебаффа
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack, api)
+    api.pHmax_mult(0.70)                      -- минус 30% к скорости передвижения
+    api.attack_speed_mult(0.70)               -- минус 30% к скорости атаки
 end)

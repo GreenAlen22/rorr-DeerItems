@@ -1,25 +1,25 @@
--- DeerItems-LootFever / В«Р›РёС…РѕСЂР°РґРєР° РґРѕР±С‹С‡РёВ» / "Loot Fever"
--- РџРѕРґР±РѕСЂ РїСЂРµРґРјРµС‚Р° РґР°С‘С‚ РІСЂРµРјРµРЅРЅС‹Р№ Р±РѕРЅСѓСЃ Рє РѕСЃРЅРѕРІРЅС‹Рј С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєР°Рј.
--- Р Р°Р·РјРµСЂ Р±РѕРЅСѓСЃР° Р·Р°РІРёСЃРёС‚ РѕС‚ СЂРµРґРєРѕСЃС‚Рё, С‚Р°Р№РјРµСЂС‹ С‚РёРєР°СЋС‚ РѕС‚РґРµР»СЊРЅРѕ, РёС‚РѕРіРѕРІС‹Р№ Р±РѕРЅСѓСЃ РѕРіСЂР°РЅРёС‡РµРЅ С‡РёСЃР»РѕРј РїСЂРµРґРјРµС‚РѕРІ.
+-- DeerItems-LootFever / «Лихорадка добычи» / "Loot Fever"
+-- Подбор предмета даёт временный бонус к основным характеристикам.
+-- Размер бонуса зависит от редкости, таймеры тикают отдельно, итоговый бонус ограничен числом предметов.
 
--- РРєРѕРЅРєР° РїСЂРµРґРјРµС‚Р° Рё РёРєРѕРЅРєР° Р±Р°С„С„Р° (Р·Р°РіР»СѓС€РєРё-С€Р°Р±Р»РѕРЅС‹ вЂ” Р·Р°РјРµРЅРё С‚РµРєСЃС‚СѓСЂС‹ РїРѕ СЌС‚РёРј РїСѓС‚СЏРј).
+-- Иконка предмета и иконка баффа (заглушки-шаблоны — замени текстуры по этим путям).
 local sprite      = Sprite.new("item/LootFever", PATH.."assets/sprites/items/sGreenItems/LootFever.png", 1, 18, 18)
 local buff_sprite = Sprite.new("buff/LootFever", PATH.."assets/sprites/buffs/LootFever.png", 1, 7, 10)
 
--- guid РјРѕРґР°: СѓСЃРєРѕСЂСЏРµС‚ get_data
+-- guid мода: ускоряет get_data
 local GUID = _ENV["!guid"]
 
--- РќР°СЃС‚СЂРѕР№РєРё Р±Р°Р»Р°РЅСЃР°
-local DURATION     = 20 * 60   -- РєР°Р¶РґС‹Р№ СЃС‚Р°Рє Р¶РёРІС‘С‚ 20 СЃРµРєСѓРЅРґ
-local DURATION_STACK = 20 * 60 -- +20 СЃРµРєСѓРЅРґ Р·Р° С€С‚.
-local CAP_PER_ITEM = 0.15      -- РјР°РєСЃ. Р±РѕРЅСѓСЃ Рє С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєР°Рј Р·Р° С€С‚.
+-- Настройки баланса
+local DURATION     = 20 * 60   -- каждый стак живёт 20 секунд
+local DURATION_STACK = 20 * 60 -- +20 секунд за шт.
+local CAP_PER_ITEM = 0.15      -- макс. бонус к характеристикам за шт.
 
--- РџСЂРµРґРјРµС‚
+-- Предмет
 local item = Item.new("LootFever")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.UNCOMMON)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
--- Р‘Р°С„С„ В«Р°Р·Р°СЂС‚В»: СЃС‚Р°РєРё С…СЂР°РЅРёРј СЃР°РјРё (is_timed=false), С‚Р°Р№РјРµСЂС‹ РІРµРґС‘Рј РІСЂСѓС‡РЅСѓСЋ вЂ” РєР°Рє BloodyRelic.
+-- Бафф «азарт»: стаки храним сами (is_timed=false), таймеры ведём вручную — как BloodyRelic.
 local buff = Buff.new("LootFever")
 buff.icon_sprite         = buff_sprite
 buff.icon_stack_subimage = false
@@ -27,9 +27,9 @@ buff.draw_stack_number   = true
 buff.stack_number_col    = Array.new(1, Color(0xffd24a))
 buff.is_timed  = false
 buff.max_stack = 999
--- РљР°Р¶РґРѕРµ РїСЂРёРјРµРЅРµРЅРёРµ Р±Р°С„С„Р° РґРѕР±Р°РІР»СЏРµС‚ РѕС‚РґРµР»СЊРЅС‹Р№ С‚Р°Р№РјРµСЂ РЅР° DURATION РєР°РґСЂРѕРІ
+-- Каждое применение баффа добавляет отдельный таймер на DURATION кадров
 DeerItemsCallbacks.buff_apply(buff, function(actor, stack)
-    local data = actor:get_data("LootFever", GUID)
+    local data = Instance.get_data(actor, "LootFever", GUID)
     if not data.timers then data.timers = {} end
     local item_stack = actor:item_count(item) or 1
     table.insert(data.timers, {
@@ -39,9 +39,9 @@ DeerItemsCallbacks.buff_apply(buff, function(actor, stack)
     data.pending_bonus = nil
 end)
 
--- РўРёРє С‚Р°Р№РјРµСЂРѕРІ: РёСЃС‚С‘РєС€РёРµ СЃС‚Р°РєРё СЃРЅРёРјР°РµРј; СЃРІРµСЂС…Сѓ РґРµСЂР¶РёРј РєР°Рї РїРѕ С‡РёСЃР»Сѓ РїСЂРµРґРјРµС‚РѕРІ
+-- Тик таймеров: истёкшие стаки снимаем; сверху держим кап по числу предметов
 DeerItemsCallbacks.buff_post_step(buff, function(actor, stack)
-    local data = actor:get_data("LootFever", GUID)
+    local data = Instance.get_data(actor, "LootFever", GUID)
     if data.timers then
         for i = #data.timers, 1, -1 do
             data.timers[i].time = data.timers[i].time - 1
@@ -54,9 +54,9 @@ DeerItemsCallbacks.buff_post_step(buff, function(actor, stack)
     if stack == 0 and data.timers then data.timers = {} end
 end)
 
--- РЎСѓРјРјР°СЂРЅС‹Р№ Р±РѕРЅСѓСЃ Рє РѕСЃРЅРѕРІРЅС‹Рј С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєР°Рј, РѕРіСЂР°РЅРёС‡РµРЅРЅС‹Р№ РєР°РїРѕРј.
-DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
-    local data = actor:get_data("LootFever", GUID)
+-- Суммарный бонус к основным характеристикам, ограниченный капом.
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack, api)
+    local data = Instance.get_data(actor, "LootFever", GUID)
     local total = 0
     for _, entry in ipairs(data.timers or {}) do
         total = total + (entry.bonus or 0)
@@ -64,10 +64,10 @@ DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
 
     local cap = CAP_PER_ITEM * (actor:item_count(item) or 1)
     local mult = 1 + math.min(total, cap)
-    actor.damage       = actor.damage * mult
-    actor.attack_speed = actor.attack_speed * mult
-    actor.pHmax        = actor.pHmax * mult
-    actor.hp_regen     = actor.hp_regen * mult
+    api.damage_mult(mult)
+    api.attack_speed_mult(mult)
+    api.pHmax_mult(mult)
+    api.hp_regen_mult(mult)
 end)
 
 local function item_from_pickup(pickup)
@@ -104,12 +104,12 @@ local function bonus_for_pickup(pickup)
     return 0.02
 end
 
--- Р›СЋР±РѕР№ РїРѕРґРѕР±СЂР°РЅРЅС‹Р№ РїСЂРµРґРјРµС‚ РґРѕР±Р°РІР»СЏРµС‚ РІСЂРµРјРµРЅРЅС‹Р№ Р±РѕРЅСѓСЃ (С‚РѕР»СЊРєРѕ РґРµСЂР¶Р°С‚РµР»СЏРј РїСЂРµРґРјРµС‚Р°, РЅР° С…РѕСЃС‚Рµ).
+-- Любой подобранный предмет добавляет временный бонус (только держателям предмета, на хосте).
 DeerItemsCallbacks.item_pickup_collected(item, function(actor, stack, pickup_instance)
     if not (actor and Instance.exists(actor)) then return end
     if not Net.host then return end
     if stack <= 0 then return end
 
-    actor:get_data("LootFever", GUID).pending_bonus = bonus_for_pickup(pickup_instance)
+    Instance.get_data(actor, "LootFever", GUID).pending_bonus = bonus_for_pickup(pickup_instance)
     actor:buff_apply(buff, 1, 1)
 end)

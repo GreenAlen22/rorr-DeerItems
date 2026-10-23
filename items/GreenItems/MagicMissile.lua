@@ -1,12 +1,12 @@
--- DeerItems-MagicMissile / В«РњР°РіРёС‡РµСЃРєР°СЏ СЃС‚СЂРµР»Р°В» / "Magic Missile"
--- РћСЃРЅРѕРІРЅРѕРµ СѓРјРµРЅРёРµ С‚СЂР°С‚РёС‚ РѕРґРёРЅ Р·Р°СЂСЏРґ Рё РІС‹РїСѓСЃРєР°РµС‚ СЃС‚СЂРµР»Сѓ РІ РЅР°РїСЂР°РІР»РµРЅРёРё РїСЂРёС†РµР»Р° РІР»Р°РґРµР»СЊС†Р°.
--- РЈСЂРѕРЅ 120% (+60% Р·Р° СЃС‚Р°Рє). Р§РµС‚С‹СЂРµ Р·Р°СЂСЏРґР° (+2 Р·Р° СЃС‚Р°Рє), РѕРґРёРЅ РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ Р·Р° 2,5 СЃРµРєСѓРЅРґС‹.
--- РЎС‚СЂРµР»Р° РїСЂРѕРЅР·Р°РµС‚ РґРѕ С‡РµС‚С‹СЂС‘С… СЂР°Р·РЅС‹С… РІСЂР°РіРѕРІ. Р•С‘ РїРѕРїР°РґР°РЅРёСЏ РЅРµ РІС‹Р·С‹РІР°СЋС‚ РїСЂРµРґРјРµС‚С‹ Рё РЅРµ РјРѕРіСѓС‚ Р·Р°РїСѓСЃС‚РёС‚СЊ СЃРµР±СЏ.
+-- DeerItems-MagicMissile / «Магическая стрела» / "Magic Missile"
+-- Основное умение тратит один заряд и выпускает стрелу в направлении прицела владельца.
+-- Урон 120% (+60% за стак). Четыре заряда (+2 за стак), один восстанавливается за 2,5 секунды.
+-- Стрела пронзает до четырёх разных врагов. Её попадания не вызывают предметы и не могут запустить себя.
 
 local sprite = Sprite.new("item/MagicMissile", PATH.."assets/sprites/items/sGreenItems/MagicMissile.png", 1, 16, 16)
 local arrowSprite = Sprite.new("particle/MagicMissileArrow", PATH.."assets/sprites/particle/MagicMissile.png", 5, 16, 16)
-local MagicMissileHit = Sound.new("sound/boom", PATH.."assets/sounds/MagicMissileHit.ogg")
-local MagicMissileLaunch = Sound.new("sound/launch", PATH.."assets/sounds/MagicMissileLaunch.ogg")
+local MagicMissileHit = Sound.new("MagicMissile/hit", PATH.."assets/sounds/MagicMissileHit.ogg")
+local MagicMissileLaunch = Sound.new("MagicMissile/launch", PATH.."assets/sounds/MagicMissileLaunch.ogg")
 
 local GUID  = _ENV["!guid"]
 local BLEND = Color(0xbfe3ff)
@@ -45,7 +45,7 @@ Callback.add(arrow.on_step, function(self)
 
     local enemy_team = self.team == 1 and 2 or 1
     local found = List.wrap(self:find_characters_circle(self.x, self.y, HIT_RADIUS, false, enemy_team, true))
-    local data = self:get_data("MagicMissile", GUID)
+    local data = Instance.get_data(self, "MagicMissile", GUID)
     if not data.hit_targets then data.hit_targets = {} end
     data.pierce_count = data.pierce_count or 0
 
@@ -57,10 +57,10 @@ Callback.add(arrow.on_step, function(self)
             local hit = self.parent:fire_direct(target, self.dmg_coef, self.direction, self.x, self.y)
             if hit and hit.attack_info then
                 hit.attack_info.proc = false
-                hit.attack_info:set_color(BLEND)
+                hit.attack_info.damage_color = BLEND
             end
 
-            local efSparks = Object.find("efSparks", "ror")
+            local efSparks = Object.find("EfSparks", "ror")
             if efSparks then
                 local sp = efSparks:create(target.x, target.y)
                 sp.sprite_index = gm.constants.sSparks1
@@ -103,7 +103,7 @@ item:set_sprite(sprite)
 item:set_tier(ItemTier.UNCOMMON)
 item.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 DeerItemsCallbacks.item_post_step(item, function(actor, stack)
-    local data = actor:get_data("MagicMissile", GUID)
+    local data = Instance.get_data(actor, "MagicMissile", GUID)
     local cap = CAP_BASE + CAP_STACK * (stack - 1)
     if data.charges == nil then data.charges = cap end
     if data.charges > cap then data.charges = cap end
@@ -120,7 +120,7 @@ end)
 
 DeerItemsCallbacks.item_primary_use(item, function(actor, stack, active_skill)
     if not Net.host then return end
-    local data = actor:get_data("MagicMissile", GUID)
+    local data = Instance.get_data(actor, "MagicMissile", GUID)
 
     local cap = CAP_BASE + CAP_STACK * (stack - 1)
     if data.charges == nil then data.charges = cap end

@@ -1,5 +1,5 @@
 -- DeerItems-GreenTea
--- Увеличивает макс. HP на 6.8% за стак, восстанавливает разницу HP при перерасчёте и даёт регенерацию.
+-- Увеличивает макс. HP на 6.8% за стак и даёт регенерацию.
 
 -- Загружаем спрайт предмета
 local sprite = Sprite.new("item/GreenTea", PATH.."assets/sprites/items/sGreenItems/GreenTea.png", 1, 18, 18)
@@ -13,24 +13,9 @@ item:set_sprite(sprite)
 item:set_tier(ItemTier.UNCOMMON)
 item.loot_tags = Item.LootTag.CATEGORY_HEALING
 
--- Переменные для сохранения значений до перерасчёта
-local maxhp_old
-local hp_old
-
--- До пересчёта статов — сохраняем старые значения HP
-gm.pre_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
-    maxhp_old = self.maxhp
-    hp_old = self.hp
-end)
-
--- После пересчёта статов — применяем бонусы
-DeerItemsCallbacks.item_post_stat_recalc(item, function(actor, stack)
-    -- Увеличение максимального HP на 6.8% за стак
-    actor.maxhp = actor.maxhp + math.ceil(actor.maxhp * (0.068 * stack))
-    -- Вычисляем недостающее HP после изменения maxhp
-    local hp_restore = hp_old - actor.hp
-    -- Восстанавливаем HP, чтобы компенсировать рост maxhp и не терять здоровье
-    actor.hp = math.min(actor.maxhp, actor.hp + math.max(0, actor.maxhp - maxhp_old + hp_restore))
-    -- Увеличение регенерации HP на 0.0091 за стак
-    actor.hp_regen = actor.hp_regen + 0.0091 * stack
+-- Прирост maxhp ваниль доливает в hp сама (recalculate_stats: hp + maxhp - maxhp_old),
+-- поэтому HP при подборе не теряется и отдельно не восстанавливается.
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack, api)
+    api.maxhp_mult(1 + 0.068 * stack)
+    api.hp_regen_add(0.0091 * stack)
 end)

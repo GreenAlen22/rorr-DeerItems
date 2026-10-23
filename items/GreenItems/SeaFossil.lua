@@ -18,7 +18,7 @@ item.loot_tags = Item.LootTag.CATEGORY_HEALING
 -- При использовании экипировки: воспроизводим звук и восстанавливаем HP
 DeerItemsCallbacks.item_equipment_use(item, function(actor, stack)
     actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
-    local cooldown = actor:get_equipment_cooldown()
+    local cooldown = gm.player_get_equipment_cooldown(actor.value)
     -- Лечение: время кулдауна (сек) × множитель (1.2 + 0.5 за стак)
     local heal = (cooldown / 60) * (1.2 + 0.5 * stack)
     actor:heal(heal)

@@ -1,4 +1,4 @@
--- РђСЂС‚РµС„Р°РєС‚ РїРѕР±РµРґС‹: РІРѕСЃРєСЂРµС€Р°РµС‚ РёРіСЂРѕРєРѕРІ РїРѕСЃР»Рµ РѕРєРѕРЅС‡Р°РЅРёСЏ С„Р°Р·С‹ Р±РѕСЃСЃР° Сѓ С‚РµР»РµРїРѕСЂС‚Р°.
+-- Артефакт победы: воскрешает игроков после окончания фазы босса у телепорта.
 
 local sprite = Sprite.new("artifact/Victory",
     PATH.."assets/sprites/artifacts/ArtifactOfVictory.png",
@@ -39,8 +39,8 @@ local function reset_event_state()
 end
 
 local function restore_player(player)
-    -- РРіСЂР° СЃРѕС…СЂР°РЅСЏРµС‚ СЌРєР·РµРјРїР»СЏСЂ РёРіСЂРѕРєР° РґР»СЏ СЃРјРµСЂС‚Рё Рё РєРѕРЅС‚СЂРѕР»СЊРЅС‹С… С‚РѕС‡РµРє. Р’РѕР·РІСЂР°С‰Р°РµРј
-    -- СЌС‚Рѕ СЃРѕСЃС‚РѕСЏРЅРёРµ, С‡С‚РѕР±С‹ РЅРµ РїРѕС‚РµСЂСЏС‚СЊ СѓРїСЂР°РІР»РµРЅРёРµ, РёРЅРІРµРЅС‚Р°СЂСЊ Рё СЃРµС‚РµРІРѕР№ ID.
+    -- Игра сохраняет экземпляр игрока для смерти и контрольных точек. Возвращаем
+    -- это состояние, чтобы не потерять управление, инвентарь и сетевой ID.
     if not player or not Instance.exists(player) then return false end
 
     player.dead = false
@@ -62,7 +62,7 @@ local function restore_player(player)
         player.dead_body:destroy()
     end
 
-    -- oPDrone вЂ” РІСЂРµРјРµРЅРЅС‹Р№ Р°РІР°С‚Р°СЂ РјС‘СЂС‚РІРѕРіРѕ РёРіСЂРѕРєР°. m_id СЃРІСЏР·С‹РІР°РµС‚ РµРіРѕ СЃ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Рј oP.
+    -- oPDrone — временный аватар мёртвого игрока. m_id связывает его с восстановленным oP.
     local player_m_id = player.m_id
     if player_m_id then
         for _, drone in ipairs(Instance.find_all(PLAYER_DRONE_OBJECT)) do
@@ -82,7 +82,7 @@ end, function(buffer)
     if not Net.client then return end
 
     local player = buffer:read_instance()
-    if Instance.exists(player) and player:same(Player.get_client()) then
+    if Instance.exists(player) and player == Player.get_local() then
         restore_player(player)
     end
 end)
@@ -90,7 +90,7 @@ end)
 local function revive_dead_players()
     for player_id, _ in pairs(dead_players) do
         local player = Instance.wrap(player_id)
-        if restore_player(player) and not player:same(Player.get_client()) then
+        if restore_player(player) and player ~= Player.get_local() then
             packet_revive:send_to_all(player)
         end
     end

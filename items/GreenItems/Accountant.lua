@@ -38,7 +38,7 @@ local function attack_speed_bonus(actor, equipment)
     end
 
     if not cd or cd <= 0 then
-        cd = (actor:get_equipment_cooldown() or 0) / 60
+        cd = (gm.player_get_equipment_cooldown(actor.value) or 0) / 60
     else
         cd = cooldown_seconds(cd)
     end
@@ -48,7 +48,7 @@ end
 
 -- При использовании снаряжения — применяем бафф
 DeerItemsCallbacks.item_equipment_use(item, function(actor, stack, equipment)
-    actor:get_data("Accountant", GUID).attack_speed_bonus = attack_speed_bonus(actor, equipment)
+    Instance.get_data(actor, "Accountant", GUID).attack_speed_bonus = attack_speed_bonus(actor, equipment)
     actor:buff_apply(buff, 60 * (6 + 3 * (stack - 1)), 1)
 
     -- Воспроизведение звука активации: всегда случайные громкость и интонация
@@ -61,7 +61,7 @@ buff.is_debuff = false
 buff.max_stack = 1
 
 -- Очистка предыдущих коллбеков баффа
-DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
-    local data = actor:get_data("Accountant", GUID)
-    actor.attack_speed = actor.attack_speed * (1 + (data.attack_speed_bonus or 0))
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack, api)
+    local data = Instance.get_data(actor, "Accountant", GUID)
+    api.attack_speed_mult(1 + (data.attack_speed_bonus or 0))
 end)

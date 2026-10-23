@@ -1,21 +1,27 @@
 -- DeerItems-Cernunnos
--- РџСЂРёР·С‹РІР°РµРјС‹Р№ СЃРѕСЋР·РЅРёРє РґР»СЏ Ingrown Idol. РЎРѕР·РґР°С‘С‚СЃСЏ С‚РѕР»СЊРєРѕ РїСЂРµРґРјРµС‚РѕРј, Р° РЅРµ РєР°СЂС‚Р°РјРё СЌС‚Р°РїР°.
+-- Призываемый союзник для Ingrown Idol. Создаётся только предметом, а не картами этапа.
 
 local SPRITE_PATH = PATH.."assets/sprites/actor/sCernunnos/"
 local GUID = _ENV["!guid"]
 
 local sprite_mask      = Sprite.new("actor/CernunnosMask", SPRITE_PATH.."cernunnos.png", 1, 64, 128)
 local sprite_palette   = Sprite.new("actor/CernunnosPalette", SPRITE_PATH.."palette.png", 1, 0, 0)
-local sprite_spawn     = Sprite.new("actor/CernunnosSpawn", SPRITE_PATH.."spawn.png", 12, 64, 128, 0.5)
-local sprite_idle      = Sprite.new("actor/CernunnosIdle", SPRITE_PATH.."idle.png", 6, 64, 128, 0.5)
-local sprite_walk      = Sprite.new("actor/CernunnosWalk", SPRITE_PATH.."walk.png", 8, 64, 128, 0.5)
+local sprite_spawn     = Sprite.new("actor/CernunnosSpawn", SPRITE_PATH.."spawn.png", 12, 64, 128)
+local sprite_idle      = Sprite.new("actor/CernunnosIdle", SPRITE_PATH.."idle.png", 6, 64, 128)
+local sprite_walk      = Sprite.new("actor/CernunnosWalk", SPRITE_PATH.."walk.png", 6, 64, 128)
 local sprite_jump      = Sprite.new("actor/CernunnosJump", SPRITE_PATH.."jump.png", 1, 64, 128)
 local sprite_jump_peak = Sprite.new("actor/CernunnosJumpPeak", SPRITE_PATH.."jumpPeak.png", 1, 64, 128)
 local sprite_fall      = Sprite.new("actor/CernunnosFall", SPRITE_PATH.."fall.png", 1, 64, 128)
-local sprite_death     = Sprite.new("actor/CernunnosDeath", SPRITE_PATH.."death.png", 9, 64, 128, 0.5)
-local sprite_shoot1    = Sprite.new("actor/CernunnosShoot1", SPRITE_PATH.."shoot1.png", 7, 64, 128, 0.5)
+-- Кадр смерти 160 в ширину: лежащее тело длиннее 128. Origin — тот же центр под ногами.
+local sprite_death     = Sprite.new("actor/CernunnosDeath", SPRITE_PATH.."death.png", 9, 80, 128)
+local sprite_shoot1    = Sprite.new("actor/CernunnosShoot1", SPRITE_PATH.."shoot1.png", 7, 64, 128)
 
-gm.elite_generate_palettes(sprite_palette)
+-- Скорость анимации в RoMT была шестым аргументом загрузки; Sprite.new в ReturnsAPI её не берёт.
+for _, s in ipairs({sprite_spawn, sprite_idle, sprite_walk, sprite_death, sprite_shoot1}) do
+    s:set_speed(0.5)
+end
+
+gm.elite_generate_palettes(sprite_palette.value)
 
 local snd = Sound.new("Cernunnos/beast", PATH.."assets/sounds/IngrownIdol.ogg")
 local snd_spawn = Sound.new("Cernunnos/spawn", PATH.."assets/sounds/CernunnosSpawn.ogg")
@@ -69,8 +75,10 @@ primary.subimage = 0
 primary.is_primary = true
 
 local statePrimary = ActorState.new("CernunnosPrimary")
+-- -4 и INVALID отсекаются до Instance.exists: обёртка INVALID разворачивается в саму
+-- Lua-таблицу, а -4 база знаний считает опасным для exists (mechanics.md, «Агро»).
 local function actor_exists(actor)
-    return actor and Instance.exists(actor)
+    return actor ~= nil and actor ~= -4 and actor ~= Instance.INVALID and Instance.exists(actor)
 end
 
 local function play_sound(actor, sound_id, volume, pitch)
@@ -80,7 +88,7 @@ local function play_sound(actor, sound_id, volume, pitch)
 end
 
 local function data_of(actor)
-    return actor:get_data("DeerItems", GUID)
+    return Instance.get_data(actor, "DeerItems", GUID)
 end
 
 local function damage_coef(stack)
@@ -182,103 +190,80 @@ local function set_targettable(actor, enabled)
     end
 end
 
-local function targets_actor(enemy, actor)
+-- Таунт: враг в радиусе получает в target маркер Cernunnos. ИИ врага держит в target не
+-- саму цель, а маркер и читает её из target.parent (alarm_ai_default_try_find_nav_path:
+-- target.parent.bbox_bottom). Ванильный маркер oActorTargetPlayer находит любой враг через
+-- find_target, а Cernunnos задуман нецелевым: свой объект видит только тот, кому таунт
+-- записал его в target. Маркер живёт у хоста — ИИ врагов и таунт идут только там.
+local taunt_marker = Object.new("CernunnosTauntMarker")
+
+local function taunt_marker_of(actor, data)
+    local id = data.taunt_marker_id
+    if id and Instance.exists(id) then return Instance.wrap(id) end
+
+    local marker = taunt_marker:create(actor.x, actor.y)
+    marker.parent = actor.id
+    -- distance_to_object врага меряет до маски маркера; ваниль даёт маркеру маску актёра.
+    marker.mask_index = sprite_mask.value
+    data.taunt_marker_id = marker.id
+    return marker
+end
+
+local function targets_marker(enemy, data)
     local target = enemy.target
-    return target == actor or (actor_exists(target) and target.parent == actor)
+    if target == nil or target == -4 then return false end
+    local id = type(target) == "number" and target or target.id
+    return id == data.taunt_marker_id
 end
 
-local function nearest_player(enemy, team)
-    local target, best = nil, math.huge
-    for _, player in ipairs(Instance.find_all(gm.constants.oP)) do
-        if actor_exists(player) and player.team == team then
-            local dist = gm.point_distance(enemy.x, enemy.y, player.x, player.y)
-            if dist < best then
-                target = player
-                best = dist
-            end
-        end
-    end
-    return target
-end
+local function clear_enemy_target(enemy, data)
+    if not actor_exists(enemy) or not targets_marker(enemy, data) then return end
 
-local function set_enemy_target(enemy, actor)
-    enemy.target = actor
-end
-
-local function clear_enemy_target(enemy, actor)
-    if not actor_exists(enemy) then return end
-
-    local target = enemy.target
-    if target == actor then
-        enemy.target = -4
-    elseif actor_exists(target) and target.parent == actor then
-        target.parent = -4
-        enemy.target = -4
-    else
-        return
-    end
-
-    local player = nearest_player(enemy, actor.team)
-    if actor_exists(player) then
-        enemy.target = player
-    end
-
+    -- -4: на следующем ходу ИИ сам выберет цель (alarm_ai_default_do_targetting).
+    enemy.target = -4
     if enemy.net_send_instance_message then
         enemy:net_send_instance_message(0)
     end
 end
 
 local function release_taunted_enemies(actor, data)
-    if data.taunted_enemies then
-        for id, enemy in pairs(data.taunted_enemies) do
-            clear_enemy_target(enemy, actor)
-            data.taunted_enemies[id] = nil
-        end
+    for id in pairs(data.taunted_enemies or {}) do
+        if Instance.exists(id) then clear_enemy_target(Instance.wrap(id), data) end
     end
+    data.taunted_enemies = {}
 
-    for _, other in ipairs(Instance.find_all(gm.constants.pActor)) do
-        if actor_exists(other) and other.team ~= actor.team and targets_actor(other, actor) then
-            clear_enemy_target(other, actor)
-        end
-    end
+    local id = data.taunt_marker_id
+    data.taunt_marker_id = nil
+    if id and Instance.exists(id) then Instance.wrap(id):destroy() end
 end
 
 local function update_taunted_enemies(actor, data)
     data.taunted_enemies = data.taunted_enemies or {}
+    local marker = taunt_marker_of(actor, data)
+    marker.x = actor.x
+    marker.y = actor.y
 
-    for id, enemy in pairs(data.taunted_enemies) do
-        local keep = actor_exists(enemy)
-            and targets_actor(enemy, actor)
+    -- Ключ — id врага: обёртка, хранимая между кадрами, после его смерти смотрит в чужую память.
+    for id in pairs(data.taunted_enemies) do
+        local enemy = Instance.exists(id) and Instance.wrap(id)
+        local keep = enemy
+            and targets_marker(enemy, data)
             and gm.point_distance(actor.x, actor.y, enemy.x, enemy.y) <= TAUNT_RANGE
         if not keep then
-            clear_enemy_target(enemy, actor)
+            if enemy then clear_enemy_target(enemy, data) end
             data.taunted_enemies[id] = nil
         end
     end
 
-    data.target_cleanup_cd = (data.target_cleanup_cd or 0) - 1
-    if data.target_cleanup_cd <= 0 then
-        data.target_cleanup_cd = 15
-        for _, other in ipairs(Instance.find_all(gm.constants.pActor)) do
-            if actor_exists(other) and other.team ~= actor.team and targets_actor(other, actor) then
-                if gm.point_distance(actor.x, actor.y, other.x, other.y) > TAUNT_RANGE then
-                    clear_enemy_target(other, actor)
-                    data.taunted_enemies[other.id] = nil
-                else
-                    data.taunted_enemies[other.id] = other
-                end
-            end
-        end
-    end
-
+    -- Ваниль переводит врага на игрока, если тот заметно ближе (do_targetting), поэтому
+    -- маркер ставится заново каждый шаг, а пакет уходит только при смене цели.
     local enemy_team = actor.team == 1 and 2 or 1
     local found = List.wrap(actor:find_characters_circle(actor.x, actor.y, TAUNT_RANGE, false, enemy_team, true))
     for _, enemy in ipairs(found) do
-        if actor_exists(enemy) then
-            local changed = not targets_actor(enemy, actor)
-            set_enemy_target(enemy, actor)
-            data.taunted_enemies[enemy.id] = enemy
-            if changed and enemy.net_send_instance_message then
+        if actor_exists(enemy) and not targets_marker(enemy, data) then
+            enemy.target = marker.id
+            data.taunted_enemies[enemy.id] = true
+            if enemy.net_send_instance_message then
                 enemy:net_send_instance_message(0)
             end
         end
@@ -412,7 +397,7 @@ Callback.add(cernunnos.on_destroy, function(actor)
         team_beasts[actor.team] = nil
     end
     if actor_exists(data.owner) then
-        local od = data.owner:get_data("IngrownIdol", GUID)
+        local od = Instance.get_data(data.owner, "IngrownIdol", GUID)
         if od.beast and od.beast.id == actor.id then
             od.beast = nil
         end
@@ -485,9 +470,9 @@ local function configure(inst, owner, stack)
     release_taunted_enemies(inst, data)
 end
 
--- Р­РєР·РµРјРїР»СЏСЂС‹ enemyClassic СѓР¶Рµ СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓСЋС‚СЃСЏ СЃР°РјРё. РџР°РєРµС‚ РЅСѓР¶РµРЅ С‚РѕР»СЊРєРѕ РґР»СЏ
--- РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ: СЂСѓС‡РЅР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РІСЃРµРіРѕ СЌРєР·РµРјРїР»СЏСЂР° СЃРѕР·РґР°СЃС‚ Сѓ РєР»РёРµРЅС‚Р°
--- РІС‚РѕСЂСѓСЋ РєРѕРїРёСЋ СЃРѕСЋР·РЅРёРєР°.
+-- Экземпляры enemyClassic уже синхронизируются сами. Пакет нужен только для
+-- дополнительного состояния: ручная синхронизация всего экземпляра создаст у клиента
+-- вторую копию союзника.
 sync_network_state = function(actor)
     if not Net.host or not actor_exists(actor) then return end
 
@@ -512,7 +497,7 @@ end, function(buffer)
     if not actor_exists(actor) or not actor_exists(owner) then return end
 
     apply_network_config(actor, owner, stack, life)
-    owner:get_data("IngrownIdol", GUID).beast = actor
+    Instance.get_data(owner, "IngrownIdol", GUID).beast = actor
 end)
 
 local function alive(inst)
@@ -533,9 +518,9 @@ local function spawn(owner, stack)
     configure(inst, owner, stack)
     team_beasts[owner.team] = inst
     if Net.host then
-        Alarm.create(function()
+        Alarm.add(1, function()
             if alive(inst) then sync_network_state(inst) end
-        end, 1)
+        end)
     end
     owner:sound_play(snd, 1.0, 0.8)
     return inst
@@ -549,9 +534,12 @@ local function get_for_team(team)
 end
 
 local function is_not_drone(actor)
+    if actor == nil then return false end
+    -- Сюда приходит и сырой self из gm.*_script_hook.
+    actor = Instance.wrap(actor)
     if not actor_exists(actor) then return false end
-    if actor.object_index == cernunnos.value then return true end
-    if not actor.get_data then return false end
+    -- object_index своего объекта — объект-носитель, с cernunnos.value он не совпадает никогда.
+    if actor:get_object_index() == cernunnos.value then return true end
     return data_of(actor)[NOT_DRONE_KEY] == true
 end
 

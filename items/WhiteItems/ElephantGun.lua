@@ -1,22 +1,22 @@
 -- DeerItems-ElephantGun
--- РЎР»РѕРЅРѕР±РѕР№: РЅР°РЅРѕСЃРёС‚ Р±РѕР»СЊС€Рµ СѓСЂРѕРЅР° Р±РѕСЃСЃР°Рј Рё С‡Р°С‰Рµ РєСЂРёС‚СѓРµС‚ РїРѕ РЅРёРј.
--- (РђРґР°РїС‚Р°С†РёСЏ Armor-Piercing Rounds РёР· RoR2.)
+-- Слонобой: наносит больше урона боссам и чаще критует по ним.
+-- (Адаптация Armor-Piercing Rounds из RoR2.)
 
--- РЎРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р° (Р±РµР· РїР°СЂС‚РёРєР»РѕРІ Рё Р·РІСѓРєР° РїРѕ РўР—)
+-- Спрайт предмета (без партиклов и звука по ТЗ)
 local sprite = Sprite.new("item/ElephantGun", PATH.."assets/sprites/items/sWhiteItems/ElephantGun.png", 1, 18, 18)
 
--- +15% СѓСЂРѕРЅР° Рё +10% РєСЂРёС‚-С€Р°РЅСЃР° Р±РѕСЃСЃР°Рј Р·Р° СЃС‚Р°Рє
+-- +15% урона и +10% крит-шанса боссам за стак
 local BOSS_DMG_PER_STACK = 0.15
 local BOSS_CRIT_PER_STACK = 10
 
--- Р‘РµР·РѕРїР°СЃРЅРѕРµ РїСЂРёРІРµРґРµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ GML-С„СѓРЅРєС†РёРё (true / 1.0 / 0.0) Рє Р±СѓР»РµРІСѓ.
--- Р’РђР–РќРћ: GM.actor_is_boss РІРѕР·РІСЂР°С‰Р°РµС‚ GML-РґРІРѕР№РєРё 0.0/1.0, Р° РІ Lua 0.0 вЂ” РРЎРўРРќРђ. РџРѕСЌС‚РѕРјСѓ
--- `if not GM.actor_is_boss(...)` РЅРёРєРѕРіРґР° РЅРµ СЃСЂР°Р±Р°С‚С‹РІР°Р» Р±С‹, Рё Р±РѕРЅСѓСЃ Р»РµС‚РµР» Р±С‹ РїРѕ РІСЃРµРј РІСЂР°РіР°Рј.
+-- Безопасное приведение значения GML-функции (true / 1.0 / 0.0) к булеву.
+-- ВАЖНО: GM.actor_is_boss возвращает GML-двойки 0.0/1.0, а в Lua 0.0 — ИСТИНА. Поэтому
+-- `if not GM.actor_is_boss(...)` никогда не срабатывал бы, и бонус летел бы по всем врагам.
 local function truthy(v)
     return v ~= nil and v ~= false and v ~= 0
 end
 
--- РЎРѕР·РґР°РЅРёРµ РїСЂРµРґРјРµС‚Р°: Р±РµР»С‹Р№ С‚РёСЂ, С‚РµРі В«СѓСЂРѕРЅВ»
+-- Создание предмета: белый тир, тег «урон»
 local item = Item.new("ElephantGun")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
@@ -37,11 +37,13 @@ local function roll_bonus_crit(actor, bonus)
     return math.random() < (bonus / missing)
 end
 
--- РљСЂРёС‚ РЅР°РґРѕ РґРѕРєРёРЅСѓС‚СЊ РґРѕ С„РёРЅР°Р»СЊРЅРѕРіРѕ СЂР°СЃС‡С‘С‚Р° СѓСЂРѕРЅР°: onHitProc СѓР¶Рµ РїРѕР·РґРЅРѕ РґР»СЏ С‡РёСЃР»Р°/Р·РІСѓРєР°.
+-- Крит надо докинуть до финального расчёта урона: onHitProc уже поздно для числа/звука.
 pcall(function()
     gm.pre_script_hook(gm.constants.damager_calculate_damage, function(self, other, result, args)
-        local hit_info = args[1] and Hit_Info.wrap(args[1].value)
-        if not hit_info or not truthy(hit_info.proc) then return end
+        -- proc и critical — аргументы самого расчёта (damager_hit_process передаёт attack_info.proc).
+        -- Поля proc у HitInfo нет, а hit_info.critical расчёт перезаписывает своим аргументом.
+        local proc = args[7] and args[7].value
+        if not truthy(proc) then return end
 
         local raw_victim = args[2] and args[2].value
         if not raw_victim then return end
@@ -59,16 +61,17 @@ pcall(function()
         local dmg = args[4] and args[4].value
         if not dmg or dmg <= 0 then return end
 
-        if not truthy(hit_info.critical) and roll_bonus_crit(actor, BOSS_CRIT_PER_STACK * stack) then
-            hit_info:set_critical(true)
+        local crit = args[5] and args[5].value
+        if not truthy(crit) and roll_bonus_crit(actor, BOSS_CRIT_PER_STACK * stack) then
+            args[5].value = true
             args[4].value = dmg * 2
         end
     end)
 end)
 
--- РџСЂРё РїРѕРїР°РґР°РЅРёРё РїРѕ Р±РѕСЃСЃСѓ РґРѕР±Р°РІР»СЏРµРј РґРѕР»СЋ СѓСЂРѕРЅР° РѕС‚РґРµР»СЊРЅС‹Рј В«Р±РµР·РїСЂРѕРєРѕРІС‹РјВ» С…РёС‚РѕРј.
--- onHitProc (Р° РЅРµ onAttackHit) вЂ” СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ С‚РѕР»СЊРєРѕ РЅР° РїСЂРѕРєРѕРІС‹С… Р°С‚Р°РєР°С…; Р±РѕРЅСѓСЃ-С…РёС‚ РЅРёР¶Рµ
--- РїРѕРјРµС‡РµРЅ proc=false, РїРѕСЌС‚РѕРјСѓ СЃР°Рј СЃРµР±СЏ РЅРµ РїСЂРѕРєР°РµС‚ (РёРЅР°С‡Рµ Р±РµСЃРєРѕРЅРµС‡РЅР°СЏ С†РµРїРѕС‡РєР°).
+-- При попадании по боссу добавляем долю урона отдельным «безпроковым» хитом.
+-- onHitProc (а не onAttackHit) — срабатывает только на проковых атаках; бонус-хит ниже
+-- помечен proc=false, поэтому сам себя не прокает (иначе бесконечная цепочка).
 DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
     if stack <= 0 then return end
@@ -79,8 +82,8 @@ DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     local dmg = hit_info and (hit_info.damage or 0) or 0
     if dmg <= 0 then return end
 
-    -- damage Сѓ fire_direct вЂ” СЌС‚Рѕ РљРћР­Р¤Р¤РР¦РР•РќРў (Г—actor.damage). Р§С‚РѕР±С‹ РґРѕР±Р°РІРёС‚СЊ СЂРѕРІРЅРѕ
-    -- 15%/СЃС‚Р°Рє РѕС‚ С„Р°РєС‚РёС‡РµСЃРєРѕРіРѕ СѓСЂРѕРЅР° СЌС‚РѕРіРѕ РїРѕРїР°РґР°РЅРёСЏ, РїРµСЂРµРІРѕРґРёРј РїР»РѕСЃРєСѓСЋ РІРµР»РёС‡РёРЅСѓ РІ РєРѕСЌС„С„РёС†РёРµРЅС‚.
+    -- damage у fire_direct — это КОЭФФИЦИЕНТ (×actor.damage). Чтобы добавить ровно
+    -- 15%/стак от фактического урона этого попадания, переводим плоскую величину в коэффициент.
     local coef = (BOSS_DMG_PER_STACK * stack * dmg) / base
     actor:fire_direct(victim, coef, nil, nil, nil, nil, false)
 end)

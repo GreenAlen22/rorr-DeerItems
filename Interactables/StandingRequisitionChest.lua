@@ -1,6 +1,6 @@
 -- DeerItems-StandingRequisitionChest
--- РЇС‰РёРє РґР»СЏ РїСЂРµРґРјРµС‚Р° StandingRequisition: РїРѕРєР°Р·С‹РІР°РµС‚ РґРІР° Р±РµСЃРїР»Р°С‚РЅС‹С… РІС‹Р±РѕСЂР° Рё РѕРґРёРЅ РїР»Р°С‚РЅС‹Р№.
--- РЎРѕР·РґР°С‘С‚СЃСЏ Рё Р·Р°РїРѕР»РЅСЏРµС‚СЃСЏ С…РѕСЃС‚РѕРј, Р° РєР»РёРµРЅС‚Р°Рј РїРµСЂРµРґР°СЋС‚СЃСЏ РІС‹Р±РѕСЂ Рё СЃРѕРґРµСЂР¶РёРјРѕРµ.
+-- Ящик для предмета StandingRequisition: показывает два бесплатных выбора и один платный.
+-- Создаётся и заполняется хостом, а клиентам передаются выбор и содержимое.
 
 local GUID = _ENV["!guid"]
 
@@ -122,7 +122,7 @@ end
 local function sync_contents_later(inst)
     if Net.host then
         for _, delay in ipairs({ 1, 8 }) do
-            Alarm.create(function()
+            Alarm.add(delay, function()
                 if not Instance.exists(inst) or not inst.contents then return end
 
                 local contents = {}
@@ -131,7 +131,7 @@ local function sync_contents_later(inst)
                 end
 
                 packet_contents:send_to_all(inst, contents)
-            end, delay)
+            end)
         end
     end
 end
@@ -177,10 +177,10 @@ local function paid_choice_ids(inst)
     if tier == nil or tier < 0 then return {} end
 
     local ids = {}
-    for _, it in ipairs(Item.find_all(tier, Item.Property.TIER)) do
+    for _, it in ipairs(DeerItemsItemPool.of_tier(tier)) do
         if it
         and it:is_loot()
-        and it:is_unlocked()
+        and DeerItemsItemPool.is_unlocked(it)
         and not is_excluded(it.value, inst.sr_exclude_item)
         then
             ids[#ids + 1] = it.value
@@ -223,7 +223,7 @@ local function charge_actor(actor, cost)
 end
 
 local function restore_pending_payment(inst)
-    local data = inst:get_data("DeerItems", GUID)
+    local data = Instance.get_data(inst, "DeerItems", GUID)
     local actor_id = data.pending_payer_id
     local gold_before = data.pending_gold
     local cost = data.pending_cost
@@ -254,7 +254,7 @@ local function release_activator(inst)
 end
 
 local function translate(token)
-    return Language.translate_token(token)
+    return gm.translate(token)
 end
 
 local function draw_choice(inst, item_id, rel_x)
@@ -276,7 +276,7 @@ end
 local function draw_choice_prompt(inst, rel_x)
     local x = inst.x - CHEST_ORIGIN_X + rel_x
     local y = inst.y - CHEST_ORIGIN_Y + CAPSULE_Y
-    gm.draw_sprite_ext(choice_sprite, 0, x, y, ITEM_ICON_SCALE, ITEM_ICON_SCALE, 0, Color.WHITE, 1)
+    gm.draw_sprite_ext(choice_sprite.value, 0, x, y, ITEM_ICON_SCALE, ITEM_ICON_SCALE, 0, Color.WHITE, 1)
 end
 
 local function configure_plan(inst, plan)
@@ -313,10 +313,7 @@ function M.get_instances()
 end
 
 function M.is_creation_authority()
-    if not Net.online then return true end
-
-    local host = Player.get_host()
-    return Instance.exists(host) and Helper.is_true(host.is_local)
+    return Net.host
 end
 
 function M.create_at(x, y, plan)
@@ -366,8 +363,8 @@ end)
 Hook.add_pre(gm.constants.interactable_pay_cost, function(self, other, result, args)
     if not is_requisition_object(self) or (self.sr_chosen or 0) ~= 1 then return end
 
-    -- РРЅС‚РµСЂС„РµР№СЃ СЏС‰РёРєР° Р±РµСЂС‘С‚ С†РµРЅСѓ РїСЂРё РѕС‚РєСЂС‹С‚РёРё. РџР»Р°С‚РЅРѕРµ С‚СЂРµР±РѕРІР°РЅРёРµ СЃРїРёСЃС‹РІР°РµРј
-    -- С‚РѕР»СЊРєРѕ РїРѕСЃР»Рµ С‚РѕРіРѕ, РєР°Рє РёРіСЂРѕРє РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ РїРѕРґС‚РІРµСЂРґРёР» РІС‹Р±РѕСЂ.
+    -- Интерфейс ящика берёт цену при открытии. Платное требование списываем
+    -- только после того, как игрок действительно подтвердил выбор.
     local cost = self.cost or 0
     self.cost = 0
     for _, argument in ipairs(args or {}) do
@@ -394,7 +391,7 @@ gm.post_script_hook(gm.constants.interactable_check_cost, function(self, other, 
 
     local can_use = #paid_choice_ids(chest) > 0 and actor_can_pay(actor, chest.cost or 0)
     if can_use then
-        local data = chest:get_data("DeerItems", GUID)
+        local data = Instance.get_data(chest, "DeerItems", GUID)
         data.pending_payer_id = actor.id
         data.pending_gold = actor.gold
         data.pending_cost = chest.cost or 0
@@ -412,7 +409,7 @@ Callback.add(chest_obj.on_step, function(self)
         self.image_speed = 0
 
         if self.image_index < 8 then
-            local data = self:get_data("DeerItems", GUID)
+            local data = Instance.get_data(self, "DeerItems", GUID)
             data.anim_timer = (data.anim_timer or 0) + 1
             if data.anim_timer >= CHEST_ANIM_DELAY then
                 data.anim_timer = 0
@@ -430,14 +427,14 @@ Callback.add(chest_obj.on_step, function(self)
     self.image_speed = 0
 
     if self.active == 0 then
-        local data = self:get_data("DeerItems", GUID)
+        local data = Instance.get_data(self, "DeerItems", GUID)
         if (self.sr_chosen or 0) == 1 then
             restore_pending_payment(self)
         end
         data.contents_phase = nil
         data.prev_selection = nil
     elseif self.active == 1 then
-        local data = self:get_data("DeerItems", GUID)
+        local data = Instance.get_data(self, "DeerItems", GUID)
         local phase = self.sr_chosen or 0
         if not Net.client and data.contents_phase ~= phase then
             if phase == 0 then
@@ -483,7 +480,7 @@ Callback.add(chest_obj.on_step, function(self)
             return
         end
 
-        selected:create(self.x, self.y - 16, self)
+        DeerItemsItemPool.drop(selected, self.x, self.y - 16, self)
 
         if self.sr_chosen == 1 then
             charge_actor(payer, paid_choice_cost())

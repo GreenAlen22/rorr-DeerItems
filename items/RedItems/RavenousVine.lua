@@ -1,13 +1,13 @@
--- DeerItems-RavenousVine / В«РќРµРЅР°СЃС‹С‚РЅР°СЏ Р»РѕР·Р°В» / "Ravenous Vine"
--- РџРµСЂРµСЂР°Р±РѕС‚РєР° в„–2 (RoR2 Growth Nectar -> В«СѓРґСѓС€РµРЅРёРµ С‚РѕР»РїС‹В» -> В«СЃР±РѕСЂ СЌСЃСЃРµРЅС†РёРё + РІСЃРїР»РµСЃРєВ»).
--- РЇРґСЂРѕ РїСЂРµР¶РЅРµРµ: СЃС‡РёС‚Р°РµРј РІСЂР°РіРѕРІ Р’РћРљР РЈР“ РёРіСЂРѕРєР°. РќРѕ СЃС‡С‘С‚С‡РёРє Р±РѕР»СЊС€Рµ РќР• РјРЅРѕР¶РёС‚ СЃС‚Р°С‚С‹
--- (СЌС‚РёРј СѓР¶Рµ Р·Р°РЅСЏС‚С‹ Community/IngrownIdol) вЂ” РѕРЅ РљРћР РњРРў Р»РѕР·Сѓ В«СЌСЃСЃРµРЅС†РёРµР№В».
--- РџРѕРєР° РІСЂР°РіРё СЂСЏРґРѕРј, Р»РѕР·Р° РєРѕРїРёС‚ СЌСЃСЃРµРЅС†РёСЋ (С‚РµРј Р±С‹СЃС‚СЂРµРµ, С‡РµРј Р±РѕР»СЊС€Рµ РІСЂР°РіРѕРІ РІ СЂР°РґРёСѓСЃРµ).
--- РџРѕРєР° РІСЂР°РіРё СЂСЏРґРѕРј, Р»РѕР·Р° РїРµСЂРёРѕРґРёС‡РµСЃРєРё Р±СЊС‘С‚ РїРѕ РѕР±Р»Р°СЃС‚Рё; РїСЂРё РґРѕСЃС‚РёР¶РµРЅРёРё РїРѕСЂРѕРіР° вЂ” В«С†РІРµС‚С‘С‚В»: Р±РѕР»СЊС€РѕР№ РІР·СЂС‹РІ + Р»РµС‡РµРЅРёРµ.
--- Р”РёРЅР°РјРёРєР° РїСЂРµР¶РЅСЏСЏ: СЃРјРµСЂС‚РµР»СЊРЅР° РІ РіСѓС‰Рµ Р±РѕСЏ, Р±РµСЃРїРѕР»РµР·РЅР° РІ РѕРґРёРЅРѕС‡РєСѓ. РЎС‚Р°РєРё СЂР°СЃС€РёСЂСЏСЋС‚
--- СЂР°РґРёСѓСЃ СЂР°СЃС€РёСЂСЏРµС‚СЃСЏ СЃРѕ СЃС‚Р°РєР°РјРё; Р±РѕР»СЊС€Рµ РІСЂР°РіРѕРІ РІ РЅС‘Рј СѓСЃРєРѕСЂСЏРµС‚ Р·Р°СЂСЏРґ Рё СѓСЃРёР»РёРІР°РµС‚ СѓСЂРѕРЅ Рё Р»РµС‡РµРЅРёРµ.
+-- DeerItems-RavenousVine / «Ненасытная лоза» / "Ravenous Vine"
+-- Переработка №2 (RoR2 Growth Nectar -> «удушение толпы» -> «сбор эссенции + всплеск»).
+-- Ядро прежнее: считаем врагов ВОКРУГ игрока. Но счётчик больше НЕ множит статы
+-- (этим уже заняты Community/IngrownIdol) — он КОРМИТ лозу «эссенцией».
+-- Пока враги рядом, лоза копит эссенцию (тем быстрее, чем больше врагов в радиусе).
+-- Пока враги рядом, лоза периодически бьёт по области; при достижении порога — «цветёт»: большой взрыв + лечение.
+-- Динамика прежняя: смертельна в гуще боя, бесполезна в одиночку. Стаки расширяют
+-- радиус расширяется со стаками; больше врагов в нём ускоряет заряд и усиливает урон и лечение.
 
--- РЎРїСЂР°Р№С‚ РїСЂРµРґРјРµС‚Р° (Р±РѕР»РІР°РЅРєР° РёР· template). РќРѕРІР° РїРµСЂРµРёСЃРїРѕР»СЊР·СѓРµС‚ РіРѕС‚РѕРІС‹Р№ Explosive.png. Р—РІСѓРє РЅРµ РЅСѓР¶РµРЅ.
+-- Спрайт предмета (болванка из template). Нова переиспользует готовый Explosive.png. Звук не нужен.
 local sprite      = Sprite.new("item/RavenousVine", PATH.."assets/sprites/items/sRedItems/RavenousVine.png", 1, 18, 18)
 local bloomSprite = Sprite.new("particle/RavenousVineBloom", PATH.."assets/sprites/particle/RavenousVineExplosion.png", 16, 50, 50)
 local radiusSprite = Sprite.new("particle/RavenousVineRadius", PATH.."assets/sprites/particle/RavenousVineRadius.png", 12, 100, 100)
@@ -17,21 +17,21 @@ local GUID = _ENV["!guid"]
 local packet_state = Packet.new("RavenousVine-packet_state")
 local packet_bloom = Packet.new("RavenousVine-packet_bloom")
 
--- РќР°СЃС‚СЂРѕР№РєРё Р±Р°Р»Р°РЅСЃР°
-local RADIUS_BASE  = 2 * 32     -- СЂР°РґРёСѓСЃ РїСЂРё 1 СЃС‚Р°РєРµ (2 РјРµС‚СЂР° = 64px)
-local RADIUS_STACK = 32   -- +1 РјРµС‚СЂР° СЂР°РґРёСѓСЃР° Р·Р° РєР°Р¶РґС‹Р№ РґРѕРї. СЃС‚Р°Рє (+32px)
-local COUNT_PERIOD = 15     -- РєР°Рє С‡Р°СЃС‚Рѕ РїРµСЂРµСЃС‡РёС‚С‹РІР°РµРј РІСЂР°РіРѕРІ СЂСЏРґРѕРј, РєР°РґСЂРѕРІ (4 СЂР°Р·Р°/СЃРµРє)
-local DAMAGE_PERIOD = 30    -- РєР°Рє С‡Р°СЃС‚Рѕ Р»РѕР·Р° Р±СЊС‘С‚ РїРѕ РѕР±Р»Р°СЃС‚Рё, РєР°РґСЂРѕРІ (2 СЂР°Р·Р°/СЃРµРє)
+-- Настройки баланса
+local RADIUS_BASE  = 2 * 32     -- радиус при 1 стаке (2 метра = 64px)
+local RADIUS_STACK = 32   -- +1 метра радиуса за каждый доп. стак (+32px)
+local COUNT_PERIOD = 15     -- как часто пересчитываем врагов рядом, кадров (4 раза/сек)
+local DAMAGE_PERIOD = 30    -- как часто лоза бьёт по области, кадров (2 раза/сек)
 
-local ESS_PER_ENEMY = 1.0   -- СЌСЃСЃРµРЅС†РёРё РІ СЃРµРєСѓРЅРґСѓ Р·Р° РєР°Р¶РґРѕРіРѕ СѓС‡С‚С‘РЅРЅРѕРіРѕ РІСЂР°РіР°
-local THRESHOLD     = 24    -- СЌСЃСЃРµРЅС†РёРё РґР»СЏ В«С†РІРµС‚РµРЅРёСЏВ» (6 РІСЂР°РіРѕРІ => РІСЃРїР»РµСЃРє СЂР°Р· РІ ~4СЃ)
+local ESS_PER_ENEMY = 1.0   -- эссенции в секунду за каждого учтённого врага
+local THRESHOLD     = 24    -- эссенции для «цветения» (6 врагов => всплеск раз в ~4с)
 
-local DAMAGE_BASE  = 0.70  -- СѓСЂРѕРЅ С‚РёРєР°: 70% Р±Р°Р·РѕРІРѕРіРѕ СѓСЂРѕРЅР°...
-local DAMAGE_STACK = 0.30  -- ...+30% Р·Р° РєР°Р¶РґС‹Р№ РґРѕРї. СЃС‚Р°Рє
-local BURST_DMG_BASE  = 4.0   -- СѓСЂРѕРЅ РІР·СЂС‹РІР° С†РІРµС‚РµРЅРёСЏ: 400% СѓСЂРѕРЅР° РёРіСЂРѕРєР°...
-local BURST_DMG_STACK = 2.0   -- ...+200% Р·Р° РєР°Р¶РґС‹Р№ РґРѕРї. СЃС‚Р°Рє
-local HEAL_BASE    = 0.12  -- Р»РµС‡РµРЅРёРµ С†РІРµС‚РµРЅРёСЏ: 12% РјР°РєСЃ. HP...
-local HEAL_STACK   = 0.06  -- ...+6% Р·Р° РєР°Р¶РґС‹Р№ РґРѕРї. СЃС‚Р°Рє
+local DAMAGE_BASE  = 0.70  -- урон тика: 70% базового урона...
+local DAMAGE_STACK = 0.30  -- ...+30% за каждый доп. стак
+local BURST_DMG_BASE  = 4.0   -- урон взрыва цветения: 400% урона игрока...
+local BURST_DMG_STACK = 2.0   -- ...+200% за каждый доп. стак
+local HEAL_BASE    = 0.12  -- лечение цветения: 12% макс. HP...
+local HEAL_STACK   = 0.06  -- ...+6% за каждый доп. стак
 
 local VINE_COLOR = Color(0x577147)
 local RADIUS_STAGE_FRAMES = 4
@@ -41,13 +41,15 @@ local BLOOM_FRAME_PERIOD = 3
 
 local function radius_for(stack) return RADIUS_BASE + (stack - 1) * RADIUS_STACK end
 local function diameter_for(stack) return radius_for(stack) * 2 end
--- РЎР°РјРё РєР°РґСЂС‹ РёРјРµСЋС‚ origin (100, 100), РЅРѕ РёС… СЃРѕРґРµСЂР¶РёРјРѕРµ СЃР»РµРіРєР° СЃРјРµС‰РµРЅРѕ РѕС‚ РєР°РґСЂР° Рє РєР°РґСЂСѓ.
--- Р’С‹СЂР°РІРЅРёРІР°РµРј СЃРѕРґРµСЂР¶РёРјРѕРµ, РЅРµ РјРµРЅСЏСЏ РёСЃС…РѕРґРЅС‹Р№ СЂР°Р·РјРµСЂ С‚РµРєСЃС‚СѓСЂС‹.
+-- Сами кадры имеют origin (100, 100), но их содержимое слегка смещено от кадра к кадру.
+-- Выравниваем содержимое, не меняя исходный размер текстуры.
 local RADIUS_FRAME_OFFSETS = {
     { 0, 1 }, { 3, 0 }, { 1, 1 }, { 0, 0 },
     { 2, 1 }, { 3, -1 }, { 2, 1 }, { 1, -6 },
     { 0, 4 }, { -4, 1 }, { 1, 4 }, { 1, -3 },
 }
+-- Вся лента рисуется на 3 px ниже точки актёра: так лоза лежит на земле.
+local RADIUS_DRAW_DY = 3
 local function radius_stage_for(ess)
     local frac = math.min(1, math.max(0, (ess or 0) / THRESHOLD))
     if frac < 0.50 then return 0 end
@@ -100,7 +102,7 @@ end, function(buffer)
     local actor = buffer:read_instance()
     local essence = buffer:read_float()
     if Instance.exists(actor) then
-        actor:get_data("RavenousVine", GUID).ess = essence
+        Instance.get_data(actor, "RavenousVine", GUID).ess = essence
     end
 end)
 
@@ -123,17 +125,17 @@ local item = Item.new("RavenousVine")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.RARE)
 item.loot_tags = Item.LootTag.CATEGORY_HEALING
--- Р“Р»Р°РІРЅР°СЏ Р»РѕРіРёРєР° РЅР° С…РѕСЃС‚Рµ: РїРµСЂРµСЃС‡С‘С‚ РІСЂР°РіРѕРІ СЂСЏРґРѕРј, РЅР°РєРѕРїР»РµРЅРёРµ СЌСЃСЃРµРЅС†РёРё, В«С†РІРµС‚РµРЅРёРµВ».
--- РЈСЂРѕРЅ/Р»РµС‡РµРЅРёРµ Р°РІС‚РѕСЂРёС‚РµС‚РЅС‹ РЅР° С…РѕСЃС‚Рµ (РєР°Рє RiftBeacon/TwistedOpinion); РєР»РёРµРЅС‚Р°Рј HP СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓРµС‚СЃСЏ.
+-- Главная логика на хосте: пересчёт врагов рядом, накопление эссенции, «цветение».
+-- Урон/лечение авторитетны на хосте (как RiftBeacon/TwistedOpinion); клиентам HP синхронизируется.
 DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if Net.client then return end
     if stack <= 0 then return end
 
-    local data  = actor:get_data("RavenousVine", GUID)
+    local data  = Instance.get_data(actor, "RavenousVine", GUID)
     local frame = Global._current_frame
     data.ess = data.ess or 0
 
-    -- РџРµСЂРµСЃС‡С‘С‚ РІСЃРµС… РІСЂР°РіРѕРІ СЂСЏРґРѕРј СЂР°Р· РІ COUNT_PERIOD РєР°РґСЂРѕРІ.
+    -- Пересчёт всех врагов рядом раз в COUNT_PERIOD кадров.
     if data.rv_next == nil then data.rv_next = frame end
     if frame >= data.rv_next then
         data.rv_next = frame + COUNT_PERIOD
@@ -142,13 +144,13 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
         data.rv_count = #found
     end
 
-    -- РќР°РєРѕРїР»РµРЅРёРµ СЌСЃСЃРµРЅС†РёРё РєР°Р¶РґС‹Р№ РєР°РґСЂ: С‚РµРј Р±С‹СЃС‚СЂРµРµ, С‡РµРј Р±РѕР»СЊС€Рµ РІСЂР°РіРѕРІ РІ СЂР°РґРёСѓСЃРµ.
+    -- Накопление эссенции каждый кадр: тем быстрее, чем больше врагов в радиусе.
     local nb = data.rv_count or 0
     if nb > 0 then
         data.ess = data.ess + nb * ESS_PER_ENEMY / 60
     end
 
-    -- РџРµСЂРёРѕРґРёС‡РµСЃРєРёР№ AoE-СѓСЂРѕРЅ РїРѕ С‚РѕРјСѓ Р¶Рµ СЂР°РґРёСѓСЃСѓ, РїРѕРєР° Р»РѕР·Сѓ РєРѕСЂРјРёС‚ С…РѕС‚СЏ Р±С‹ РѕРґРёРЅ РІСЂР°Рі.
+    -- Периодический AoE-урон по тому же радиусу, пока лозу кормит хотя бы один враг.
     if data.rv_damage_next == nil then data.rv_damage_next = frame end
     if nb > 0 and frame >= data.rv_damage_next then
         data.rv_damage_next = frame + DAMAGE_PERIOD
@@ -159,12 +161,12 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
         if atk and atk.attack_info then
             atk.attack_info.proc = false
             atk.attack_info:set_critical(false)
-            atk.attack_info:set_color(VINE_COLOR)
+            atk.attack_info.damage_color = VINE_COLOR
             disable_control_effects(atk.attack_info)
         end
     end
 
-    -- Р¦РІРµС‚РµРЅРёРµ: Р±РѕР»СЊС€РѕР№ AoE-РІР·СЂС‹РІ + Р»РµС‡РµРЅРёРµ, РѕСЃС‚Р°С‚РѕРє СЌСЃСЃРµРЅС†РёРё РїРµСЂРµРЅРѕСЃРёРј.
+    -- Цветение: большой AoE-взрыв + лечение, остаток эссенции переносим.
     if data.ess >= THRESHOLD then
         data.ess = data.ess - THRESHOLD
 
@@ -172,15 +174,15 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
         local diameter = diameter_for(stack)
         local atk = actor:fire_explosion(actor.x, actor.y, diameter, diameter, dmg_coef, nil, nil, false)
         if atk and atk.attack_info then
-            atk.attack_info.proc = false                 -- РІР·СЂС‹РІ С†РІРµС‚РµРЅРёСЏ РЅРµ РґРѕР»Р¶РµРЅ РїСЂРѕРєР°С‚СЊ РґСЂСѓРіРёРµ РїСЂРµРґРјРµС‚С‹/СЃР°Рј СЃРµР±СЏ
+            atk.attack_info.proc = false                 -- взрыв цветения не должен прокать другие предметы/сам себя
             atk.attack_info:set_critical(false)
-            atk.attack_info:set_color(VINE_COLOR)
+            atk.attack_info.damage_color = VINE_COLOR
         end
 
         local heal_frac = HEAL_BASE + HEAL_STACK * (stack - 1)
         actor:heal(actor.maxhp * heal_frac)
 
-        -- Р’РёР·СѓР°Р»СЊРЅР°СЏ РЅРѕРІР° С†РІРµС‚РµРЅРёСЏ
+        -- Визуальная нова цветения
         create_bloom(actor)
         if Net.host then
             packet_bloom:send_to_all(actor)
@@ -193,10 +195,10 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     end
 end)
 
--- РџСЂРё РїРѕР»РЅРѕР№ РїРѕС‚РµСЂРµ РїСЂРµРґРјРµС‚Р° РѕР±РЅСѓР»СЏРµРј РЅР°РєРѕРїР»РµРЅРЅРѕРµ.
+-- При полной потере предмета обнуляем накопленное.
 DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if stack <= 1 then
-        local data = actor:get_data("RavenousVine", GUID)
+        local data = Instance.get_data(actor, "RavenousVine", GUID)
         data.ess      = 0
         data.rv_count = 0
         data.rv_next  = nil
@@ -205,14 +207,14 @@ DeerItemsCallbacks.item_removed(item, function(actor, stack)
     end
 end)
 
--- Р’РёР·СѓР°Р»: РєРѕРЅС‚СѓСЂ СЂР°РґРёСѓСЃР° В«РїРёС‚Р°РЅРёСЏВ» РІРѕРєСЂСѓРі РёРіСЂРѕРєР° (Р±РµР· С…СѓРґР° РЅР°Рґ РіРѕР»РѕРІРѕР№).
+-- Визуал: контур радиуса «питания» вокруг игрока (без худа над головой).
 DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     if stack <= 0 then return end
-    local data = actor:get_data("RavenousVine", GUID)
+    local data = Instance.get_data(actor, "RavenousVine", GUID)
     local frame = radius_frame_for(data.ess)
     local offset = RADIUS_FRAME_OFFSETS[frame + 1] or { 0, 0 }
 
-    gm.draw_sprite_ext(radiusSprite, frame, actor.x + offset[1], actor.y + offset[2], 1, 1, 0, Color.WHITE, 1)
+    gm.draw_sprite_ext(radiusSprite.value, frame, actor.x + offset[1], actor.y + offset[2] + RADIUS_DRAW_DY, 1, 1, 0, Color.WHITE, 1)
     gm.draw_set_colour(VINE_COLOR)
     gm.draw_circle(actor.x, actor.y, radius_for(stack), true)
     gm.draw_set_colour(Color.WHITE)

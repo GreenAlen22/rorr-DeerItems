@@ -13,11 +13,9 @@ item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
--- Очистка всех предыдущих коллбеков предмета (важно для перезагрузки логики)
 -- Пересчёт статов: уменьшение кулдауна утилитарного скилла на 5% за стак
-DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
-	local utility = actor:get_active_skill(Skill.Slot.UTILITY)
-	utility.cooldown = math.ceil(utility.cooldown * (0.95 ^ stack))
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack, api)
+	api.skill_utility.cooldown_mult(0.95 ^ stack)
 end)
 -- При использовании утилитарного скилла: барьер, зависящий от базового кулдауна навыка.
 -- Чем длиннее кулдаун (т.е. чем реже доступен барьер), тем он больше — это уравнивает
@@ -28,5 +26,6 @@ DeerItemsCallbacks.item_utility_use(item, function(actor, stack)
 	local cd_seconds = (utility.cooldown or 0) / 60
 	-- 1.5% от макс. HP за каждую секунду кулдауна (+0.5% за стак сверх первого)
 	local pct = 0.015 + 0.005 * (stack - 1)
-	actor:add_barrier(actor.maxhp * pct * cd_seconds)
+	-- heal_barrier сам выходит на клиенте; хост выдаёт барьер и рассылает его.
+	actor:heal_barrier(actor.maxhp * pct * cd_seconds)
 end)

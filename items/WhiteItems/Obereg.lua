@@ -9,23 +9,23 @@ local oberegParticle = Sprite.new("particle/Obereg", PATH.."assets/sprites/buffs
 -- Создание предмета Obereg
 -- Привязка спрайта к предмету
 -- Установка тира предмета: белый (обычный)
--- Назначение тега лута: предмет, связанный с лечением
+-- Назначение тега лута: утилита — броня, как у ванильного Tough Times
 local item = Item.new("Obereg")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
-item.loot_tags = Item.LootTag.CATEGORY_HEALING
+item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
--- Пересчёт брони после базового расчёта статистики
-DeerItemsCallbacks.item_post_stat_recalc(item, function(actor, stack)
+-- Бонус к броне при пересчёте статистики
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack, api)
     -- Если текущее здоровье ≤ 50% от максимального — даём бонус к броне
     if actor.hp <= actor.maxhp * 0.50 then
-        actor.armor = actor.armor + (20 * stack)
+        api.armor_add(20 * stack)
     end
 end)
 
 -- Отображение партикла над игроком, пока предмет активен (hp ≤ 50%)
 DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
     if actor.hp <= actor.maxhp * 0.50 then
-        gm.draw_sprite(oberegParticle, 0, actor.x, actor.y - 30)
+        gm.draw_sprite(oberegParticle.value, 0, actor.x, actor.y - 30)
     end
 end)

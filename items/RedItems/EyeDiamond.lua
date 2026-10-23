@@ -26,10 +26,10 @@ DeerItemsCallbacks.item_attack_create(item, function(actor, stack, attack_info)
 end)
 
 -- Добавляем 10% критшанса
-DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
-    actor.critical_chance = actor.critical_chance + 10
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack, api)
+    api.critical_chance_add(10)
 end)
 -- Отображение визуального индикатора у персонажа
 DeerItemsCallbacks.item_post_draw(item, function(actor, stack)
-    gm.draw_sprite(DiamondIndictor, 0, actor.x - 30, actor.y + 50)
+    gm.draw_sprite(DiamondIndictor.value, 0, actor.x - 30, actor.y + 50)
 end)

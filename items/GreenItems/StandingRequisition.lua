@@ -1,10 +1,10 @@
--- DeerItems-StandingRequisition / В«РџРѕСЃС‚РѕСЏРЅРЅРѕРµ СЃРЅР°Р±Р¶РµРЅРёРµВ» / "Standing Requisition"
--- Р’ РЅР°С‡Р°Р»Рµ СЌС‚Р°РїР° СЃРѕР·РґР°С‘С‚ РґР»СЏ РєР°Р¶РґРѕРіРѕ РІР»Р°РґРµР»СЊС†Р° СЏС‰РёРє СЃ РґРІСѓРјСЏ Р±РµСЃРїР»Р°С‚РЅС‹РјРё РІР°СЂРёР°РЅС‚Р°РјРё Рё РѕРґРЅРёРј РїР»Р°С‚РЅС‹Рј.
--- РҐРѕСЃС‚ СЃРѕР·РґР°С‘С‚ СЏС‰РёРєРё РїРѕСЃР»Рµ С‚РѕРіРѕ, РєР°Рє РІСЃРµ РёРіСЂРѕРєРё РїРѕРґС‚РІРµСЂРґРёР»Рё Р·Р°РіСЂСѓР·РєСѓ СЌС‚Р°РїР°.
+-- DeerItems-StandingRequisition / «Постоянное снабжение» / "Standing Requisition"
+-- В начале этапа создаёт для каждого владельца ящик с двумя бесплатными вариантами и одним платным.
+-- Хост создаёт ящики после того, как все игроки подтвердили загрузку этапа.
 
 local sprite = Sprite.new("item/StandingRequisition", PATH.."assets/sprites/items/sGreenItems/StandingRequisition.png", 1, 18, 18)
 
--- РџСЂРѕРІРµСЂСЏРµРј СЏС‰РёРєРё РґРІР°Р¶РґС‹: СЃСЂР°Р·Сѓ РїРѕСЃР»Рµ Р·Р°РіСЂСѓР·РєРё Рё РµС‰С‘ СЂР°Р·, РєРѕРіРґР° СЃРµС‚СЊ СѓСЃРїРµРµС‚ СЃРѕР·РґР°С‚СЊ РІСЃРµ СЌРєР·РµРјРїР»СЏСЂС‹.
+-- Проверяем ящики дважды: сразу после загрузки и ещё раз, когда сеть успеет создать все экземпляры.
 local CHEST_RECONCILE_DELAYS = { 8, 120 }
 
 local item = Item.new("StandingRequisition")
@@ -22,7 +22,7 @@ local ready_stage_players = {}
 local stage_reconcile_started = false
 local schedule_reconcile
 
--- РџРѕРґРєР»СЋС‡Р°РµС‚ API СЏС‰РёРєР°. РћРЅРѕ РјРѕР¶РµС‚ РµС‰С‘ РЅРµ Р±С‹С‚СЊ Р·Р°РіСЂСѓР¶РµРЅРѕ, РµСЃР»Рё РїРѕСЂСЏРґРѕРє С„Р°Р№Р»РѕРІ РёР·РјРµРЅРёР»СЃСЏ.
+-- Подключает API ящика. Оно может ещё не быть загружено, если порядок файлов изменился.
 local function load_chest_api()
     if chest_api then return chest_api end
 
@@ -49,7 +49,7 @@ local function load_chest_api()
     return chest_api
 end
 
--- РџСЂРѕРєСЃРё РїРѕР·РІРѕР»СЏРµС‚ РѕР±СЂР°С‰Р°С‚СЊСЃСЏ Рє API СЏС‰РёРєР° РєР°Рє Рє С‚Р°Р±Р»РёС†Рµ Рё РїРѕРґРіСЂСѓР¶Р°РµС‚ РµРіРѕ С‚РѕР»СЊРєРѕ РїСЂРё РїРµСЂРІРѕРј РѕР±СЂР°С‰РµРЅРёРё.
+-- Прокси позволяет обращаться к API ящика как к таблице и подгружает его только при первом обращении.
 local Chest = setmetatable({}, {
     __index = function(_, key)
         return load_chest_api()[key]
@@ -64,7 +64,7 @@ local function make_stage_key(level, stage_id)
     return tostring(level)..":"..tostring(stage_id)
 end
 
--- РЎРѕР·РґР°С‘Рј СЏС‰РёРєРё С‚РѕР»СЊРєРѕ РїРѕСЃР»Рµ РіРѕС‚РѕРІРЅРѕСЃС‚Рё РІСЃРµС… РёРіСЂРѕРєРѕРІ, РёРЅР°С‡Рµ РєР»РёРµРЅС‚ РјРѕР¶РµС‚ РїРѕР»СѓС‡РёС‚СЊ РґСѓР±Р»РёРєР°С‚.
+-- Создаём ящики только после готовности всех игроков, иначе клиент может получить дубликат.
 local function try_schedule_reconcile()
     if stage_reconcile_started or not active_stage_key then return end
 
@@ -76,7 +76,7 @@ local function try_schedule_reconcile()
     schedule_reconcile()
 end
 
--- РҐРѕСЃС‚ РЅР°С‡РёРЅР°РµС‚ РѕР¶РёРґР°РЅРёРµ РєР»РёРµРЅС‚РѕРІ РЅР° РЅРѕРІРѕРј СЌС‚Р°РїРµ.
+-- Хост начинает ожидание клиентов на новом этапе.
 local function begin_stage_ready_barrier(level, stage_id)
     if not is_chest_authority() then return end
 
@@ -93,7 +93,7 @@ local function begin_stage_ready_barrier(level, stage_id)
         end
     end
 
-    local host = Player.get_host()
+    local host = Player.get_local()
     if Instance.exists(host) then
         ready_stage_players[host.m_id] = true
     end
@@ -101,7 +101,7 @@ local function begin_stage_ready_barrier(level, stage_id)
     try_schedule_reconcile()
 end
 
--- РљР»РёРµРЅС‚ СЃРѕРѕР±С‰Р°РµС‚ С…РѕСЃС‚Сѓ, С‡С‚Рѕ Р·Р°РІРµСЂС€РёР» Р·Р°РіСЂСѓР·РєСѓ СЌС‚Р°РїР°.
+-- Клиент сообщает хосту, что завершил загрузку этапа.
 local function send_stage_ready(level, stage_id)
     if not Net.client then return end
 
@@ -130,7 +130,7 @@ end, function(buffer, player)
     end
 end)
 
--- Р‘РѕР»СЊС€Рµ СЃС‚Р°РєРѕРІ РїРѕРІС‹С€Р°РµС‚ РІРµСЃ РЅРµРѕР±С‹С‡РЅС‹С… Рё СЂРµРґРєРёС… РїСЂРµРґРјРµС‚РѕРІ.
+-- Больше стаков повышает вес необычных и редких предметов.
 local function roll_tier(stack)
     local n = math.max(1, stack or 1)
     local common_weight = 0.79
@@ -154,11 +154,11 @@ local function is_excluded(value, exclude)
     return false
 end
 
--- Р’С‹Р±РёСЂР°РµС‚ РґРѕСЃС‚СѓРїРЅС‹Р№ Рё РѕС‚РєСЂС‹С‚С‹Р№ РїСЂРµРґРјРµС‚ РЅСѓР¶РЅРѕРіРѕ С‚РёСЂР°, РёСЃРєР»СЋС‡Р°СЏ СѓРєР°Р·Р°РЅРЅС‹Рµ ID.
+-- Выбирает доступный и открытый предмет нужного тира, исключая указанные ID.
 local function pick_item(tier, exclude)
     local candidates = {}
-    for _, it in ipairs(Item.find_all(tier, Item.Property.TIER)) do
-        if it and it:is_loot() and it:is_unlocked() and not is_excluded(it.value, exclude) then
+    for _, it in ipairs(DeerItemsItemPool.of_tier(tier)) do
+        if it and it:is_loot() and DeerItemsItemPool.is_unlocked(it) and not is_excluded(it.value, exclude) then
             candidates[#candidates + 1] = it
         end
     end
@@ -181,7 +181,7 @@ local function pick_item_with_fallback(tier, exclude)
     return nil
 end
 
--- Р”РІР° РІР°СЂРёР°РЅС‚Р° РЅРµ РјРѕРіСѓС‚ РїРѕРІС‚РѕСЂСЏС‚СЊСЃСЏ Рё РЅРµ РјРѕРіСѓС‚ Р±С‹С‚СЊ СЃР°РјРёРј StandingRequisition.
+-- Два варианта не могут повторяться и не могут быть самим StandingRequisition.
 local function pick_choices(stack)
     local a = pick_item_with_fallback(roll_tier(stack), { item.value })
     if not a then return nil end
@@ -192,7 +192,7 @@ local function pick_choices(stack)
     return a, b
 end
 
--- Р“РѕС‚РѕРІРёС‚ РїРѕ РѕРґРЅРѕРјСѓ РїР»Р°РЅСѓ СЏС‰РёРєР° РЅР° РєР°Р¶РґРѕРіРѕ РёРіСЂРѕРєР°, Сѓ РєРѕС‚РѕСЂРѕРіРѕ РµСЃС‚СЊ РїСЂРµРґРјРµС‚.
+-- Готовит по одному плану ящика на каждого игрока, у которого есть предмет.
 local function collect_stage_plans()
     stage_plans = {}
 
@@ -219,7 +219,7 @@ local function collect_stage_plans()
     return #stage_plans
 end
 
--- РС‰РµС‚ СЃР»СѓС‡Р°Р№РЅСѓСЋ С‚РѕС‡РєСѓ РїРѕР»Р°. Р•СЃР»Рё РЅРµ РЅР°С…РѕРґРёС‚, СЏС‰РёРє РїРѕСЏРІРёС‚СЃСЏ СЂСЏРґРѕРј СЃ РІР»Р°РґРµР»СЊС†РµРј.
+-- Ищет случайную точку пола. Если не находит, ящик появится рядом с владельцем.
 local function find_chest_position()
     local director = gm._mod_game_getDirector()
     local width = gm._mod_room_get_current_width()
@@ -255,7 +255,7 @@ local function spawn_chest(plan, index)
     return Chest.create_at(x, y, plan)
 end
 
--- РЎРІРµСЂСЏРµС‚ СЂРµР°Р»СЊРЅС‹Рµ СЏС‰РёРєРё СЃ РїР»Р°РЅР°РјРё СЌС‚Р°РїР°: СЃРѕР·РґР°С‘С‚ РЅРµРґРѕСЃС‚Р°СЋС‰РёРµ Рё СѓРґР°Р»СЏРµС‚ Р»РёС€РЅРёРµ.
+-- Сверяет реальные ящики с планами этапа: создаёт недостающие и удаляет лишние.
 local function reconcile_chests()
     if not is_chest_authority() then return end
 
@@ -312,18 +312,23 @@ local function reconcile_chests()
     end
 end
 
--- РћС‚РєР»Р°РґС‹РІР°РµС‚ СЃРІРµСЂРєСѓ РґРѕ РґРІСѓС… РјРѕРјРµРЅС‚РѕРІ РїРѕСЃР»Рµ Р·Р°РіСЂСѓР·РєРё СЌС‚Р°РїР°, РЅРѕ РЅРµ СЃС‚Р°РІРёС‚ РµС‘ РґРІР°Р¶РґС‹ РІ РѕРґРёРЅ РєР°РґСЂ.
+-- Откладывает сверку до двух моментов после загрузки этапа, но не ставит её дважды в один кадр.
 schedule_reconcile = function()
     local frame = Global._current_frame or 0
     if reconcile_scheduled_frame == frame then return end
     reconcile_scheduled_frame = frame
     for _, delay in ipairs(CHEST_RECONCILE_DELAYS) do
-        Alarm.create(reconcile_chests, delay)
+        Alarm.add(delay, reconcile_chests)
     end
 end
 
--- РќР° РЅРѕРІРѕРј СЌС‚Р°РїРµ РєР»РёРµРЅС‚ РѕС‚РїСЂР°РІР»СЏРµС‚ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ, Р° С…РѕСЃС‚ Р·Р°РїСѓСЃРєР°РµС‚ РѕР¶РёРґР°РЅРёРµ РІСЃРµС… РёРіСЂРѕРєРѕРІ.
+-- На новом этапе клиент отправляет подтверждение, а хост запускает ожидание всех игроков.
 Callback.add(Callback.ON_STAGE_START, function()
+    -- План ящика живёт один этап. Lua-состояние мода переживает и смену этапа, и новый
+    -- забег, а reconcile_chests собирает план, только пока список пуст: без сброса план
+    -- первого ящика повторялся на каждом этапе каждого следующего забега.
+    stage_plans = {}
+
     local level = math.floor(Global.stage_current_level or -1)
     local stage_id = math.floor(Global.stage_id or -1)
 
@@ -338,9 +343,9 @@ Callback.add(Callback.ON_STAGE_START, function()
 
     if Net.client then
         for _, delay in ipairs({ 1, 30 }) do
-            Alarm.create(function()
+            Alarm.add(delay, function()
                 send_stage_ready(level, stage_id)
-            end, delay)
+            end)
         end
         return
     end

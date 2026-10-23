@@ -32,11 +32,11 @@ DeerItemsCallbacks.item_interactable_activate(item, function(actor, stack, inter
     -- Один раз за активацию выбираем, какой навык получит ускоренную перезарядку,
     -- и фиксируем выбор на всё время баффа (раньше он перебрасывался каждый пересчёт статов).
     -- tw_slot = 1/2/3 = вторичное/утилита/спец (как Skill.Slot.SECONDARY/utility/special).
-    local data = actor:get_data("DeerItems", GUID)
+    local data = Instance.get_data(actor, "DeerItems", GUID)
     data.tw_slot = math.random(3)
     -- Визуальный эффект активации
     local ef = gm.instance_create(actor.x, actor.y - 40, gm.constants.oEfSparks)
-    ef.sprite_index = ThinWingsActivate
+    ef.sprite_index = ThinWingsActivate.value
 end)
 
 -- Подсветка выбранного навыка на иконке HUD.
@@ -75,11 +75,11 @@ gm.post_script_hook(gm.constants.draw_hud, function()
     local frame = Global._current_frame or 0
     if g_bar.frame ~= frame then return end        -- базу поймали именно в этом кадре (бар нарисован)
 
-    local p = Player.get_client()
+    local p = Player.get_local()
     if not p or not Instance.exists(p) then return end
     -- Подсветка живёт РОВНО пока активен бафф (т.е. пока реально срезан КД этого навыка)
     if (p:buff_count(buff) or 0) <= 0 then return end
-    local slot = p:get_data("DeerItems", GUID).tw_slot
+    local slot = Instance.get_data(p, "DeerItems", GUID).tw_slot
     if not slot then return end
 
     local cx = g_bar.x + ICON_FIRST + slot * ICON_STEP
@@ -89,7 +89,7 @@ gm.post_script_hook(gm.constants.draw_hud, function()
     local a = 0.55 + 0.45 * (0.5 + 0.5 * math.sin(frame * 0.15))
     gm.draw_set_colour(Color.WHITE)
     gm.draw_set_alpha(a)
-    gm.draw_sprite(ThinWingsSkillBorder, 0, cx, cy)
+    gm.draw_sprite(ThinWingsSkillBorder.value, 0, cx, cy)
     gm.draw_set_alpha(1)
 end)
 
@@ -101,22 +101,19 @@ buff.max_stack = 9999
 
 -- Очистка старых коллбеков баффа
 -- Модификация статов под действием баффа
-DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack)
+DeerItemsCallbacks.buff_stat_recalc(buff, function(actor, stack, api)
     -- Увеличение максимальной горизонтальной скорости
-    actor.pHmax = actor.pHmax + (0.19 + 0.22 * stack)
+    api.pHmax_add(0.19 + 0.22 * stack)
     -- Берём ЗАФИКСИРОВАННЫЙ при активации навык (а не новый рандом на каждом пересчёте)
-    local slot = actor:get_data("DeerItems", GUID).tw_slot or 1
+    local slot = Instance.get_data(actor, "DeerItems", GUID).tw_slot or 1
     if slot == 1 then
         -- Уменьшаем кулдаун вторичного умения
-        local secondary = actor:get_active_skill(Skill.Slot.SECONDARY)
-        secondary.cooldown = math.ceil(secondary.cooldown * 0.8)
+        api.skill_secondary.cooldown_mult(0.8)
     elseif slot == 2 then
         -- Уменьшаем кулдаун утилиты
-        local utility = actor:get_active_skill(Skill.Slot.UTILITY)
-        utility.cooldown = math.ceil(utility.cooldown * 0.9)
+        api.skill_utility.cooldown_mult(0.9)
     else
         -- Уменьшаем кулдаун специального умения
-        local special = actor:get_active_skill(Skill.Slot.SPECIAL)
-        special.cooldown = math.ceil(special.cooldown * 0.8)
+        api.skill_special.cooldown_mult(0.8)
     end
 end)

@@ -1,7 +1,7 @@
--- DeerItems-RiftBeacon / В«РњР°СЏРє СЂР°Р·Р»РѕРјР°В» / "Rift Beacon"
--- РџР°РґРµРЅРёРµ РЅРёР¶Рµ 25% HP РґР°С‘С‚ Р±Р°СЂСЊРµСЂ Рё РЅР° 8СЃ РѕС‚РєСЂС‹РІР°РµС‚ СЂР°Р·Р»РѕРј РІРѕРєСЂСѓРі РёРіСЂРѕРєР°: РІСЂР°РіРё
--- РїРµСЂРёРѕРґРёС‡РµСЃРєРё РІС‹Р±СЂР°СЃС‹РІР°СЋС‚СЃСЏ РїСЂРѕС‡СЊ. Р›СЋР±РѕРµ СѓР±РёР№СЃС‚РІРѕ РїСЂРё Р°РєС‚РёРІРЅРѕРј СЂР°Р·Р»РѕРјРµ РїСЂРѕРґР»РµРІР°РµС‚ РµРіРѕ РЅР° 1СЃ.
--- РџРѕСЃР»Рµ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ Р»РѕРјР°РµС‚СЃСЏ Рё С‡РёРЅРёС‚СЃСЏ РІ РЅР°С‡Р°Р»Рµ РЅРѕРІРѕРіРѕ СЌС‚Р°РїР°.
+-- DeerItems-RiftBeacon / «Маяк разлома» / "Rift Beacon"
+-- Падение ниже 25% HP даёт барьер и на 8с открывает разлом вокруг игрока: враги
+-- периодически выбрасываются прочь. Любое убийство при активном разломе продлевает его на 1с.
+-- После срабатывания ломается и чинится в начале нового этапа.
 
 local sprite = Sprite.new("item/RiftBeacon", PATH.."assets/sprites/items/sRedItems/RiftBeacon.png", 1, 18, 18)
 local radiusSprite = Sprite.new("particle/RiftBeaconRadius", PATH.."assets/sprites/particle/RiftBeaconRadius.png", 26, 64, 64)
@@ -12,13 +12,13 @@ local deactivate
 
 local function truthy(v) return v ~= nil and v ~= false and v ~= 0 end
 
--- РќР°СЃС‚СЂРѕР№РєРё Р±Р°Р»Р°РЅСЃР°
+-- Настройки баланса
 local HP_THRESHOLD = 0.25
 local BARRIER_FRAC = 0.25
 local LIFE_BASE    = 8 * 60
-local LIFE_MAX     = 16 * 60     -- РїРѕС‚РѕР»РѕРє РїСЂРѕРґР»РµРЅРёСЏ СѓР±РёР№СЃС‚РІР°РјРё
+local LIFE_MAX     = 16 * 60     -- потолок продления убийствами
 local RADIUS       = 250
-local TP_TICK      = 60          -- РІС‹Р±СЂРѕСЃ СЂР°Р· РІ 1СЃ
+local TP_TICK      = 60          -- выброс раз в 1с
 local TP_DIST      = 250
 
 local RADIUS_SPRITE_SIZE = 128
@@ -76,7 +76,7 @@ local function radius_frame_for(self)
     return RADIUS_LOOP_FIRST + (math.floor(loop_age / RADIUS_ANIM_TICK) % RADIUS_LOOP_LENGTH)
 end
 
--- РћР±СЉРµРєС‚ СЂР°Р·Р»РѕРјР° (С†РµРЅС‚СЂРёСЂСѓРµС‚СЃСЏ РЅР° РёРіСЂРѕРєРµ)
+-- Объект разлома (центрируется на игроке)
 local obj = Object.new("RiftZone")
 obj:set_depth(40)
 Callback.add(obj.on_create, function(self)
@@ -85,20 +85,20 @@ Callback.add(obj.on_create, function(self)
     self.end_age = nil
     self.radius_frame = 0
     self.tt = 0
-    self:projectile_sync(4)   -- СЃРёРЅРєР°РµРј РїРѕР·РёС†РёСЋ РєР»РёРµРЅС‚Р°Рј (РѕР±СЉРµРєС‚ СЃР»РµРґСѓРµС‚ Р·Р° РёРіСЂРѕРєРѕРј РЅР° С…РѕСЃС‚Рµ)
+    self:projectile_sync(4)   -- синкаем позицию клиентам (объект следует за игроком на хосте)
 end)
 
 Callback.add(obj.on_step, function(self)
     self.age = (self.age or 0) + 1
     self.radius_frame = radius_frame_for(self)
 
-    -- Р›РѕРіРёРєР° Рё РґРІРёР¶РµРЅРёРµ вЂ” С‚РѕР»СЊРєРѕ РЅР° С…РѕСЃС‚Рµ (parent С…СЂР°РЅРёС‚СЃСЏ Р»РѕРєР°Р»СЊРЅРѕ Сѓ С…РѕСЃС‚Р°); РєР»РёРµРЅС‚Р°Рј
-    -- РїРѕР·РёС†РёСЏ РїСЂРёС…РѕРґРёС‚ С‡РµСЂРµР· projectile_sync, Р° РєСЂСѓРі СЂРёСЃСѓРµС‚ onDraw.
+    -- Логика и движение — только на хосте (parent хранится локально у хоста); клиентам
+    -- позиция приходит через projectile_sync, а круг рисует onDraw.
     if Net.client then return end
-    local data = self:get_data(nil, GUID)
+    local data = Instance.get_data(self, nil, GUID)
     local parent = data.parent
-    if not parent or not parent:exists() then self:destroy(); return end
-    -- СЃР»РµРґСѓРµРј Р·Р° РёРіСЂРѕРєРѕРј
+    if not Instance.exists(parent) then self:destroy(); return end
+    -- следуем за игроком
     self.x = parent.x
     self.y = parent.y
 
@@ -110,7 +110,7 @@ Callback.add(obj.on_step, function(self)
 
     self.life = self.life - 1
 
-    -- Р’С‹Р±СЂРѕСЃ РІСЂР°РіРѕРІ РїСЂРѕС‡СЊ СЂР°Р· РІ 1СЃ (Р±РѕСЃСЃРѕРІ РЅРµ С‚СЂРѕРіР°РµРј)
+    -- Выброс врагов прочь раз в 1с (боссов не трогаем)
     self.tt = self.tt + 1
     if self.tt >= TP_TICK then
         self.tt = 0
@@ -133,7 +133,7 @@ end)
 Callback.add(obj.on_draw, function(self)
     gm.draw_set_colour(RIFT_COLOR)
     gm.draw_circle(self.x, self.y, RADIUS, true)
-    gm.draw_sprite_ext(radiusSprite, self.radius_frame or radius_frame_for(self), self.x, self.y, RADIUS_SPRITE_SCALE, RADIUS_SPRITE_SCALE, 0, Color.WHITE, 1)
+    gm.draw_sprite_ext(radiusSprite.value, self.radius_frame or radius_frame_for(self), self.x, self.y, RADIUS_SPRITE_SCALE, RADIUS_SPRITE_SCALE, 0, Color.WHITE, 1)
     gm.draw_set_colour(Color.WHITE)
 end)
 
@@ -171,21 +171,21 @@ local function break_item(actor)
 end
 
 local function extend_zone(actor)
-    local data = actor:get_data("RiftBeacon", GUID)
+    local data = Instance.get_data(actor, "RiftBeacon", GUID)
     if data.last_extend_frame == Global._current_frame then return end
 
     local z = data.zone
-    if z and z:exists() then
+    if Instance.exists(z) then
         data.last_extend_frame = Global._current_frame
         z.life = math.min(LIFE_MAX, (z.life or 0) + 60)
     end
 end
 
--- РўСЂРёРіРіРµСЂ РїРѕ РЅРёР·РєРѕРјСѓ HP (СЂР°Р· Р·Р° СЌС‚Р°Рї)
+-- Триггер по низкому HP (раз за этап)
 DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if Net.client then return end
     if stack <= 0 then return end
-    local data = actor:get_data("RiftBeacon", GUID)
+    local data = Instance.get_data(actor, "RiftBeacon", GUID)
     if not actor.maxhp or actor.maxhp <= 0 then return end
     if (actor.hp / actor.maxhp) >= HP_THRESHOLD then
         data.below_stack_gate = nil
@@ -201,26 +201,26 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
 
     if not break_item(actor) then return end
     data.below_stack_gate = ready_stack_count(actor)
-    actor:add_barrier(actor.maxhp * BARRIER_FRAC)
+    actor:heal_barrier(actor.maxhp * BARRIER_FRAC)
 
     local inst = obj:create(actor.x, actor.y)
-    local idata = inst:get_data(nil, GUID)
+    local idata = Instance.get_data(inst, nil, GUID)
     idata.parent = actor
     data.zone = inst
 end)
 
--- Р›СЋР±РѕРµ СѓР±РёР№СЃС‚РІРѕ РїСЂРё Р°РєС‚РёРІРЅРѕРј СЂР°Р·Р»РѕРјРµ РїСЂРѕРґР»РµРІР°РµС‚ РµРіРѕ РЅР° 1СЃ
+-- Любое убийство при активном разломе продлевает его на 1с
 DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if Net.client then return end
 
     extend_zone(actor)
 end)
 
--- РџРµСЂРµР·Р°СЂСЏРґ РІ РЅР°С‡Р°Р»Рµ СЌС‚Р°РїР°
+-- Перезаряд в начале этапа
 DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
     if Net.client then return end
 
-    local data = actor:get_data("RiftBeacon", GUID)
+    local data = Instance.get_data(actor, "RiftBeacon", GUID)
     data.below_stack_gate = nil
     data.last_extend_frame = nil
     data.zone = nil

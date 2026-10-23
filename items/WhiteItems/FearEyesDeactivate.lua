@@ -7,11 +7,10 @@ local sprite = Sprite.new("item/FearEyesDeactivate", PATH.."assets/sprites/items
 -- Создание сломанного предмета с флагом is_broken = true
 -- Привязка спрайта к предмету
 local item = Item.new("FearEyesDeactivate")
-item.is_hidden = true
 item:set_sprite(sprite)
 
 -- Обработка пересчёта статистики при получении предмета
-DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack)
+DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack, api)
     -- Увеличение урона на 1 за каждый стак
-    actor.damage = actor.damage + (1 * stack)
+    api.damage_add(1 * stack)
 end)

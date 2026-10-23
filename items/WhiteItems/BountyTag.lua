@@ -20,25 +20,20 @@ item:set_tier(ItemTier.COMMON)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 -- Получение урона обнуляет серию
 DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_info)
-    if attacker and actor:same(attacker) then return end
-    actor:get_data("BountyTag", GUID).bt_streak = 0
+    if attacker and actor == attacker then return end
+    Instance.get_data(actor, "BountyTag", GUID).bt_streak = 0
 end)
 
--- Убийство: начисляем золото и наращиваем серию
+-- Убийство: начисляем золото и наращиваем серию. Оба колбэка зовёт только хост,
+-- поэтому серия живёт у хоста, а держателю-клиенту золото уходит пакетом.
 DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
-    -- Золото — только локальному игроку (HUD-золото клиентское)
-    if not actor:same(Player.get_client()) then return end
-
-    local data = actor:get_data("BountyTag", GUID)
+    local data = Instance.get_data(actor, "BountyTag", GUID)
     local streak = data.bt_streak or 0
 
     -- Базовое золото + бонус серии (с капом), масштаб по времени через множитель цен
     local money = (GOLD_PER_STACK * stack + math.min(streak, STREAK_CAP) * STREAK_BONUS)
                 * gm.cost_get_base_gold_price_scale()
-    local hud = GM._mod_game_getHUD()
-    if hud ~= -4 then
-        hud.gold = hud.gold + money
-    end
+    DeerItemsGold.pay(actor, money)
 
     data.bt_streak = streak + 1
 end)

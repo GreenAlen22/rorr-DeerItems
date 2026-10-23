@@ -1,5 +1,5 @@
 -- DeerItems-Bramble
--- РўРµСЂРЅРёСЃС‚С‹Р№ elite: СѓСЂРѕРЅ РёР·-Р·Р° РїСЂРµРґРµР»РѕРІ Р·РѕРЅС‹ РІ 4 Рј СѓРјРµРЅСЊС€Р°РµС‚СЃСЏ РІРґРІРѕРµ.
+-- Тернистый elite: урон из-за пределов зоны в 4 м уменьшается вдвое.
 
 local METERS_TO_PIXELS = 32
 local RADIUS = 4 * METERS_TO_PIXELS
@@ -25,9 +25,11 @@ local icon = Sprite.new("elite/BrambleIcon",
 )
 
 local bramble = Elite.new("Bramble")
-bramble:set_palette(palette, BRAMBLE_COLOR)
+-- set_palette в ReturnsAPI берёт одну палитру и сам перегенерирует палитры элит;
+-- цвет, который RoMT принимал вторым аргументом, — отдельное поле.
+bramble.blend_col = BRAMBLE_COLOR
+bramble:set_palette(palette)
 bramble.healthbar_icon = icon
-gm.elite_generate_palettes()
 
 local slow = Buff.new("BrambleSlow")
 slow.show_icon = false
@@ -69,8 +71,8 @@ DeerItemsCallbacks.buff_post_draw(slow, function(actor)
     draw_slow_tint(actor)
 end)
 
-DeerItemsCallbacks.buff_stat_recalc(slow, function(actor)
-    actor.pHmax = actor.pHmax * SLOW_MULTIPLIER
+DeerItemsCallbacks.buff_stat_recalc(slow, function(actor, stack, api)
+    api.pHmax_mult(SLOW_MULTIPLIER)
 end)
 
 local function exists(inst)
@@ -134,8 +136,8 @@ local function draw_zone(actor)
     gm.draw_set_colour(Color.WHITE)
 end
 
--- MonsterCard РґРѕСЃС‚СѓРїРµРЅ РїРѕСЃР»Рµ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РІР°РЅРёР»СЊРЅРѕРіРѕ РєРѕРЅС‚РµРЅС‚Р°. Р­С‚РѕС‚ callback
--- РІС‹Р·С‹РІР°РµС‚СЃСЏ РїРµСЂРµРґ Р·Р°РїРѕР»РЅРµРЅРёРµРј РґРёСЂРµРєС‚РѕСЂРѕРј РјР°СЃСЃРёРІРѕРІ СЃРїР°РІРЅР° Рё Р±РµР·РѕРїР°СЃРµРЅ РґР»СЏ РїСЂР°РІРєРё РєР°СЂС‚.
+-- MonsterCard доступен после инициализации ванильного контента. Этот callback
+-- вызывается перед заполнением директором массивов спавна и безопасен для правки карт.
 Callback.add(Callback.ON_DIRECTOR_POPULATE_SPAWN_ARRAYS, function()
     for _, card in ipairs(MonsterCard.find_all()) do
         local elite_list = List.wrap(card.elite_list)
@@ -145,8 +147,8 @@ Callback.add(Callback.ON_DIRECTOR_POPULATE_SPAWN_ARRAYS, function()
     end
 end)
 
--- Р Р°СЃС‡С‘С‚ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РґРѕ СЃРЅСЏС‚РёСЏ HP. args[6] вЂ” Р°РєС‚С‘СЂ, СЃРѕР·РґР°РІС€РёР№ СѓСЂРѕРЅ: РёРјРµРЅРЅРѕ РµРіРѕ
--- РїРѕР·РёС†РёСЏ РѕРїСЂРµРґРµР»СЏРµС‚, РЅР°С…РѕРґРёС‚СЃСЏ Р»Рё РёРіСЂРѕРє РІ Р·РѕРЅРµ, Р° РЅРµ РїРѕР·РёС†РёСЏ РїРѕРїР°РІС€РµРіРѕ СЃРЅР°СЂСЏРґР°.
+-- Расчёт выполняется до снятия HP. args[6] — актёр, создавший урон: именно его
+-- позиция определяет, находится ли игрок в зоне, а не позиция попавшего снаряда.
 pcall(function()
     gm.pre_script_hook(gm.constants.damager_calculate_damage, function(self, other, result, args)
         if not Net.host then return end

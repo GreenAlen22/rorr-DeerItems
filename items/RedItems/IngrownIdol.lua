@@ -1,11 +1,15 @@
 -- DeerItems-IngrownIdol
--- РЈР±РёР№СЃС‚РІР° РїРёС‚Р°СЋС‚ РёРґРѕР». РљРѕРіРґР° РЅР°РєРѕРїР»РµРЅ РїРѕСЂРѕРі, РѕРЅ РїСЂРёР·С‹РІР°РµС‚ РёР»Рё РѕР±РЅРѕРІР»СЏРµС‚ РѕРґРЅРѕРіРѕ
--- Р¦РµСЂРЅСѓРЅРЅР° РґР»СЏ РєРѕРјР°РЅРґС‹.
+-- Убийства питают идол. Когда накоплен порог, он призывает или обновляет одного
+-- Цернунна для команды.
 
 local sprite = Sprite.new("item/IngrownIdol", PATH.."assets/sprites/items/sRedItems/IngrownIdol.png", 1, 16, 16)
 local indicatorSprite = Sprite.new("particle/IngrownIdolIndicator", PATH.."assets/sprites/particle/IngrownIdolIndicator.png", 15, 0, 0)
 
 local GUID = _ENV["!guid"]
+
+-- Подношения считает хост: ON_KILL_PROC у клиента не вызывается (scr_actor_death.gml:231-273).
+-- Клиенту счёт нужен для индикатора, поэтому едет пакетом, как душа в TwistedOpinion.
+local packet_fed = Packet.new("IngrownIdol-packet_fed")
 
 local THRESHOLD = 30
 local OFFERINGS_PER_FRAME = 2
@@ -64,56 +68,77 @@ local function total_team_stacks(team)
 end
 
 DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
-    local data = actor:get_data("IngrownIdol", GUID)
+    local data = Instance.get_data(actor, "IngrownIdol", GUID)
     data.fed = (data.fed or 0) + offering_for(victim)
+end)
+
+packet_fed:set_serializers(function(buffer, actor, fed)
+    buffer:write_instance(actor)
+    buffer:write_float(fed)
+end, function(buffer)
+    local actor = buffer:read_instance()
+    local fed = buffer:read_float()
+    if not Net.client then return end
+    if actor ~= Instance.INVALID and Instance.exists(actor) then
+        Instance.get_data(actor, "IngrownIdol", GUID).fed = fed
+    end
 end)
 
 DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if stack <= 0 then return end
-
-    local data = actor:get_data("IngrownIdol", GUID)
-    if (data.fed or 0) < THRESHOLD then return end
-    data.fed = data.fed - THRESHOLD
-
     if Net.client then return end
-    if not DeerItemsCernunnos or not DeerItemsCernunnos.spawn then
-        error("IngrownIdol requires actor/Cernunnos.lua to be loaded before items")
+
+    local data = Instance.get_data(actor, "IngrownIdol", GUID)
+    if (data.fed or 0) >= THRESHOLD then
+        data.fed = data.fed - THRESHOLD
+        if not DeerItemsCernunnos or not DeerItemsCernunnos.spawn then
+            error("IngrownIdol requires actor/Cernunnos.lua to be loaded before items")
+        end
+        data.beast = DeerItemsCernunnos.spawn(actor, total_team_stacks(actor.team))
     end
 
-    data.beast = DeerItemsCernunnos.spawn(actor, total_team_stacks(actor.team))
+    if data.synced_fed ~= data.fed then
+        data.synced_fed = data.fed
+        packet_fed:send_to_all(actor, data.fed or 0)
+    end
 end)
 
 DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if stack <= 1 then
-        local data = actor:get_data("IngrownIdol", GUID)
+        local data = Instance.get_data(actor, "IngrownIdol", GUID)
         data.fed = 0
     end
 end)
 
 DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
-    actor:get_data("IngrownIdol", GUID).beast = nil
+    Instance.get_data(actor, "IngrownIdol", GUID).beast = nil
 end)
 
+-- Полоса навыков стоит на 58 px левее центра HUD (draw_hud: skill_x = origin_x - 58).
+-- Центр берём из аргументов draw_hud, а не x из hud_draw_skills: пока HUD трясётся от
+-- урона, draw_hud рисует через матрицу сдвига и отдаёт навыкам координаты от нуля, а
+-- значок рисуется после сброса матрицы — и уезжал к левому краю экрана. Это «точка в
+-- покое» из rorr_cloding/knowledge/ui.md, «Поймать базу ванильной панели».
+local SKILLBAR_FROM_CENTER = -58
 local g_bar = { x = 0, frame = -1 }
-pcall(function()
-    if not gm.constants.hud_draw_skills then return end
-    gm.pre_script_hook(gm.constants.hud_draw_skills, function(self, other, result, args)
-        local ok, x = pcall(function() return args[2].value end)
-        if ok and type(x) == "number" then
-            g_bar.x = x
-            g_bar.frame = Global._current_frame or 0
-        end
-    end)
+gm.pre_script_hook(gm.constants.draw_hud, function(self, other, result, args)
+    -- Кооп передаёт центр третьим аргументом; одиночный HUD берёт его по умолчанию.
+    local ok, origin_x = pcall(function() return args[3].value end)
+    if not ok or type(origin_x) ~= "number" then
+        origin_x = Global.___view_l_x + math.floor(Global.___view_l_w / 2)
+    end
+    g_bar.x = origin_x + SKILLBAR_FROM_CENTER
+    g_bar.frame = Global._current_frame or 0
 end)
 
 gm.post_script_hook(gm.constants.draw_hud, function()
     if g_bar.frame ~= (Global._current_frame or 0) then return end
 
-    local player = Player.get_client()
+    local player = Player.get_local()
     if not actor_exists(player) then return end
     if (player:item_count(item, Item.StackKind.ANY) or 0) <= 0 then return end
 
-    local data = player:get_data("IngrownIdol", GUID)
+    local data = Instance.get_data(player, "IngrownIdol", GUID)
     local fed = data.fed or 0
     local beast = data.beast
     if DeerItemsCernunnos and DeerItemsCernunnos.get_for_team then
@@ -121,5 +146,5 @@ gm.post_script_hook(gm.constants.draw_hud, function()
     end
     local frame = beast_alive(beast) and INDICATOR_MAX_FRAME
         or math.min(INDICATOR_MAX_FRAME, math.floor(fed / OFFERINGS_PER_FRAME))
-    gm.draw_sprite(indicatorSprite, frame, g_bar.x + HUD_SKILLBAR_DX, HUD_Y)
+    gm.draw_sprite(indicatorSprite.value, frame, g_bar.x + HUD_SKILLBAR_DX, HUD_Y)
 end)

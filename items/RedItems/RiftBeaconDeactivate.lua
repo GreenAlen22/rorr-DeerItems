@@ -1,5 +1,5 @@
 -- DeerItems-RiftBeaconDeactivate
--- РЎР»РѕРјР°РЅРЅС‹Р№ РјР°СЏРє СЂР°Р·Р»РѕРјР°: РЅРµР°РєС‚РёРІРЅР°СЏ Р·Р°РіР»СѓС€РєР° РґРѕ СЃР»РµРґСѓСЋС‰РµРіРѕ СЌС‚Р°РїР°.
+-- Сломанный маяк разлома: неактивная заглушка до следующего этапа.
 
 local sprite = Sprite.new("item/RiftBeaconDeactivate", PATH.."assets/sprites/items/sRedItems/RiftBeaconDeactivate.png", 1, 18, 18)
 
@@ -8,15 +8,14 @@ local LIFE_MAX = 16 * 60
 local active
 
 local item = Item.new("RiftBeaconDeactivate")
-item.is_hidden = true
 item:set_sprite(sprite)
 
 local function extend_zone(actor)
-    local data = actor:get_data("RiftBeacon", GUID)
+    local data = Instance.get_data(actor, "RiftBeacon", GUID)
     if data.last_extend_frame == Global._current_frame then return end
 
     local z = data.zone
-    if z and z:exists() then
+    if Instance.exists(z) then
         data.last_extend_frame = Global._current_frame
         z.life = math.min(LIFE_MAX, (z.life or 0) + 60)
     end
@@ -33,7 +32,7 @@ DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
 
     active = active or Item.find("RiftBeacon", "DeerItems")
 
-    local data = actor:get_data("RiftBeacon", GUID)
+    local data = Instance.get_data(actor, "RiftBeacon", GUID)
     data.below_stack_gate = nil
     data.last_extend_frame = nil
     data.zone = nil

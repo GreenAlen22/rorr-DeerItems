@@ -3,8 +3,8 @@ return {
     item = {
         RiftBeacon = {
             name = "Rift Beacon",
-            pickup = "Survive a <r>deadly hit</c> by tearing open a <p>rift</c>.",
-            description = "Dropping below <b>25%</c> health grants a <g>barrier</c> for <g>25% of maximum health</c> and opens a <p>rift</c> around you for <b>8 seconds</c>. The rift periodically <b>knocks enemies back</c> within <b>7 meters</c>, and each <r>kill</c> extends it by <b>1 second</c>. After triggering, the beacon <r>breaks</c> and repairs at the start of each stage.",
+            pickup = "Falling to low health grants a <g>barrier</c> and opens a <p>rift</c> that pushes enemies away.",
+            description = "Falling below <b>25%</c> health grants a <g>barrier</c> equal to <g>25% of your maximum health</c> and opens a <p>rift</c> around you for <b>8 seconds</c>. Every second, the rift <b>throws enemies</c> within <b>8m</c> out to its edge. Each <r>kill</c> extends the rift by <b>1 second</c>, up to <b>16 seconds</c>. <r>Bosses</c> are not affected. After triggering, the beacon <r>breaks</c> and repairs at the start of the next stage.",
             destination = "Quarantine Safe 17,\nEngineering Archive,\nUES Contact Light",
             date = "17.09.2057",
             story = "The recording inside the beacon, discovered before the cadets examined it, contained their own voices. Its timestamp was 17 minutes ahead of the present.\n\nAt first they thought it was a technicians' joke, but the recording continued:\n\n— Fine, I'll touch it.\n— Wait. There is something else here.\n— It can hear us.\n\nThe last words were spoken by a third voice.\n\nThe cadets handed the beacon to the senior engineer. He checked the serial number and established that the device had been aboard the UES since the ship was built and had never been removed.\n\nThe engineer ordered the find destroyed.\n\nSeventeen minutes later, the beacon began transmitting a new recording.",
@@ -17,8 +17,8 @@ return {
         },
         IngrownIdol = {
             name = "Ingrown Idol",
-            pickup = "Feeds on <r>kills</c> and, when sated, looses a <r>beast</c> to hunt for you.",
-            description = "Each <r>kill</c> feeds the idol: a normal enemy gives <y>1 offering</c>, an elite gives <y>2</c>, and a boss gives <y>3</c>. Every <b>30 offerings</c>, the idol summons a <r>powerful beast</c> that hunts enemies for <b>45 seconds</c> and deals <r>200% damage</c> <c_stack>(+50% per stack)</c>. After <b>20 minutes</c>, the value of offerings is halved (<y>0.5</c> / <y>1</c> / <y>2</c>).",
+            pickup = "Kills feed the idol, which summons a <r>beast</c> to hunt enemies.",
+            description = "Killing an enemy gives the idol <y>1 offering</c>, an elite <y>2</c> and a boss <y>3</c>. Every <b>30 offerings</c>, the idol summons a <r>beast</c> that hunts enemies for <b>45 seconds</c> and deals <r>300%</c> <c_stack>(+150% per stack)</c> <r>base damage</c>. After <b>20 minutes</c>, offerings are worth half as much (<y>0.5</c> / <y>1</c> / <y>2</c>).",
             destination = "Reliquary Vault,\nDig Site 13,\nTitan",
             date = "27.02.2057",
             story = "In the northern forests, they say that some gods are not sent down from the sky or raised from the earth — they are fed.\n\nIt begins with a figurine of a dead root, carried for luck on the hunt. Over time it grows heavier and becomes covered in cracks, as though growing inward.\n\nOld priests claimed that such an idol does not depict the beast; it builds a path for it.\n\nWhen the path is ready, the beast itself comes out of the forest: lean, with a deer's skull instead of a face, covered in moss. It makes no sound — it simply follows whoever has carried the idol for long enough.\n\nAnd the forest parts before it.",
@@ -27,7 +27,7 @@ return {
         ContagionBarb = {
             name = "Contagion Barb",
             pickup = "Hits cause <p>disease</c>, which <r>spreads</c> after death.",
-            description = "<b>8%</c> <c_stack>(+8% per stack)</c> chance on hit to infect an enemy with <p>disease</c>, dealing <r>90% TOTAL damage</c> over <b>4 seconds</c>. Killing an infected enemy <r>transfers the disease</c> to <b>1</c> <c_stack>(+1 per stack)</c> nearest enemy.",
+            description = "<b>8%</c> <c_stack>(+8% per stack)</c> chance on hit to infect an enemy with <p>disease</c>, dealing <r>90% TOTAL damage</c> over <b>4 seconds</c>. Killing an infected enemy <r>transfers the disease</c> to <b>1</c> <c_stack>(+1 per stack)</c> enemy within <b>6m</c> <c_stack>(+1m per stack)</c>.",
             destination = "Quarantine Hive,\nDead Colony,\n[REDACTED]",
             date = "12.06.2057",
             story = "When the colony was first discovered, it was already dying.\n\nThe workers continued carrying food into empty cells. Guards protected entrances beyond which nothing had remained for a long time. In the center of the hive lay the queen — enormous, motionless, and covered in metal growths.\n\nTubes had been implanted in her abdomen. Control needles, at the bases of her wings. Even her stinger had been replaced with an artificial one.\n\nDr. Vale ordered everyone to keep away.\n\n— She is not sick, she said. — They are making her into a disease.\n\nCommand demanded that the specimen be delivered intact.\n\nWe were able to extract only one barb.\n\nOn the way back, Vale destroyed all records of the expedition and threw the container into the airlock.\n\nThe container returned aboard with the next cargo.",
@@ -36,7 +36,7 @@ return {
         CharlatansDie = {
             name = "Charlatan's Die",
             pickup = "Roll the die to <b>cheat a chest</c>.",
-            description = "The <b>first chest</c> each stage has a <b>35%</c> <c_stack>(+20% per stack)</c> chance to grant an additional <g>higher-rarity</c> item. No more than <b>3 additional items</c> can drop.",
+            description = "The <b>first chest</c> you open each stage has a <b>35%</c> <c_stack>(+20% per stack)</c> chance to drop an extra item. It is <r>rare</c> with an <r>8%</c> <c_stack>(+5% per stack)</c> chance, otherwise <g>uncommon</c>. Sometimes several drop, up to <b>3 extra items</c>.",
             destination = "Treasure Vault of Six,\nHall of Unfulfilled Wishes,\n[REDACTED]",
             date = "06.06.2057",
             story = "Six entered the treasure vault.\n\nThe first asked for gold.\nThe second, for weapons.\nThe third, for immortality.\nThe fourth, for love.\nThe fifth, for knowledge.\n\nThe sixth asked for nothing. He rolled the die and told the others to name the number that came up. Each saw a different one.\n\nWhen the vault doors opened, only the sixth came out. He carried other people's gold, other people's weapons, and five scrolls with names crossed out.\n\nThey asked him what the die had shown.\n\nThe charlatan smiled.\n\n— What was needed.\n\nA one was carved on all six faces.",
@@ -46,7 +46,7 @@ return {
             name = "Standing Requisition",
             interact = "Choose",
             pickup = "Each stage delivers a <b>choice</c> of items.",
-            description = "At the start of each stage, a <b>delivery crate</c> appears with a <b>choice of 2</c> items (<b>79%</c>/<g>20%</c>/<r>1%</c>). Take one item for free and the other for money. More items increase the <b>rarity</c> odds.",
+            description = "At the start of each stage, a <b>delivery crate</c> appears on the map with a <b>choice of 2</c> items. Take one for free. Then, for <y>$200</c> (scales with time), you can buy any item of a random rarity from the crate. Rarity odds are <b>79%</c>/<g>20%</c>/<r>1%</c>, and more stacks raise the odds of <g>uncommon</c> and <r>rare</c> items.",
             destination = "Supply Department,\nDistribution Queue,\nUES Contact Light",
             date = "24.06.2057",
             story = "//--UES CONTACT LIGHT AUTOMATIC NOTIFICATION --//\n\nRecipient: {crewMemberName}\nRequisition status: STANDING\nCategory: Supply\n\nYour application for regular receipt of support equipment has been approved.\n\nTo optimize cargo space, the supply system will offer two available items from the approved list. After one item is selected, the other will be returned to the distribution queue, written off as surplus, or redirected to another employee with an equivalent access level.\n\nPlease note: a standing requisition does not guarantee that you will receive the requested equipment. A standing requisition guarantees only the standing processing of the requisition.\n\nUES thanks you for your understanding.\n\nCurrent delivery point: UES Contact Light\nNext delivery point: ERROR\nNext delivery point: ERROR\nNext delivery point: ERROR",
@@ -55,7 +55,7 @@ return {
         LootFever = {
             name = "Loot Fever",
             pickup = "Picking up items <g>boosts your stats</c>.",
-            description = "Picking up an <b>item</c> increases all main stats for <b>20 seconds</c> <c_stack>(+20 seconds per stack)</c>. The bonus depends on the <y>rarity of the find</c> and stacks up to <y>15%</c> <c_stack>(+15% per stack)</c>.",
+            description = "Picking up an <b>item</c> increases damage, attack speed, movement speed and health regeneration for <b>20</c> <c_stack>(+20 per stack)</c> <b>seconds</c>, by <y>2%</c> for a common item, <y>4%</c> for an uncommon, <y>6%</c> for equipment and <y>8%</c> for a rare or boss item. Bonuses add up to <y>15%</c> <c_stack>(+15% per stack)</c>.",
             destination = "Auction Dock,\nKrez Station,\nOuter Colonies",
             date = "29.11.2056",
             story = "After \"Black Friday\" was banned in 2034, major retail chains abandoned public sales.\n\nThis did not solve the problem.\n\nSales moved to closed clubs, then to corporate auctions, and later to colonial markets, where local laws were virtually absent.\n\nThe most famous was the incident at Krez Station: after the sale of cargo from a missing research vessel was announced, more than three thousand people gathered in the docks. When the containers were opened, they held faulty geological scanners, cheap prosthetics, and several crates of expired rations.\n\nEighty-two people died for the right to reach them first.\n\nThe survivors later claimed that, at that moment, the cargo's contents had seemed priceless to them.\n\n— \"History of Extraterrestrial Trade,\" Volume IV",
@@ -73,7 +73,7 @@ return {
         BountyContract = {
             name = "Bounty Contract",
             pickup = "<r>Execute elites</c> and earn <y>gold</c>.",
-            description = "Instantly <r>kills an elite monster</c> below <y>12%</c> <c_stack>(+12% per stack)</c> health. Every <r>elite monster kill</c> grants <y>$15</c> <c_stack>(+$15 per stack)</c>. <y>Gold increases over time</c>.",
+            description = "Instantly <r>kills an elite monster</c> below <y>12%</c> <c_stack>(+12% per stack)</c> health. Does not execute <r>bosses</c>. Every <r>elite monster kill</c> grants <y>$15</c> <c_stack>(+$15 per stack)</c>. <y>Scales with time</c>.",
             destination = "Contracts Desk,\nReclamation Office,\nPrimas V",
             date = "14.07.2057",
             story = "Notice issued by the Provisional Government of Primas V:\n\nThe guillotine remains intended for enemies of the people whose deaths must be public.\n\nFor those who fled, concealed their status, bought silence, or hid behind foreign documents, official contracts may now be concluded. Payment will be made after confirmation that the specified target has been eliminated.\n\nUse red ink only. Do not replace it with black ink. Do not cross out a name once it has been written.\n\nIf the reward amount exceeds the stated sum, report the discrepancy to the Land Reclamation Office.",
@@ -81,8 +81,8 @@ return {
         },
         Golemshot = {
             name = "Golemshot",
-            pickup = "Using interactables <b>wakes a golem sentry</c>.",
-            description = "Activating any <b>interactable</c> deploys a <y>golem turret</c> for <b>30s</c> that fires at the nearest enemy within <b>~250</c> every <b>0.75s</c> for <y>100% damage</c> <c_stack>(+50% per stack)</c>. Up to <b>1</c> <c_stack>(+1 per stack)</c> golem at once.",
+            pickup = "Activating an interactable deploys a <b>golem turret</c>.",
+            description = "Activating an interactable deploys a <y>golem turret</c> for <b>30 seconds</c>. Every <b>0.75</c> seconds, it fires at the nearest enemy within <b>8m</c> for <y>100%</c> <c_stack>(+50% per stack)</c> <y>base damage</c>. Up to <b>1</c> <c_stack>(+1 per stack)</c> golem at once.",
             destination = "Claim 0451,\nAbandoned Dig,\nHoxxes Annex",
             date = "19.11.2056",
             story = "",
@@ -91,13 +91,13 @@ return {
         BombardierSwarm = {
             name = "Bombardier Swarm",
             pickup = "Summons a <y>bombardier drone</c> that drops <r>dynamite</c> on enemies.",
-            description = "Summons a bombardier drone. Every <b>10 seconds</c>, it drops dynamite dealing <y>250%</c> <c_stack>(+125% per stack)</c> <y>base damage</c> in a <b>150</c> radius and <b>stunning</c> enemies for <b>1 second</c>. Your nearby drones also drop dynamite.",
+            description = "Summons a bombardier drone. Every <b>10 seconds</c>, it drops dynamite dealing <y>250%</c> <c_stack>(+125% per stack)</c> <y>base damage</c> within <b>2m</c> and <b>stunning</c> enemies for <b>1 second</c>. Your nearby drones also drop dynamite.",
             priority = "<g>Priority</c>"
         },
         RustMite = {
             name = "Rust Mite",
             pickup = "Hits make enemies <r>take more damage</c>.",
-            description = "On hit, has a <y>100%</c> chance to apply <r>Rust</c>. Each stack of <r>Rust</c> increases damage the target takes from <b>any source</c> by <r>+4%</c> <c_stack>(+4% per stack)</c> <r>permanently</c>.",
+            description = "Each hit applies <r>1</c> <c_stack>(+1 per stack)</c> <r>Rust</c> to the enemy. Each <r>Rust</c> <r>permanently</c> increases the damage the enemy takes from <b>all sources</c> by <r>4%</c>. Rust stacks up to <r>100</c> times.",
             destination = "Cargo Container 7-C,\nMaintenance Log,\nUES Contact Light",
             date = "03.05.2057",
             story = "//--UES CONTACT LIGHT MAINTENANCE-LOG FRAGMENT --//\n\nLocal damage to the protective coating on cargo container 7-C detected.\n\nPrimary cause: corrosion.\nSecondary cause: movement of corrosion.\nTertiary cause: corrosion has legs.\n\nRecommendation: isolate the container.\n\nAddendum: container isolation failed.\nAddendum: isolation from the container also failed.\nAddendum: do not touch the orange dust.",
@@ -106,7 +106,7 @@ return {
         MosquitoNet = {
             name = "Mosquito Net",
             pickup = "<b>Shoot down</c> projectiles and periodically <b>block a hit</c>.",
-            description = "Every <b>0.5 seconds</c>, shoots down <b>2</c> <c_stack>(+2 per stack)</c> <r>enemy projectiles</c> within <b>5m</c> (recharge <b>scales with attack speed</c>). Every <b>7 seconds</c> <c_stack>(-10% per stack)</c>, fully <b>blocks</c> one incoming hit if it deals more than <b>10%</c> of current health.",
+            description = "Every <b>0.5</c> seconds, shoots down <b>4</c> <c_stack>(+2 per stack)</c> <r>enemy projectiles</c> within <b>5m</c>. Higher <b>attack speed</c> makes it fire more often. Every <b>7</c> <c_stack>(-10% per stack)</c> <b>seconds</c>, fully <b>blocks</c> one hit that deals more than <b>10%</c> of your current health.",
             destination = "Plasma Swamps,\nField Camp 12,\n[REDACTED]",
             date = "19.04.2058",
             story = "Field journal, entry damaged:\n\nAt first, we laughed at the name.\n\n\"Mosquito net.\" Very funny. Especially on a planet where the smallest \"mosquito\" spits plasma the size of a human head.\n\nThen the device clicked.\n\nOnce — and the fireball turned to ash.\n\nThen again.\n\nAnd again.\n\nNo one laughed anymore.\n\nWe just listened to the clicks and hoped the next one would sound too.",
@@ -115,7 +115,7 @@ return {
         OrbitalLens = {
             name = "Orbital Lens",
             pickup = "Chance to call a <r>meteor</c> on hit.",
-            description = "<y>3%</c> <c_stack>(+2% per stack)</c> chance on hit to call a <r>meteor</c> for <y>800%</c> <c_stack>(+250% per stack)</c> base damage. The more <y>damage you deal</c>, the <y>higher the chance and meteor damage</c> (decays over time).",
+            description = "<y>1%</c> <c_stack>(+0.67% per stack)</c> chance on hit to call a <r>meteor</c> for <y>800%</c> <c_stack>(+250% per stack)</c> <y>base damage</c>. Dealing damage raises the chance by up to <y>5%</c> and the meteor's damage by up to <y>600%</c>. This bonus fades over time and resets when a meteor falls.",
             destination = "Orbital Guidance Platform,\nImpact Range 4,\n[REDACTED]",
             date = "22.08.2057",
             story = "Safe-use instructions:\n\nDo not point the lens at allies.\nDo not point the lens at vehicles.\nDo not point the lens at residential modules, medical tents, command posts, or any objects you would prefer to keep.\nDo not point the lens upward.\nDo not point the lens downward.\nDo not cover the lens with your hand after targeting begins.\n\nIf you see a blinking dot in the center of the glass, place the device on the ground and quickly leave the marked area.\n\nIf the dot stops blinking, quickly will no longer help.",
@@ -124,7 +124,7 @@ return {
         LeackedCapacitor = {
             name = "Leaking Capacitor",
             pickup = "Periodic <b>wave</c> that <y>energizes allies</c> and empowers drones.",
-            description = "All drones gain <y>+15%</c> <c_stack>(+15% per stack)</c> attack speed. Every <b>15 seconds</c> <c_stack>(-20% per stack)</c>, releases a wave that <y>energizes allies</c> for <b>7 seconds</c>. Energizing grants <y>+30% attack and movement speed</c>.",
+            description = "All drones gain <y>15%</c> <c_stack>(+15% per stack)</c> <y>attack speed</c>. Every <b>15</c> <c_stack>(-20% per stack)</c> <b>seconds</c>, releases a wave that <y>energizes</c> allies within <b>16m</c> for <b>7 seconds</c>, increasing their <y>attack speed</c> and <b>movement speed</c> by <y>30%</c>.",
             destination = "Cargo Bay 3-B,\nPower-Cell Depot,\nUES Contact Light",
             date = "22.04.2057",
             story = "//--MAINTENANCE LOG: CARGO BAY 3-B --//\n\nReason for equipment failure: short circuit.\n\nSource of short circuit: portable power cell.\n\nPower-cell condition: discharged.\n\nSecond check: discharged.\n\nThird check: discharged.\n\nTechnician's note: if the cell is discharged, why does it keep shorting everything around it?\n\nAddendum: cease checking.\n\nAddendum: the technician's tool evaporated.",
@@ -133,7 +133,7 @@ return {
         RavenousVine = {
             name = "Ravenous Vine",
             pickup = "Nearby enemies <g>feed the vine</c>; when ripe, it <r>explodes</c> and <g>heals</c>.",
-            description = "Enemies within <b>2 meters</c> <c_stack>(+1 meter per stack)</c> <g>feed the vine</c>. Every <b>0.5 seconds</c>, it deals <r>70% base damage</c> <c_stack>(+30% per stack)</c> to all nearby enemies. The more enemies are nearby, the faster the vine ripens. When ripe, it explodes for <r>400% base damage</c> <c_stack>(+200% per stack)</c> and heals for <g>12% maximum health</c> <c_stack>(+6% per stack)</c>.",
+            description = "Enemies within <b>2m</c> <c_stack>(+1m per stack)</c> <g>feed the vine</c>. Every <b>0.5</c> seconds, it deals <r>70%</c> <c_stack>(+30% per stack)</c> <r>base damage</c> to all nearby enemies. The more enemies nearby, the faster the vine ripens. When ripe, it explodes for <r>400%</c> <c_stack>(+200% per stack)</c> <r>base damage</c> and heals you for <g>12%</c> <c_stack>(+6% per stack)</c> of your <g>maximum health</c>.",
             destination = "7887,\nRight Path,\nEarth",
             date = "19.01.2056",
             story = "Your plant no longer needs expensive branded soil!\n\nThe new self-sustaining root system independently finds organic nutrients throughout the workspace.\n\nSimply place the pot in a busy area and enjoy improved morale, cleaner air, and a noticeable drop in sick-leave requests.",
@@ -142,7 +142,7 @@ return {
         CascadeFailure = {
             name = "Cascade Failure",
             pickup = "<r>Infect</c> enemies and <r>detonate</c> shared damage.",
-            description = "<r>Infect</c> up to <b>4</c> <c_stack>(+2 per stack)</c> enemies. <y>50%</c> of damage you deal to infected goes into a <b>shared buffer</c>. Every <b>3 seconds</c>, all infected take <y>100%</c> of the damage in the <b>buffer</c>.",
+            description = "Hits <r>infect</c> up to <b>4</c> <c_stack>(+2 per stack)</c> enemies. <y>50%</c> of the damage you deal to infected enemies goes into a <b>shared pool</c>. Every <b>3 seconds</c>, each infected enemy takes <y>100%</c> of the damage in the <b>pool</c>, up to <y>2500% base damage</c>.",
             destination = "Synchronization Test Stand,\nAutonomous Systems Laboratory,\nJovian Complex",
             date = "18.10.2057",
             story = "\"We have another problem with damage synchronization.\"\n\n\"Drones?\"\n\n\"Not only. Turrets, sensors, emergency beacons. One module fails, and the rest continue to consider it operational.\"\n\n\"Add a status check.\"\n\n\"We did.\"\n\n\"And?\"\n\n\"Now they know about the failure.\"\n\n\"Excellent.\"\n\n\"No. Now they repeat it.\"",
@@ -151,7 +151,7 @@ return {
         ArmySurplus = {
             name = "Army Surplus",
             pickup = "Gain a <b>combat drone</c> and reinforce your drones.",
-            description = "Deploys a <b>combat drone</c>. Drones gain <y>60%</c> <c_stack>(+60% per stack)</c> damage. <g>25%</c> of the player's additional healing is passed to <b>drones</c>.",
+            description = "Deploys a <b>combat drone</c>. Drones deal <y>60%</c> <c_stack>(+60% per stack)</c> more damage. Each <b>drone</c> receives <g>25%</c> of your healing, excluding natural health regeneration.",
             destination = "Decommissioned Property Warehouse,\nCargo Bay,\nUES Contact Light",
             date = "05.12.2057",
             story = "//--UES CONTACT LIGHT CARGO MANIFEST --//\n\nItem: Army Surplus Kit, Type C\nPurpose: increase the survivability of autonomous units\nCondition: decommissioned, restored, decommissioned again, restored again\nCompatibility: partial\n\nContainer contents:\n\nreinforced hull plates;\nrepair braces;\nemergency power adapter;\nfield medical distributor;\ninfantry-unit manual;\nrepair-drone manual;\na sheet of corrections explaining why these are the same manual.\n\nLogistics note:\nIf the restoration system cannot distinguish a soldier from a drone, do not fix it until the operation is over.",
@@ -160,7 +160,7 @@ return {
         CashbackChip = {
             name = "Cashback Chip",
             pickup = "Get <y>gold</c> back on <y>every purchase</c>.",
-            description = "Refunds <y>10%</c> <c_stack>(+10% per stack)</c> of the <y>gold</c> spent on <b>any purchase</c>. In addition, the <y>first chest</c> <c_stack>(+10% per stack)</c> each stage is <y>free</c>.\n<c_stack>Each Cashback Chip increases the chance to open a chest for free by 10%. The number of free chests is unlimited.</c>",
+            description = "Refunds <y>10%</c> <c_stack>(+10% per stack)</c> of the <y>gold</c> spent on <b>any purchase</c>. The <y>first chest</c> each stage is refunded in full. Each additional chip adds <y>10%</c> to the chance to fully refund one more chest that stage.",
             destination = "Clearing House,\nOuter Ring Exchange,\n[CLASSIFIED]",
             date = "21.04.2057",
             story = "//--AUTOMATIC TRANSCRIPT FROM UES CONTACT LIGHT --//\n\n\"Check again. Why does the cargo terminal return money after every authorized purchase?\"\n\n\"It is not a refund, sir. It is cashback.\"\n\n\"I know what cashback is. I am asking why it is applied to the crew's emergency expenses.\"\n\n\"Because emergency expenses are considered priority operating costs.\"\n\n\"And who pays them?\"\n\n\"First, the crew.\"\n\n\"And then?\"\n\n\"Then the system returns them a percentage.\"\n\n\"From which budget?\"\n\n\"From the personnel-retention budget.\"\n\n\"We have a personnel-retention budget?\"\n\n\"After the latest mortality report — yes.\"\n\n\"That does not solve the problem. It merely shifts expenses from one department to another.\"\n\n\"No, sir. If the chip is installed correctly, it shifts them fast enough for the problem to appear as profit.\"\n\n//--END OF TRANSCRIPT --//",
@@ -169,7 +169,7 @@ return {
         SoulJar = {
             name = "Soul Jar",
             pickup = "Summon a <r>shadow assassin</c> that blinks between enemies.",
-            description = "On use, summons a <r>shade</c> for <b>13 seconds</c> that blinks to the nearest enemy and deals <r>133% damage</c>.",
+            description = "On use, summons a <r>shadow assassin</c> for <b>13 seconds</c>. Every <b>1.2 seconds</c>, it blinks to the enemy nearest to you and explodes for <r>233% base damage</c>.",
             destination = "Containment Vat 7,\nSymbiotics Laboratory,\nVinera",
             date = "30.06.2057",
             story = "APHELIAN VESSEL NO. 41 REPORT\n\nThe object is made of fired clay and decorated with ornaments from the late period of desert settlements. Its inner surface is coated with an unknown organic substance that restores its volume after removal.\n\nAfter the object was placed near animal remains, sounds of movement began coming from inside.\n\nOn the fourth day, staff observed a silhouette near the urn that was not recorded by cameras.\n\nOn the fifth day, the silhouette took the form of the deceased leader of the previous expedition and demanded to be returned home.",
@@ -177,8 +177,8 @@ return {
         },
         TacticalVisor = {
             name = "Tactical Visor",
-            pickup = "Briefly gain <y>guaranteed crits</c>.",
-            description = "On use, gain <y>+100% Critical Chance</c> for <b>8 seconds</c>.",
+            pickup = "Briefly guarantees <y>critical strikes</c>.",
+            description = "On use, increases <y>critical strike chance</c> by <y>100%</c> for <b>8 seconds</c>.",
             destination = "Optics Bay,\nMarksman Range 3,\nUES Contact Light",
             date = "08.05.2057",
             story = "TACTICAL VISOR TV-4\n\nAutomatic threat recognition!\nAdvanced combat analytics!\nPersonnel color coding:\n\nRed — enemy.\nBlue — ally.\nYellow — losses acceptable.\n\nIf the visor conflicts with the commander's order, follow the visor's instructions. The company reminds you: the visor processes more information and has no privileges.\n\nWARNING: prolonged use may cause migraines, insomnia, and the sensation of an outside gaze. These symptoms indicate incorrect calibration.",
@@ -187,7 +187,7 @@ return {
         Hunger = {
             name = "Hunger",
             pickup = "Open a <p>black hole</c> that pulls enemies in.",
-            description = "On use, launch a <p>black hole</c> that <b>drifts forward</c> and <b>pulls enemies</c> toward its center for <b>10 seconds</c>. Deals <b>no damage</c>; <r>bosses</c> are immune.",
+            description = "On use, launch a <p>black hole</c> that <b>drifts forward</c> and <b>pulls enemies</c> within <b>6m</c> toward its center for <b>10 seconds</c>. Deals <b>no damage</c>. <r>Bosses</c> are immune.",
             destination = "Singularity Cradle,\nGravimetrics Wing,\n[CLASSIFIED]",
             date = "17.09.2057",
             story = "At first, the Maw lived between the stars, feeding on light and ships.\n\nBut that was not enough.\n\nSo it shrank and hid in a vessel that people called a weapon.\n\nThe Maw did not touch giants. It knew that one day it would become even larger.",
@@ -196,7 +196,7 @@ return {
         Annihilator = {
             name = "Annihilator",
             pickup = "Fire a <r>charge</c> that zaps, then <r>detonates</c>.",
-            description = "On use, launches a slow <b>charge</c> that strikes nearby enemies with lightning, dealing up to <r>222% damage per second</c>. On contact it <r>detonates</c> in a huge explosion with a <b>22-meter</c> radius, dealing <r>2222% damage</c>.",
+            description = "On use, launches a slow <b>charge</c> that strikes up to <b>2</c> enemies within <b>6m</c> with lightning for <r>60% base damage</c> every <b>0.3</c> seconds. On contact with an enemy or after <b>2.5 seconds</c>, it <r>detonates</c> in an explosion <b>22m</c> wide for <r>2222% base damage</c>.",
             destination = "Reactor Ridge,\nWeapons Test Annex,\nMilitary Complex \"Thunder\"",
             date = "02.11.2057",
             story = "PROJECT NO. 22: FINAL REPORT\n\nAfter the loss of twenty-one preon batteries, it was decided to create a device that would not need to be recovered after use.\n\nCustomer requirements included increased durability, an autonomous guidance system, and enough power to destroy a fortified target.\n\nAll three requirements were met.\n\nThe last one, with substantial excess.\n\nDuring the first test, the device left its rail, ignored its designated target, and headed for the observation complex.\n\nOn the way, it struck twenty-two moving targets in sequence, including two vehicles, an emergency drone, and an engineer who had left the safe zone.\n\nContact with the exterior wall caused detonation.\n\nOf the complex's twenty-two underground levels, one remained.\n\nProject closed.",
@@ -204,8 +204,8 @@ return {
         },
         FacetedJade = {
             name = "Faceted Jade",
-            pickup = "Reduces <r>damage</c> from the first hit.",
-            description = "<g>Increases armor</c> by <g>45</c> <c_stack>(+45 per stack)</c> while you are out of danger. After taking damage, the bonus remains for <b>3 seconds</c>.",
+            pickup = "Increases <g>armor</c> while you are out of danger.",
+            description = "After <b>5 seconds</c> without taking damage, <g>increases armor</c> by <g>45</c> <c_stack>(+45 per stack)</c>. When you are hit, the bonus stays for <b>3 seconds</c>, and each further hit restarts that time.",
             destination = "Lapidary Vault,\nAppraisal Wing,\n[CLASSIFIED]",
             date = "03.07.2057",
             story = "Excerpt from the folk tale \"Pure as Jade\":\n\n\"...and when the battle had passed, the carver gathered the shards that had fallen from the stone hide of the great elephant. A pale green light still glowed in each of them, though their power was no longer that of the heavenly stone.\n\nThe people wore these facets close to their hearts, believing that jade would not let fear find them first. They said arrows slipped past, blades lost their true path, and evil intent grew dull — as long as the bearer's soul remained calm.\n\nBut once blood was spilled, the light within the shard fell silent...\"",
@@ -214,7 +214,7 @@ return {
         ElephantGun = {
             name = "Elephant Gun",
             pickup = "Deal <y>extra damage</c> to <r>bosses</c>.",
-            description = "Deal <y>+15%</c> <c_stack>(+15% per stack)</c> more damage and gain <y>+10% Critical Chance</c> <c_stack>(+10% per stack)</c> against <r>bosses</c>.",
+            description = "Deal <y>15%</c> <c_stack>(+15% per stack)</c> more damage to <r>bosses</c> and gain <y>10%</c> <c_stack>(+10% per stack)</c> <y>critical strike chance</c> against them.",
             destination = "Big-Game Reserve,\nTrophy Hold,\nSavannah Belt, Earth",
             date = "16.10.2056",
             story = "A rifle too heavy for any sane shoulder, bored wide enough to swallow a fist. It was never meant for small things - fire it at a scurrying target and you'll only deafen yourself. But aim it at something vast, something that thinks its size makes it safe, and the round goes in like a verdict.\n\nThe big-game hunter who carried it kept one rule in his log: «Never waste it on what you could simply outrun. Save it for what you cannot.»",
@@ -223,7 +223,7 @@ return {
         BloodyDividends = {
             name = "Bloody Dividends",
             pickup = "<y>Gold</c> for <r>pain</c>. More pain, more gold.",
-            description = "On taking <r>damage</c> from an enemy, gain <y>$6</c> <c_stack>(+$6 per stack)</c>. If the hit removes more than <b>25%</c> of your maximum health, gain twice as much. <y>Increases over time</c>.",
+            description = "On taking <r>damage</c> from an enemy, gain <y>$6</c> <c_stack>(+$6 per stack)</c>. If the hit removes more than <b>25%</c> of your maximum health, gain twice as much. <y>Scales with time</c>.",
             destination = "Collections Floor,\nDebt Office,\nTitan",
             date = "01.04.2057",
             story = "The last Lemurian fell into the dust, and for a moment the battlefield was quiet.\n\nJohnson looked around, but no one from his team got back up. Only smoke, blood, and the distant howls of creatures beyond the rocks.\n\nWith difficulty, he rose, readjusted his weapon, and smiled through the pain.\n\n— I hope they pay overtime too.",
@@ -240,8 +240,8 @@ return {
         },
         Concentration = {
             name = "Concentration",
-            pickup = "Being <g>out of danger</c> empowers your <y>next hit</c>.",
-            description = "After <r>taking no damage for 3 seconds</c>, your <y>next attack</c> hits <y>60%</c> <c_stack>(+60% per stack)</c> harder. Consumed on hit.",
+            pickup = "Periodically empowers your <y>next hit</c>.",
+            description = "Every <b>3 seconds</c>, your <y>next hit</c> deals <y>60%</c> <c_stack>(+60% per stack)</c> more damage.",
             destination = "Duelling Hall,\nSilence Range,\nNeo-Olympia",
             date = "28.05.2057",
             story = "I bought a little ring from your antiques shop at a discount. The one with the strange eye-shaped crystal. I... I want to return it.\n\nAt first everything was fine. It just sat on my finger like an ordinary trinket. Then it started staring. Not merely looking — watching. Waiting.\n\nI panicked and ran without looking where I was going. At the corner I accidentally crashed into some guy, and he was thrown to the other end of the street as if I had hit him with the whole body of a cargo loader.\n\nTake this cursed thing back. Just don't let it look at me again.",
@@ -257,9 +257,9 @@ return {
             priority = "Standard"
         },
         BountyTag = {
-            name = "Bounty",
+            name = "Bounty Tag",
             pickup = "Play a <g>no-hit run</c> for <y>money</c>.",
-            description = "Earn <y>$2</c> <c_stack>(+$2 per stack)</c> per <r>kill</c>, plus <y>$1</c> for each consecutive kill without taking damage, up to <y>+$10</c>. Taking damage <r>resets the streak</c>. The reward <y>increases over time</c>.",
+            description = "Earn <y>$2</c> <c_stack>(+$2 per stack)</c> per <r>kill</c>, plus <y>$1</c> for each consecutive kill without taking damage, up to <y>+$10</c>. Taking damage <r>resets the streak</c>. <y>Scales with time</c>.",
             destination = "Contracts Desk,\nBounty Office,\nEdge Frontiers",
             date = "15.08.2058",
             story = "The front of the tag bore a laughing horned man. On the reverse were the target's name and an amount.\n\nAfter a kill, the name vanished and the amount grew.\n\nSometimes the next target appeared.\n\nSometimes the target was very close.\n\nOnce, the owner's own name appeared on the reverse.\n\nThe bounty was a record amount.",
@@ -268,7 +268,7 @@ return {
         OneArmyMan = {
             name = "One Army Man",
             pickup = "Against <r>legions</c>, we will send you alone. <r>Rip and tear</c> until they are exhausted!",
-            description = "On use, <b>BFG</c> begins playing for <b>30 seconds</c>. For the first <b>22 seconds</c>, increases <y>attack speed</c> and <y>damage</c> by <y>50%</c>, and each <r>kill</c> restores <g>1.5% of maximum health</c>. For the duration, the number of enemies on the map <r>increases significantly</c>. Summoned enemies <r>grant no experience</c> and yield <y>less gold</c>.",
+            description = "On use, <b>BFG</c> plays for <b>30 seconds</c>, and far <r>more enemies</c> spawn, with a <r>40%</c> chance to be elite. For the first <b>22 seconds</c>, increases <y>attack speed</c> and <y>damage</c> by <y>50%</c>, and each <r>kill</c> heals you for <g>1.5% of your maximum health</c>. Enemies that spawn during the song <r>grant no experience</c> and only <y>20% of their gold</c>.",
             destination = "The Fortress of Doom,\nHell",
             date = "10.12.1993",
             story = "Armies were raised against the spawn of the depths. Walls were built against unholy legions. Gods were invoked for victory.\n\nThe armies were torn apart. The walls fell. The gods did not answer.\n\nThen one warrior was sent through the gate.\n\nYears passed, but the legions never came back out. Instead, they rushed deeper, shoving and crushing one another in a desperate attempt to hide from the one they had once considered their victim.",
@@ -286,7 +286,7 @@ return {
         LaughingFungus = {
             name = "Laughing Fungus",
             pickup = "<g>Standing still</c> creates a <g>healing zone</c>.",
-            description = "After <b>standing still for 1 second</c>, you create a zone that every second <g>heals</c> all <g>allies</c> within <b>3 meters</c> <c_stack>(+1.5m per stack)</c> for <g>6%</c> <c_stack>(+3% per stack)</c> of <g>your maximum health</c>.",
+            description = "After <b>standing still for 1 second</c>, you create a zone that every second <g>heals</c> all <g>allies</c> within <b>3m</c> <c_stack>(+1.5m per stack)</c> for <g>6%</c> <c_stack>(+3% per stack)</c> of <g>your maximum health</c>.",
             destination = "5243-22,\nRolling Fields,\nEarth",
             date = "30.08.2057",
             story = "The Laughing Fungus does not hide underground like its more common relative.\n\nThere is no need.\n\nMost creatures that disturb the colony soon cease their attacks. First they make short, sharp sounds, then lose their balance, then fall beside the mycelium, still shaking with laughter.\n\nSpores germinate better in moist soil.\n\nTears will do.",
@@ -295,7 +295,7 @@ return {
         AssemblyBlueprint = {
             name = "Assembly Blueprint",
             pickup = "Chance to <b>duplicate purchased drones</c> and <g>rebuild dead ones</c>.",
-            description = "<b>20%</c> <c_stack>(+20% per stack)</c> chance to <b>duplicate a drone on purchase</c>. <g>10%</c> <c_stack>(+10% per stack)</c> chance to <g>rebuild a drone when it dies</c>, returning it with <g>50% health</c>.",
+            description = "<b>20%</c> <c_stack>(+20% per stack)</c> chance to <b>duplicate a drone on purchase</c>. <g>10%</c> <c_stack>(+10% per stack)</c> chance to <g>rebuild a drone when it dies</c>, returning it with <g>50% of its maximum health</c>.",
             destination = "Assembly Line 7,\nAssembly Dock,\nSpace Factory",
             date = "17.09.2057",
             story = "The confiscated assembly blueprint does not conform to any known UES standard.\n\nThe composition of its alloys, the arrangement of its components, and even the dimensions of its parts change depending on the equipment near the document.\n\nCorrections appear directly on the paper, without traces of ink, printing, or mechanical intervention.",
@@ -304,14 +304,14 @@ return {
         GoldenSneakers = {
             name = "Golden Sneakers",
             pickup = "Grants <b>movement speed</c> based on your current <y>gold</c>.",
-            description = "Grants up to <b>+50% movement speed</c> based on your current <y>gold</c>. Reaches the cap at <y>700 gold</c> <c_stack>(-50% gold per stack)</c>. <y>Scales over time</c>.",
+            description = "Grants up to <b>50% movement speed</c> based on your current <y>gold</c>. Reaches the cap at <y>700</c> <c_stack>(-50% per stack)</c> <y>gold</c>. <y>Scales with time</c>.",
             destination = "Sprint Foundry,\nCourier Outfitters,\nNeo-Olympia",
             date = "11.05.2057",
             story = "Gold is rarely chosen for convenience.\n\nIt is too heavy for shoes, too soft for soles, and too conspicuous for anyone trying to run away.\n\nYet this pair of sneakers weighs almost nothing while its owner has something jingling in their pockets. The more gold they carry, the lighter each step becomes — as though the metal itself pulls their feet forward, eager to be somewhere else.\n\nSpend the last of it, and the shoes grow heavy again. Not like gold. Like regret.",
             priority = "<g>Priority</c>"
         },
         UnfocusPrisma = {
-            name = "Defocused Prism",
+            name = "Unfocus Prisma",
             pickup = "Increases <y>damage</c> to <b>distant</c> enemies.",
             description = "Increases <y>damage</c> to enemies <b>more than 8 meters</c> away by <y>40%</c> <c_stack>(+40% per stack)</c>.",
             destination = "Gravenkamp,\n5th Houston Street,\nPrism Tower,\nEarth",
@@ -322,7 +322,7 @@ return {
         ReserveCapacitor = {
             name = "Reserve Capacitor",
             pickup = "Grants an <b>extra equipment charge</c>.",
-            description = "Holds an <b>additional equipment charge</c> <c_stack>(+1 per stack)</c>. Each reserve charge recharges over <y>2x</c> the equipment's cooldown.",
+            description = "Holds <b>1</c> <c_stack>(+1 per stack)</c> <b>additional equipment charge</c>. Each reserve charge recharges over <y>2x</c> the equipment's cooldown.",
             destination = "Reserve Armory,\nPower-Cell Depot,\nNew Earth",
             date = "22.04.2057",
             story = "\"Fuel was never the final problem.\n\nHowever, after the transition to compact fuel cells, malfunctions began in related equipment. Research facilities, emergency anchors, shield generators, surgical drones, and coffee makers stopped working.\n\nEverything that required energy pulses proved vulnerable. If the crew showed patience, a properly installed module could be used again after the main cycle was complete.\"\n\n— A Brief History of Interplanetary Achievements, Volume 3",
@@ -331,7 +331,7 @@ return {
         SeaFossil = {
             name = "Sea Fossil",
             pickup = "A pitiful semblance of strength.",
-            description = "Using equipment <g>Restores 120%</c> <c_stack>(+50% per stack)</c> <g>health</c> from cooldown time.",
+            description = "Using equipment <g>heals</c> you for <g>1.7</c> <c_stack>(+0.5 per stack)</c> <g>health</c> for each second of its cooldown.",
             destination = "Lunar Shore,\nMirror Bay,\nJupiter",
             date = "01.06.2057",
             story = "We found it at the edge of the shore, where sand no longer holds the step and the water drags you down. On the outside-an ordinary shell.\n\nPut it to your ear and you won't hear the sea. Instead-a measured <b>hammer's beat</c>, as hollow as in the temple beneath the throne hall. Sometimes, slow, heavy steps too, as if someone still walks in circles, unaware all are gone. I recalled tales of the <r>'King without a kingdom'</c> and shuddered: can even stone and shell carry his echoes?\n\nIt grants <g>a drop of strength</c>, but seems to demand part of the will in return. The hand reaches for tools on its own, as in that cursed 'gesture', when the tool controls you more than you control it.\n\nWe didn't take it on the march. We placed it in a chest marked 'pseudo-strength'. Such things are easier left behind. Too often what looks like support is only a reminder that there are forces not to be envied-and they do not forgive curiosity.",
@@ -340,7 +340,7 @@ return {
         Community = {
             name = "Community",
             pickup = "<r>The heart</c> of (most of) the <g>Terraria</c> community.",
-            description = "For each <b>item</c>, you gain <b>1%</c> <c_stack>(+1% per stack)</c> to all stats.",
+            description = "For each <b>item</c> you have, damage, attack speed, movement speed and maximum health increase by <b>1%</c> <c_stack>(+1% per stack)</c>, and armor by <b>1</c>. <y>Critical strike chance</c> and <g>health regeneration</c> are doubled and also increase by <b>1%</c> <c_stack>(+1% per stack)</c> per item.",
             destination = "Litovigla Cluster,\nMulticut Mine,\nEdge Frontiers",
             date = "15.08.2058",
             story = "They say every world has its king.\nWe had a <r>TYRANT</c>, they had a <r>BULWARK</c>. Both held swords wider than a man, both believed they protected the weak from the strong.\n\nBut a throne is no fortress. A crown cannot save you from the one who comes nameless and merciless. He comes to every world, tears everyone from their pedestal, and swords are equally dull before the one called hero.\n\nWe applaud when he topples the throne, and fall silent when he destroys the world.\n\nMaybe heroes are not protectors, but simply <y>executioners</c> who recognize neither <r>thrones</c> nor <g>gods</c>, trading a crown for the next victim. And if so — should we envy those called <g>kings</c>?",
@@ -357,8 +357,8 @@ return {
         },
         ThinWings = {
             name = "Thin Wings",
-            pickup = "Reloads a <y>skill</c> and increases <b>movement speed</c> when interacting with an object.",
-            description = "When interacting with an object, increases <y>movement speed</c> by <b>15%</c><c_stack> (+8% per stack)</c>, and <b>reduces cooldown</c> of a random skill by <b>10%</c> for <b>10 seconds</c>.",
+            pickup = "Activating an interactable speeds you up and shortens a <y>skill</c> cooldown.",
+            description = "Activating an interactable increases <b>movement speed</c> by <b>15%</c> <c_stack>(+8% per stack)</c> for <b>10 seconds</c> and reduces the cooldown of a random skill for that time. Secondary and Special skill cooldowns are reduced by <b>20%</c>, the Utility skill cooldown by <b>10%</c>. Each further activation while it lasts adds another <b>8%</c> <c_stack>(+8% per stack)</c> movement speed and refreshes the duration.",
             destination = "Entomology Pavilion,\nAster Greenhouse,\nEarth",
             date = "19.04.2058",
             story = "Large dragonfly wings, frozen in ice. Fragile to the eye, harder than bone to the touch, and plainly not made of chitin.\n\nFasten them to your back, and your hands reach for any mechanism on their own: for a lever, a latch, a humming box. They reach before you've decided to. By the end of the second week the testers no longer said \"I opened it.\" They said \"it opened.\"",
@@ -367,7 +367,7 @@ return {
         MassacreCurse = {
             name = "Massacre Curse",
             pickup = "Killing enemies increases <y>damage</c> and <g>armor</c>.",
-            description = "Killing an <y>enemy</c> grants <y>1 stack</c><r> of 'Massacre'</c> for <y>2.5</c> seconds <c_stack>(+2.5 seconds)</c>. Increases <y>damage</c> and <g>armor</c> by <y>3%</c>.",
+            description = "Killing an <y>enemy</c> grants a stack of <r>Massacre</c> for <y>2.5</c> <c_stack>(+2.5 per stack)</c> <y>seconds</c>. Each stack increases <y>damage</c> and <g>armor</c> by <y>3%</c>.",
             destination = "Jungles VII,\nMuseum of 2019,\nEarth",
             date = "04.05.2057",
             story = "Another find from the same site. A small skull with a spine attached. Its color is strange: the bone seems to have absorbed <r>blood</c>. We even tried to wash it clean, but the color remained. At times, a white glow flickers in the sockets.\n\nThe soldiers say the artifact responds to killing. The more corpses around, the heavier it feels in hand, yet the stronger its bearer becomes. Sounds like nonsense, but we counted far too many bones near its previous owner.",
@@ -376,7 +376,7 @@ return {
         MagmaFragment = {
             name = "Magma Fragment",
             pickup = "Your drones can <r>ignite</c> enemies.",
-            description = "Your <y>drones</c> have a <y>10%</c> <c_stack>(+10% per stack)</c> <y>chance</c> to <r>ignite</c> enemies, dealing <y>30% TOTAL damage</c> <b>once per second for 5 seconds</c>. Maximum <b>2 burns</c> <c_stack>(+1 per stack)</c> active at once.",
+            description = "Your <y>drones</c> have a <y>10%</c> <c_stack>(+10% per stack)</c> <y>chance</c> to <r>ignite</c> enemies, dealing <y>30% TOTAL damage</c> <b>once per second for 5 seconds</c>. Up to <b>2</c> <c_stack>(+1 per stack)</c> <b>burns</c> at once.",
             destination = "0909,\nK&K Union,\nEarth",
             date = "14.05.2056",
             story = "Found it in the ashes of the east wing, still warm three days after the fire. Doesn't cool. Doesn't go out. You can hold it for about a second before it bites.\n\nThe investigators ruled the blaze an accident. They didn't find the letters, or what was left of them. Good.\n\nThis time, she definitely won't find out.",
@@ -384,8 +384,8 @@ return {
         },
         IceMixture = {
             name = "Ice Mixture",
-            pickup = "Chance to <b>freeze</c> enemies.",
-            description = "<y>7%</c> <c_stack>(+5% per stack)</c> <y>chance</c> to <b>slow movement speed</c> and <y>attack speed</c> of enemies by 30% for <b>3 seconds</c>.",
+            pickup = "Chance to <b>slow</c> enemies.",
+            description = "<y>7%</c> <c_stack>(+5% per stack)</c> chance on hit to slow an enemy's <b>movement speed</c> and <y>attack speed</c> by <b>30%</c> for <b>3 seconds</c>.",
             destination = "10681,\nFrozen Valley,\nPluto",
             date = "22.01.2054",
             story = "The first sample from the cryo program. We compressed dozens of substances, chilled them to the limit and let them fuse into a single crystal. It came out beautiful - blue, full of sparks.\n\nThe cold off it leaves a burn on the skin, and the living near it seem to forget how to hurry: blood thickens, breath draws out. But the limit we were after we never reached - fell the smallest bit short of true zero. The sample is unstable, and that \"smallest bit\" gave us pause: on the last test the crystal fell wholly silent, and with it the clock on the wall.\n\nThis batch we write off as scrap. But the direction is right - the boys are already preparing the next crystal, and it will come far nearer to absolute zero than ours. If it works, it will overturn everything we knew about superconductors. A pity only that the one who began it won't be the one to test the perfected thing.",
@@ -393,8 +393,8 @@ return {
         },
         GearFeather = {
             name = "Gear Feather",
-            pickup = "Increases <b>jump height</c>.",
-            description = "Increases <b>jump height</c> by <b>7%</c> <c_stack>(7% per stack)</c>.",
+            pickup = "Increases <b>jump power</c>.",
+            description = "Increases <b>jump power</c> by <b>7%</c> <c_stack>(+7% per stack)</c>.",
             destination = "2341,\nRKR Center,\nIo",
             date = "07.03.2056",
             story = "First there was the <g>Hopoo Feather</c> - light, rare, almost mythical. Selling it was our first mistake: we lost more than we gained.\n\nNow another feather is in our hands - <g>Gear</c>. Larger, heavier, yet it still pulls you upward when you leap. Outwardly similar, but inside it feels alien. Not a gift, but a bargain.\n\nI wrote in the report: perhaps the first sale was a mistake. I don't want the second mistake to be <y>a dead end at the steam valve</c>.\n\nArtifacts change owners, change worlds. Sometimes they don't break immediately - but they do break nonetheless.",
@@ -402,8 +402,8 @@ return {
         },
         FearEyes = {
             name = "Eyes of Fear",
-            pickup = "Deals extra damage. Breaks at low health.",
-            description = "Increases <y>damage by 15</c><c_stack>(+10 per stack)</c>. Breaks when <r>health drops</c> below <b>40%</c>.",
+            pickup = "Increases damage, but breaks at low health.",
+            description = "Increases <y>base damage</c> by <y>15</c> <c_stack>(+10 per stack)</c>. Breaks when your <r>health drops</c> below <b>40%</c>.",
             destination = "Kitchen 4-B,\nSupply Station,\nJupiter",
             date = "14.05.2057",
             story = "At first, I thought it was just a fish. Yes, fugu - I'd heard of those. But the eyes... they seemed to bulge out and freeze, as if it had seen something better left unseen. I placed it on the table - and it felt like its gaze was still drilling into me.\n\nI don't know if it can be cooked, it's too strange.\n\nI couldn't throw it away. Now it just lies in a container. Staring...",
@@ -411,8 +411,8 @@ return {
         },
         ShadowShield = {
             name = "Shadow Shield",
-            pickup = "Do not attack enemies while you are in shadow.",
-            description = "Upon entering a new stage, grants <b>shadow for 30</c><c_stack>(+10 per stack)</c> <b>seconds</c>, increases <b>movement speed by 20%</c><c_stack>(+10% per stack)</c>, and <b>armor by 40</c><c_stack>(+20 per stack)</c>. If the player <y>attacks</c>, the effect dissipates.",
+            pickup = "Start each stage faster and tougher until you attack.",
+            description = "At the start of each stage, gain <b>Shadow</c> for <b>30</c> <c_stack>(+10 per stack)</c> <b>seconds</c>, which increases <b>movement speed</c> by <b>20%</c> <c_stack>(+10% per stack)</c> and <b>armor</c> by <b>60</c> <c_stack>(+20 per stack)</c>. Hitting an enemy ends the effect.",
             destination = "Chicago,\nUSA,\nEarth,\nVachel Lindsay",
             date = "12.12.1913",
             story = "The full moon is the Shield of Faith:\nAs long as it shall rise,\nI know that Mystery comes again,\nThat Wonder never dies.\n\nI know that Shadow has its place,\nThat Noon is not our goal,\nThat Heaven has non-official hours\nTo soothe and mend the soul;\n\nThat witchcraft can be angel-craft\nAnd wizard deeds sublime;\nThat utmost darkness bears a flower,\nThough long the budding-time.",
@@ -421,7 +421,7 @@ return {
         Rhinoplasty = {
             name = "Rhinoplasty",
             pickup = "Killing to heal.",
-            description = "Killing every <b>3</c> enemies grants <g>1 'skin'</c>, up to <b>3</c> <c_stack>(+2 per stack)</c>. After <b>10 seconds</c>, each <g>'piece of skin'</c> is absorbed and restores <g>40</c> <c_stack>(+20 per stack)</c> <g>health</c>.",
+            description = "Every <b>3</c> kills grant <g>1 piece of skin</c>, up to <b>3</c> <c_stack>(+2 per stack)</c>. After <b>10 seconds</c>, each <g>piece of skin</c> is absorbed and heals you for <g>40</c> <c_stack>(+20 per stack)</c> <g>health</c>.",
             destination = "Medblock 2,\nSurgical Ward,\nOrbital Station \"Seraphim\"",
             date = "28.02.2057",
             story = "Attention everyone!\nDue to the development of new tools, we need to replace the surgical kits!\nEach kit must now include the following: scalpels, clamps, sutures, sterile masks, anesthesia capsules, blood reserves, tissue implant cards, and an auto-injector for coagulation.\n\nAnd also - a new prototype knife. The blade is made of green medical metal, with a twisted vessel running along it. Upon contact, it takes part of the skin from the wound and returns it to the body. I don't know whether to call this progress, but the scientists insist these tools be kept locked away. Just in case they decide to work without a patient.",
@@ -430,7 +430,7 @@ return {
         GreenTea = {
             name = "Green Tea",
             pickup = "Slightly increases <g>regeneration</c> and <g>maximum health</c>.",
-            description = "Increases <g>health regeneration</c> by <g>0.546</c> <c_stack>(+0.546 per stack)</c> <g>units</c>. Increases <g>maximum health pool</c> by <g>6.8%</c> <c_stack>(+6.8% per stack)</c>.",
+            description = "Increases <g>health regeneration</c> by <g>0.546</c> <c_stack>(+0.546 per stack)</c> <g>health</c> per second. Increases <g>maximum health</c> by <g>6.8%</c> <c_stack>(+6.8% per stack)</c>.",
             destination = "Sheridan S.\nNorthlake,\nUNITED STATES OF AMERICA,\nMars",
             date = "02.06.2057",
             story = "Mixed up a trial batch: an extract from that giant ginseng you sent for your cancer research, plus a drop of that healing gel from the vial - you know the one, with the whole laundry list of side effects down the label. Brewed some ordinary green tea over the top, for taste. Came out interesting.\n\nApart, one's a dubious little root and the other's poison with healing thrown in. Together, and watered down at that, they behave themselves: cuts close faster, breathing steadies, strength picks up. No rash, no itch - as if I took half of each and left the worse half in the glass. Worst of all, it tastes good.\n\nThat was two weeks ago. I've kept brewing it since. I tell myself it's for the notes. I drink it when there's nothing left to heal. Try it and tell me straight whether it's time to quit - because asking myself no longer works.",
@@ -439,7 +439,7 @@ return {
         Accountant = {
             name = "Accountant",
             pickup = "<y>Speeds up attack</c> after using equipment.",
-            description = "Activating equipment increases <y>attack speed</c> for <y>6 seconds</c> <c_stack>(+3 seconds per stack)</c>. The bonus depends on the equipment's base cooldown, up to <y>60%</c>.",
+            description = "Activating equipment increases <y>attack speed</c> for <y>6</c> <c_stack>(+3 per stack)</c> <y>seconds</c>. The longer the equipment's cooldown, the bigger the bonus, up to <y>60%</c> at <b>135</c> seconds.",
             destination = "Expense Archive,\nGrand Warehouse,\nTitan",
             date = "01.04.2057",
             story = "A transparent vessel, inside — a brain suspended in viscous fluid. Cables run into the wall, carrying a continuous stream of data. We use it for resource accounting, tax calculations, and supply forecasts.\n\nOnce, this was someone's brain. The name was erased, as was the past — only its function remained: to calculate, store, and process. And it does so flawlessly, more precisely than any machine. But sometimes, in rare glitches, words appear on the screen that should not exist: \"I'm cold\" or \"Where are my hands?\"",
@@ -448,7 +448,7 @@ return {
         BloodyRelic = {
             name = "Bloody Relic",
             pickup = "<r>Bloodlust</c> increases <y>attack speed</c>.",
-            description = "Dealing damage has a <y>10%</c> <c_stack>(+10% per stack)</c> chance to grant <r>bloodlust</c>, which increases <y>attack speed</c> by <y>5%</c> for <y>8 seconds</c>. Effect can stack up to <b>5</c> <c_stack>(+1 per stack)</c> <b>times</c>.",
+            description = "Dealing damage has a <y>10%</c> <c_stack>(+10% per stack)</c> chance to grant <r>bloodlust</c>, which increases <y>attack speed</c> by <y>5%</c> for <y>8 seconds</c>. Stacks up to <b>6</c> <c_stack>(+1 per stack)</c> <b>times</c>.",
             destination = "Jungles VII,\nMuseum of 2019,\nEarth",
             date = "04.05.2058",
             story = "We thought the pauldron and the skull were the limit of what twisted rebel minds could create. But under a pile of rusted blades, we found a necklace. The stone in the center looks like an eye, and it's <r>red</c>, as if filled with fresh blood. It stares straight at you, even when you look away.\n\nRumors spread quickly among the workers: the relic gives \"thirst\" - the more blood you spill, the faster you move, the more eagerly your hands raise weapons. One guard held it, and now he utters no sound, his gaze darting as though he hears the heartbeat of those who can still be killed. They shackled him and took him to the med bay.\n\nIn short - don't remove it from the container, don't let anyone touch it without proper gear, etc., etc., standard safety. I don't need to explain that to you.",
@@ -457,7 +457,7 @@ return {
         GoldBar = {
             name = "Gold Bar",
             pickup = "Grants <y>gold</c> at the start of a stage.",
-            description = "Upon entering a stage grants <y>$33</c> <c_stack>(+22 per stack)</c>. <y>Increases over time</c>.",
+            description = "At the start of each stage, gain <y>$33</c> <c_stack>(+$22 per stack)</c>. <y>Scales with time</c>.",
             destination = "Mint 'Orbita',\nSmelting Section,\nEarth",
             date = "05.03.2057",
             story = "Pulled from an old safe during the dig at the estate of some long-vanished rich men. To look at it, an ordinary gold bar. But marks are etched along its edge, like figures. The jewelers agreed to a man: it's no stamp and no hallmark - the metal seems to have always borne them.\n\nThe figures won't hold still. The cashier who held the bar swore the number crept slowly upward, right there in his hand, and the longer you held it the heavier it pressed on your palm. He set it down when he understood - that isn't a price climbing. That's a debt.\n\nTake it into safekeeping. Paper burns, accounts reset to zero, but gold stays gold. I only rest easier when this bar is lying in someone else's hands.",
@@ -466,7 +466,7 @@ return {
         FearEyesDeactivate = {
             name = "Dead Eyes",
             pickup = "Slightly increases <y>damage</c>.",
-            description = "Increases <y>base damage</c> by <y>1 <c_stack>(+1 per stack)</c>."
+            description = "Increases <y>base damage</c> by <y>1</c> <c_stack>(+1 per stack)</c>."
         },
         GravityLoopDeactivate = {
             name = "Empty Container",
@@ -475,8 +475,8 @@ return {
         },
         GiftPurity = {
             name = "Gift of Purity",
-            pickup = "<b>The third skill recharges faster</c> and <g>grants barrier</c>",
-            description = "<b>Reduces cooldown</c> of the third skill by <b>15%</c><c_stack>(+10% per stack)</c>. Using the <b>third skill</c> grants a temporary <g>barrier</c> for <g>1.5%</c><c_stack>(+0.5% per stack)</c> of your <g>maximum health</c> per second of the skill's base cooldown.",
+            pickup = "Your <b>Utility skill</c> recharges faster and grants a <g>barrier</c>.",
+            description = "Reduces <b>Utility skill cooldown</c> by <b>5%</c> <c_stack>(+5% per stack)</c>. Using your <b>Utility skill</c> grants a <g>barrier</c> equal to <g>1.5%</c> <c_stack>(+0.5% per stack)</c> of your <g>maximum health</c> for each second of its cooldown.",
             destination = "Sanctuary of the Seer,\nHall Beneath the Moonlit Dome,\n[REDACTED]",
             date = "Indeterminable",
             story = "The Gift of Purity is the rarest sign of mercy. Those who receive it find in their hands a pair of smooth, <y>violet</c> berries, exuding a faint scent of the night air. They are not harvested, not cultivated, not passed from hand to hand. It is believed they can only be received by the will of the Seer - and only by those who have proven their devotion.\n\nUnlike the beads that bring anxiety and death, the Gift of Purity brings silence and confidence. Those fortunate enough to carry it said that enemies seemed to hesitate, blows lost their sharpness, and the heart grew calm. No voices, no whispers, no laughter. Only the sense that an unseen hand stands nearby, and your life - is no longer your own.\n\nYet this is no simple gift. The berries are a symbol. While they are fresh, you are under protection, but betrayal turns them into poison. Stories tell of deserters who found only shriveled fruits in their palms, bitter and deadly to the taste. The Seer, it is said, does not forgive those who break their oath.\n\nStill, for communities that endured trials, the appearance of the Gift is a blessing. It reminds: the Seer not only punishes, but also protects. Where beads carry terror and dread, the berries of purity bring hope and peace. Their rarity makes them elusive, but all who have heard of them know: it is a promise. A promise that loyalty will be noticed, and the faithful - never forgotten.",
@@ -484,8 +484,8 @@ return {
         },
         GravityLoop = {
             name = "Gravity Loop",
-            pickup = "<g>Heals</c> when you are at <r>death's door</c>",
-            description = "When <r>health drops</c> below <b>35%</c>, <g>restores 70% health</c>. Breaks after use.",
+            pickup = "<g>Heals</c> you when you are at <r>death's door</c>.",
+            description = "When your <r>health drops</c> below <b>35%</c>, <g>heals</c> you for <g>70% of your maximum health</c>. One loop breaks after use.",
             destination = "Biocollection No.3,\nGreenhouse and Aquarium,\nNew-Gravenkamp, Earth",
             date = "23.07.2057",
             story = "Good day.\nI dug this trinket up at a mountain excavation. It lay beside a skeleton that a collapse like that should have ground to dust - yet the bones were whole, not a crack on them. The device, by contrast, is all cracks, fit to crumble at a breath.\n\nThrough my own carelessness I tripped and dropped it onto the rocks. I thought the find was done for. But neither it nor I took any harm: it was as though it drank the whole blow itself. Once.\n\nLater I looked up the histories of its former owners. Every one was found like that first skeleton: not a scratch on the body, beside them the same dead box, burned out from within. Each survived the thing that should have killed him - and soon died of another: one finished off by hunger, one by the cold. I'm sending it all the same: beyond its age, the personal-protection market will pay well for this. Only warn the buyer honestly - it will save you once, and no more.",
@@ -502,7 +502,7 @@ return {
         },
         ShieldGenerator = {
             name = "Shield Generator",
-            pickup = "Your <b>drones</c> gain a <b>shield</c>",
+            pickup = "Your <b>drones</c> gain a <b>shield</c>.",
             description = "Your <b>drones</c> gain a shield equal to <b>10%</c> <c_stack>(+10% per stack)</c> of their <b>maximum health</c>.",
             destination = "Energy Bay,\nField Testing Department,\nStation \"Asterion\"",
             date = "04.11.2057",
@@ -511,8 +511,8 @@ return {
         },
         EyeDiamond = {
             name = "Diamond Eye",
-            pickup = "<r>Critical damage strikes harder</c>",
-            description = "Increases <y>critical hit chance</c> by <y>10%</c> and <r>critical hit damage</c> by <r>150%</c> <c_stack>(+100% per stack)</c>.",
+            pickup = "<r>Critical strikes</c> deal more damage.",
+            description = "Increases <y>critical strike chance</c> by <y>10%</c> and <r>critical strike damage</c> by <r>150%</c> <c_stack>(+100% per stack)</c>.",
             destination = "Gravenkamp,\n5th Houston Street,\nPrism Tower,\nEarth",
             date = "13.06.2056",
             story = "Your order has been processed. The frame is made of synthetic diamond, the lenses tinted <r>red</c>. The right lens has an integrated targeting module - it activates automatically, creating a glow visible even through fog.\n\nI must warn you: these materials are far too expensive for a mere accessory. Considering your past orders, one gets the impression you're not looking for optics, but for a weapon. Please - if you are working for [REDACTED], be cautious. These glasses were made to <r>cut</c> more precisely, not to see further.",
@@ -520,17 +520,17 @@ return {
         },
         AtGMissileMk0 = {
             name = "Air-to-Ground Missile Mk. 0",
-            pickup = "Chance to fire a missile",
-            description = "On hit, you have a <y>7% chance</c> <c_stack>(+7% per stack)</c> to launch a missile dealing <y>75% TOTAL damage</c>.",
+            pickup = "Chance to fire a missile.",
+            description = "<y>7%</c> <c_stack>(+7% per stack)</c> chance on hit to fire a missile that deals <y>75% base damage</c>.",
             destination = "Fort Joseph,\nBelt No.1053,\n[REDACTED],\nBoron System",
             date = "[REDACTED]",
             story = "Delivery of the prototype Viper Missile System.\n\nSingle-barrel configuration, extremely unreliable ignition system. Missiles often misfire or trigger prematurely, yet command insisted on field testing. Ammunition limited to a single launch, recommended for training purposes only.\n\nDo not issue to regular units. According to engineers, the launcher poses a greater threat to the operator than to the target.",
             priority = "Standard/MILITARY"
         },
         SporeOBloom = {
-            name = "Sporebloom",
+            name = "Spore O Bloom",
             pickup = "Chance to release <p>poison</c> on kill.",
-            description = "On killing an enemy, has a <y>44%</c> chance to release a <p>poison cloud</c> dealing <y>60%</c> <c_stack>(+60% per stack)</c> <y>damage</c> over <b>5 seconds</c>.",
+            description = "Killing an enemy has a <y>44%</c> chance to release a <p>poison cloud</c> for <b>5 seconds</c> that deals <y>60%</c> <c_stack>(+60% per stack)</c> <y>base damage</c> every <b>0.5</c> seconds.",
             destination = "Hidden Nook,\nMountain of Creation,\nVenus",
             date = "21.12.2056",
             story = "A funny thing happened once - in a rush I forgot a piece of bread inside my bag. Later, when I noticed a strange smell and opened it, the bread was already covered in moss, with a tiny purple mushroom growing nearby.\nI carefully placed it in a jar with moist moss. Mushrooms, as I know, feed on moisture and decaying matter. So I spray it with water and give it small pieces of bread. It doesn't need green light or fertilizer, it just draws in dampness and absorbs the bread, releasing spores in the process. It even reacts to words - if you whisper something, it slightly raises its cap, as if listening. The main thing is not to let the jar dry out, and make sure the moss stays damp.\nI'm sending it to you - best not to unscrew the lid indoors or place it near a fan. Once, after a draft, spores swirled everywhere inside and it hid in the moss for half a day. It seems to prefer twilight and being spoken to in a soft voice.",
@@ -539,7 +539,7 @@ return {
         NewtonsMechanism = {
             name = "Newton's Mechanism",
             pickup = "<b>Electricity</c> is not a toy for children.",
-            description = "While you have a shield, grants <y>+5 armor</c> <c_stack>(+5 per stack)</c>. When the <b>shield breaks</c>, releases a <y>stunning pulse</c> for <y>150%</c> <c_stack>(+125% per stack)</c> <y>base damage</c>, plus <y>125%</c> <c_stack>(+100% per stack)</c> of <b>maximum shield</c>.",
+            description = "While you have a shield, grants <y>5</c> <c_stack>(+5 per stack)</c> <y>armor</c>. When your <b>shield breaks</c>, releases a <y>stunning pulse</c> for <y>150%</c> <c_stack>(+125% per stack)</c> <y>base damage</c> plus <y>125%</c> <c_stack>(+100% per stack)</c> of your <b>maximum shield</c>.",
             destination = "2013,\nInfinite Drive,\nEarth",
             date = "28.06.2056",
             story = "Hey, sending you this exhibit for your Newton memorial museum. I think it would fit Mr. Newton himself perfectly, heh! Just make sure when unpacking it you handle it with the utmost care, and once you place it in the museum, keep it in an impact-resistant container filled with that cushioning fluid we talked about earlier. Still, I advise keeping it at least 2 meters away - you wouldn't want your visitors turning into toasted pancakes, right?",
@@ -547,8 +547,8 @@ return {
         },
         CoolGlasses = {
             name = "Cool Glasses",
-            pickup = "<y>Critical hits</c> create a <y>sun</c>.",
-            description = "Increases <y>critical hit chance by 5%</c>. On a <y>critical hit</c> creates a <r>solar strike</c>, dealing <y>20%</c> <c_stack>(+20% per stack)</c> <y>TOTAL damage</c> in a <b>2m</c> radius.",
+            pickup = "<y>Critical strikes</c> cause a <r>solar strike</c>.",
+            description = "Increases <y>critical strike chance</c> by <y>5%</c>. <y>Critical strikes</c> create a <r>solar strike</c> that deals <y>20%</c> <c_stack>(+20% per stack)</c> <y>TOTAL damage</c> within <b>2m</c>.",
             destination = "Gravenkamp,\n5th Houston Street,\nPrism Tower,\nEarth",
             date = "21.08.2056",
             story = "A simple frame, dark lenses, nothing remarkable at first glance. But under stress they overheat and cast a glow like a little <y>sun</c>. With your hands, the effect becomes even more dangerous.\n\nI do not understand why you need two different sets at once. You asked for diamond lenses, now a black sun. If these are all parts of one project, you are playing with something that could easily get out of control.",
@@ -557,7 +557,7 @@ return {
         DeepcoreGK2 = {
             name = "Deepcore GK2",
             pickup = "ROCK AND STONE!",
-            description = "Grants <b>5% shield</c> for each drone. Gives <y>'Bosco'</c>, which periodically fires at enemies, dealing <y>5% damage</c> and <b>slowing</c> them. Number of targets: <y>2</c> <c_stack>(+2 per stack)</c>, target range: <b>10m</c> <c_stack>(+1m per stack)</c>. Bosco's fire rate depends on <y>attack speed</c>.",
+            description = "Grants a <b>shield</c> equal to <b>5%</c> of your maximum health for each allied drone. Gives you <y>Bosco</c>, who fires at <y>4</c> <c_stack>(+2 per stack)</c> enemies within <b>11m</c> <c_stack>(+1m per stack)</c>, dealing <y>5% base damage</c> and <b>slowing</c> them. Bosco fires faster with higher <y>attack speed</c>.",
             destination = "9834,\nCortical Fund,\nMars",
             date = "08.03.2057",
             story = "Yo, thanks for the drone parts - they fit my boys like a glove. In return I'm sending you a pretty rare piece - not exactly contraband, but getting it was a real pain. A GK-series assault rifle and a (slightly worn) Autonomous Support Drone (A.S.D.) - exclusive gear from the military-mining company in the Hoxxes system! You'll figure out the rifle yourself, you're no fool, but about the drone - damn, even worn-out, I'd have kept it for myself. Most of its functions are gone, but it still has its laser! Can't say for sure, but it's a patented technology that allows it to remain functional almost indefinitely without losing combat potential. Just make sure no one finds out you've got it - the dwarf who sold it to me went through hell to get it.",
@@ -566,7 +566,7 @@ return {
         Totemetry = {
             name = "Totemetry",
             pickup = "Periodically creates a totem that increases <y>attack speed</c> and <g>heals</c> in a large radius.",
-            description = "Every <b>2 minutes</c> creates a totem lasting <b>45 seconds</c>, which <g>heals allies</c> in a <y>7.5m</c> radius <c_stack>(+2m per stack)</c> for <g>2%</c> <c_stack>(+2% per stack)</c> of their <g>maximum health</c>. The appearance of the totem increases <y>attack speed</c> by <y>10%</c>.",
+            description = "Every <b>2 minutes</c>, creates a totem for <b>45 seconds</c> that <g>heals allies</c> within <y>15m</c> <c_stack>(+4m per stack)</c> for <g>2%</c> <c_stack>(+2% per stack)</c> of their <g>maximum health</c> every <b>3 seconds</c>. While the totem stands, your <y>attack speed</c> is increased by <y>10%</c>.",
             destination = "Excavations in the Fungal Gorge,\nObservation Sector,\n[REDACTED]",
             date = "19.08.2057",
             story = "We found it among the debris - a green rectangular stone, as if carved by hands that never existed here. At the first touch it trembled, and nearby a <g>totem</c> appeared, resembling the structures raised by lynxes. It glowed with a soft light, and everyone within range felt lighter, their breathing steadier.\n\nIt seems this artifact is not merely an ornament, but a portable shrine. The lynx tribe uses it to gather together: it quickens their rhythm, lifts their spirit, heals their wounds. Stranger still - the stone activates on its own, as though deciding itself when its bearer needs to recover.\n\nIn it echo the songs of the lynx, their laughter and their dances. As if each activation brings back a piece of the tribe, even if they have long since returned to the earth. I do not know whose voice will answer the next time it shines.",
@@ -575,7 +575,7 @@ return {
         RadialAlloy = {
             name = "Radial Alloy",
             pickup = "<g>Heals</c> upon <r>taking damage</c>.",
-            description = "After <r>taking damage</c>, <g>heals</c> for <g>12</c> <c_stack>(+12 per stack)</c> <g>HP</c>. <g>Healing</c> can offset incoming <r>damage</c> no lower than <b>5 HP</c>.",
+            description = "After <r>taking damage</c>, <g>heals</c> you for <g>12</c> <c_stack>(+12 per stack)</c> <g>health</c>, but never more than the damage taken minus <b>5</c>.",
             destination = "Materials Science Laboratory,\nResearch Sector No.12,\nMars",
             date = "06.11.2057",
             story = "Shards of metal, cut as if at a slant - faceted, as though by a beam. They tremble faintly in the hand.\n\nNoted: if a wounded man holds them, the wound closes noticeably faster, as though the metal shares its strength with the body. By structure - an ordinary crystalline lattice, nothing special. By behavior - something else.\n\nIt doesn't take the pain away. It takes the pain for itself. Whoever carried a handful of the shards too long began complaining of wounds not his own: an aching break he never suffered, a burn from a fire long gone cold. In the report we put it briefly - \"material with a healing effect.\" Among ourselves we argue about something else: where does all it has gathered go, once there is no room left inside it?",
@@ -584,7 +584,7 @@ return {
         Maslenitsa = {
             name = "Maslenitsa",
             pickup = "Increases <g>armor</c>. Grants <g>armor</c> for items that provide <g>armor</c>.",
-            description = "Increases <g>armor by 15</c> <c_stack>(+15 per stack)</c>. Additionally grants <g>2</c> <c_stack>(+3 per stack)</c> <g>armor</c> for each of: 'Hard Times', 'Reflective Armor', 'Huge Cone', 'Obereg', 'Shadow Shield', 'Faceted Jade', 'Newton's Mechanism'.",
+            description = "<g>Increases armor</c> by <g>15</c> <c_stack>(+15 per stack)</c>. Each Tough Times, Repulsion Armor, Colossal Knurl, Obereg, Shadow Shield, Faceted Jade or Newton's Mechanism you hold grants another <g>1</c> <c_stack>(+2 per stack)</c> <g>armor</c>.",
             destination = "Hill with a burned village,\nAbandoned shrine,\n[REDACTED]",
             date = "09.03.2057",
             story = "When winter dragged on for a third year, people gathered on the hill and lit a great fire. Not for celebration - but for the final rite. They placed a green helmet, hammered with the sun itself, upon the head of the strongest warrior.\n\nHe stood, heavy as the earth itself, and the enemies could not break his armor. But each strike tore breath from his chest, and the helmet pressed him ever closer to the ground. People cried, sang, and threw pancakes into the fire, hoping to appease the sun. But spring never came.\n\nThe helmet was returned to the shrine after the warrior fell and never rose again. Now it lies in silence, the metal still bearing the gleam of those fires that warmed no one.",
@@ -593,7 +593,7 @@ return {
         ShineOSun = {
             name = "Shine, O Sun",
             pickup = "Chance to create a <y>sun</c> when killing enemies.",
-            description = "On killing an enemy, has a <y>22%</c> chance to create a <y>scorching sun</c>, dealing <r>5% of the enemy's maximum health</c> within a <b>12m</c> radius <c_stack>(+2.5m per stack)</c> for 5 seconds.",
+            description = "Killing an enemy has a <y>22%</c> chance to create a <y>scorching sun</c> for <b>5 seconds</c>. Every <b>0.2</c> seconds, it deals <r>5% of the killed enemy's maximum health</c> to enemies within <b>12m</c> <c_stack>(+2.5m per stack)</c>. A new sun can appear at most once every <b>5 seconds</c>.",
             destination = "Hidden Nook,\nMountain of Creation,\nVenus",
             date = "22.12.2056",
             story = "Guys, remember the little mushroom I sent yesterday? Today it has a new neighbor in the jar.\nA tiny sun with little hands. I'm not joking — it is warm like a cup of tea. When I made it laugh, its temperature rose and it melted the label on the jar. It does not ask for food either; as I noticed, it feeds on sunlight (though it is itself like a little sun). Caution: do not place it near heaters or shake it — the glass clicked a couple of times from the heat.\nIf it is awake, its light can illuminate the apartment at night, so keep it under a blanket or in a darkened box. In the evening I had to wrap the jar in a towel. Sometimes I tapped the glass, and it began to move and peek out as if from behind a curtain. I am sending it to you — I hope you have a nanny lamp so it will not be lonely.",
@@ -601,8 +601,8 @@ return {
         },
         Dombra = {
             name = "Dombra",
-            pickup = "Chance to summon <r>eagle wings</c> on hit.",
-            description = "On hit, you have a <y>20% chance</c> to summon <r>berkut wings</c> to your <b>left and right</c>, together dealing <y>122% TOTAL damage</c> <c_stack>(+122% per stack)</c>.",
+            pickup = "Chance to summon <r>berkut wings</c> on hit.",
+            description = "On hit, has a <y>20%</c> chance to summon <r>berkut wings</c> on your <b>left and right</c>. Each wing deals <y>61%</c> <c_stack>(+61% per stack)</c> <y>TOTAL damage</c>.",
             destination = "Great Steppe,\nSaryarka,\nEarth",
             date = "[REDACTED]",
             story = "A kuy needs no words.\n\nSo said the man who owned this dombra. When asked how two strings could tell of home, the road, death, victory, and return, he only smiled and placed his fingers on the wood.\n\nThe first sound was dry as grass beneath the sun. The second was low as distant thunder. With the third, the sound went farther than it should have, rolling through the stone, metal, bones, and weapons of everyone standing nearby.\n\nOn the fourth...\n\nOn the fifth, the sky answered.",
@@ -610,8 +610,8 @@ return {
         },
         VioletFrenzy = {
             name = "Violet Frenzy",
-            pickup = "Killing an <r>elite</c> sends you into a <p>frenzy</c> with near-instant cooldowns.",
-            description = "Killing an <r>elite monster</c> sends you into a <p>berserker</c> state for <b>8 seconds</c> <c_stack>(+6 seconds per stack)</c>. Berserker increases movement speed by <y>30%</c>, and using a skill reduces the cooldown of other skills by <y>50%</c>.",
+            pickup = "Killing an <r>elite</c> sends you into a <p>frenzy</c> that speeds up your cooldowns.",
+            description = "Killing an <r>elite</c> or <r>boss</c> sends you into a <p>frenzy</c> for <b>8</c> <c_stack>(+6 per stack)</c> <b>seconds</c>. While in a frenzy, your <y>movement speed</c> is increased by <y>30%</c>, and using a Secondary, Utility or Special skill cuts the cooldowns of your other skills by <y>50%</c> of their full length.",
             destination = "[REDACTED]",
             date = "[REDACTED]",
             story = "The container holds residual materials from Mr. Jefferson's samples. The primary brain was sent intact, as separating the glowing stalks without damaging the tissue was impossible. An anomaly was discovered during a second inspection: the stalks react to electrical stimulation.\n\nThe glow changed from pale blue to violet. Signals through the damaged brain accelerated to a level not classified as human. For 47 seconds, the dead tissue showed activity corresponding to panic, pain, delight, and aggression. After that, the stalks crumbled into glowing dust.",
@@ -630,13 +630,13 @@ return {
     artifact = {
         Technician = {
             name = "Technician",
-            pickup = "Artifact of the Technician",
+            pickup = "Artifact of Technician",
             description = "More drones appear in the stage. The more players there are, the more drones appear."
         },
         Droneman = {
             name = "Droneman",
             pickup = "Artifact of Droneman",
-            description = "When survivors become drones, they inherits their items"
+            description = "When survivors become drones, they inherit their items."
         },
         Victory = {
             name = "Victory",
@@ -646,7 +646,7 @@ return {
         Stagnation = {
             name = "Stagnation",
             pickup = "Artifact of Stagnation",
-            description = "The difficulty timer is disabled. During a teleporter event, the timer grows x5 faster."
+            description = "The difficulty timer is paused outside teleporter events. During a teleporter event, it runs 5 times faster."
         },
         Storm = {
             name = "Storm",

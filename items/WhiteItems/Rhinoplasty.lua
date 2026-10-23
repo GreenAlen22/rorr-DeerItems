@@ -38,15 +38,15 @@ end
 DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if Net.client then return end
 
-    local data = actor:get_data("Rhinoplasty", GUID)
+    local data = Instance.get_data(actor, "Rhinoplasty", GUID)
     data.kills = (data.kills or 0) + 1
 end)
 
--- РЈ РєР°Р¶РґРѕР№ РєРѕР¶Рё СЃРІРѕР№ С‚Р°Р№РјРµСЂ: РЅРѕРІР°СЏ РєРѕР¶Р° РЅРµ РѕР±РЅРѕРІР»СЏРµС‚ Рё РЅРµ С‚СЂР°С‚РёС‚ СЃС‚Р°СЂС‹Рµ.
+-- У каждой кожи свой таймер: новая кожа не обновляет и не тратит старые.
 DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if Net.client then return end
 
-    local data = actor:get_data("Rhinoplasty", GUID)
+    local data = Instance.get_data(actor, "Rhinoplasty", GUID)
     data.kills = data.kills or 0
     data.skin_timers = data.skin_timers or {}
     local timers = data.skin_timers
@@ -73,7 +73,7 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
         actor:buff_apply(buff, 1, 1)
     end
 
-    -- РџРѕСЃР»Рµ Р»РёРјРёС‚Р° РЅРµ РєРѕРїРёРј РіРѕС‚РѕРІС‹Рµ РєРѕР¶Рё: СЃРѕС…СЂР°РЅСЏРµРј С‚РѕР»СЊРєРѕ РЅРµРїРѕР»РЅС‹Р№ РїСЂРѕРіСЂРµСЃСЃ СѓР±РёР№СЃС‚РІ.
+    -- После лимита не копим готовые кожи: сохраняем только неполный прогресс убийств.
     if #timers >= cap then
         data.kills = data.kills % KILLS_PER_SKIN
     end
@@ -82,7 +82,7 @@ end)
 DeerItemsCallbacks.item_removed(item, function(actor, stack)
     if Net.client or stack > 1 then return end
 
-    local data = actor:get_data("Rhinoplasty", GUID)
+    local data = Instance.get_data(actor, "Rhinoplasty", GUID)
     data.kills = 0
     data.skin_timers = {}
     local skins = actor:buff_count(buff)

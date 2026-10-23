@@ -19,15 +19,6 @@ local item = Item.new("CashbackChip")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.UNCOMMON)
 item.loot_tags = Item.LootTag.CATEGORY_UTILITY
--- Начисление золота ЛОКАЛЬНОМУ игроку через HUD (как все денежные предметы мода: GoldBar/BloodyDividends/BountyTag)
-local function give_gold(amount)
-    if amount <= 0 then return end
-    local hud = GM._mod_game_getHUD()
-    if hud and hud ~= -4 then
-        hud.gold = hud.gold + amount
-    end
-end
-
 -- Безопасное приведение значения GML-функции (true / 1.0 / 0.0) к булеву
 local function truthy(v)
     return v ~= nil and v ~= false and v ~= 0
@@ -66,7 +57,7 @@ DeerItemsCallbacks.item_interactable_activate(item, function(actor, stack, inter
     if not interactable or not Instance.exists(interactable) then return end
 
     -- Кредитуем только HUD локального игрока (в сетевой игре чужие покупки не трогаем)
-    local p = Player.get_client()
+    local p = Player.get_local()
     if not p or not Instance.exists(p) or actor.id ~= p.id then return end
 
     -- Только покупки за ЗОЛОТО (cost_type 0). Для hp/percent_hp покупок .cost — не деньги.
@@ -76,13 +67,13 @@ DeerItemsCallbacks.item_interactable_activate(item, function(actor, stack, inter
 
     -- (b) Бесплатный сундук: 1 гарантированно, затем +10% к следующему за каждый доп. стак.
     if is_chest(interactable) and should_refund_chest(actor.id, stack) then
-        give_gold(cost)
+        DeerItemsGold.add_local(cost)
         actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
         return   -- бесплатный сундук не комбинируем с 10%-возвратом (и так вернули всё)
     end
 
     -- (a) 10% кэшбэк с любой покупки за золото, настакивается гиперболически без капа.
-    give_gold(math.floor(cost * cashback_fraction(stack)))
+    DeerItemsGold.add_local(math.floor(cost * cashback_fraction(stack)))
 end)
 
 -- Сброс счётчика бесплатных сундуков на новом этапе

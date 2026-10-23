@@ -1,4 +1,4 @@
--- РђСЂС‚РµС„Р°РєС‚ Р±СѓСЂРё: С‡РµРј Р±РѕР»СЊС€Рµ РїСЂРµРґРјРµС‚РѕРІ Сѓ РєРѕРјР°РЅРґС‹, С‚РµРј С‡Р°С‰Рµ РІ РЅРµС‘ Р±СЊСЋС‚ РјРѕР»РЅРёРё.
+-- Артефакт бури: чем больше предметов у команды, тем чаще в неё бьют молнии.
 
 local sprite = Sprite.new("artifact/Storm",
     PATH.."assets/sprites/artifacts/ArtifactOfStorm.png",
@@ -26,7 +26,7 @@ local STRIKE_RANGE = 8 * 32
 local STRIKE_RADIUS = 2 * 32
 local MAX_HP_DAMAGE = 0.05
 local TELEGRAPH_DURATION = 60
--- РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ Р·Р°РЅРёРјР°РµС‚ РєР°РґСЂС‹ 1вЂ“4. РќР° РїСЏС‚РѕРј РєР°РґСЂРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ Р°РЅРёРјР°С†РёСЏ СѓРґР°СЂР°.
+-- Предупреждение занимает кадры 1–4. На пятом кадре начинается анимация удара.
 local TELEGRAPH_END_FRAME = 4
 
 local TIER_WEIGHTS = {
@@ -88,7 +88,7 @@ end
 
 local function create_effect(x, y, frame, speed)
     local effect = gm.instance_create(x, y, gm.constants.oEfExplosion)
-    effect.sprite_index = volt_overload
+    effect.sprite_index = volt_overload.value
     effect.image_yscale = 0.8
     effect.image_xscale = 0.8
     effect.image_index = frame

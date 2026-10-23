@@ -17,7 +17,7 @@ item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- При начале стадии: воспроизведение звука и начисление золота
 DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
-    if not actor:same(Player.get_client()) then return end
+    if actor ~= Player.get_local() then return end
 
     -- Воспроизводим звук с рандомизированным питчем
     actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
@@ -27,10 +27,7 @@ DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
 
     -- Через 1 тик добавляем золото на HUD. Через 1 тик, так как если сделать это без задержки, 
     -- hud не успеет загрузиться, и начисление денег будет в пустоту. Из-за этого будет краш игры.
-    Alarm.create(function()
-        local hud = GM._mod_game_getHUD()
-        if hud ~= -4 then
-            hud.gold = hud.gold + money
-        end
-    end, 1)
+    Alarm.add(1, function()
+        DeerItemsGold.add_local(money)
+    end)
 end)

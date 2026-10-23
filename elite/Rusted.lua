@@ -1,5 +1,5 @@
 -- DeerItems-Rusted
--- Р­Р»РёС‚РЅС‹Р№ РІСЂР°Рі С‚РѕР»СЊРєРѕ РґР»СЏ В«РњСѓСЃСЃРѕРЅР°В»: СЃРѕР·РґР°С‘С‚ РїРѕРґ РґР°Р»СЊРЅРёРјРё РёРіСЂРѕРєР°РјРё РґРІСѓС…СЌС‚Р°РїРЅС‹Рµ СЂР¶Р°РІС‹Рµ С€РёРїС‹.
+-- Элитный враг только для «Муссона»: создаёт под дальними игроками двухэтапные ржавые шипы.
 
 local GUID = _ENV["!guid"]
 
@@ -58,9 +58,11 @@ local spike_emerge_sound = Sound.new("elite/RustedSpikeEmerge",
 )
 
 local rusted = Elite.new("Rusted")
-rusted:set_palette(palette, Color(0x9c4d26))
+-- set_palette в ReturnsAPI берёт одну палитру и сам перегенерирует палитры элит;
+-- цвет, который RoMT принимал вторым аргументом, — отдельное поле.
+rusted.blend_col = Color(0x9c4d26)
+rusted:set_palette(palette)
 rusted.healthbar_icon = icon
-gm.elite_generate_palettes()
 
 local rust = Buff.new("RustedDebuff")
 rust.icon_sprite = debuff_sprite
@@ -97,9 +99,9 @@ local function remove_rusted_from_card(card)
     end
 end
 
--- Р’ РґРѕСЃС‚СѓРїРЅРѕРј API Сѓ СЌР»РёС‚ РЅРµС‚ РѕС‚РґРµР»СЊРЅРѕР№ С†РµРЅС‹ РґРёСЂРµРєС‚РѕСЂР°. РџРѕСЌС‚РѕРјСѓ Rusted РґРѕР±Р°РІР»РµРЅ
--- С‚РѕР»СЊРєРѕ Рє СЃР°РјС‹Рј РґРѕСЂРѕРіРёРј РєР°СЂС‚Р°Рј РјРѕРЅСЃС‚СЂРѕРІ: С‚Р°Рє РѕРЅ С‚СЂРµР±СѓРµС‚ Р±РѕР»СЊС€РѕР№ Р±СЋРґР¶РµС‚ РґРёСЂРµРєС‚РѕСЂР°
--- Рё РїРѕСЏРІР»СЏРµС‚СЃСЏ Р·Р°РјРµС‚РЅРѕ СЂРµР¶Рµ РѕР±С‹С‡РЅС‹С… СЌР»РёС‚.
+-- В доступном API у элит нет отдельной цены директора. Поэтому Rusted добавлен
+-- только к самым дорогим картам монстров: так он требует большой бюджет директора
+-- и появляется заметно реже обычных элит.
 local function update_card_availability()
     local cards = MonsterCard.find_all()
     local costs = {}
@@ -133,7 +135,7 @@ Callback.add(rusted.on_apply, function(actor)
     if not Net.host then return end
     if not is_rusted(actor) then return end
 
-    local data = actor:get_data("Rusted", GUID)
+    local data = Instance.get_data(actor, "Rusted", GUID)
     if data.stats_applied then return end
     data.stats_applied = true
 
@@ -200,7 +202,7 @@ Callback.add(Callback.ON_ATTACK_HIT, function(hit_info)
     if not Net.host then return end
     if not is_rusted(actor) or not is_player(victim) then return end
 
-    -- РЎРЅР°С‡Р°Р»Р° СЃРЅРёРјР°РµРј СЌС„С„РµРєС‚, С‡С‚РѕР±С‹ С‡РµС‚С‹СЂРµ СЃРµРєСѓРЅРґС‹ РЅРµ СЃРєР»Р°РґС‹РІР°Р»РёСЃСЊ, Р° РѕР±РЅРѕРІР»СЏР»РёСЃСЊ.
+    -- Сначала снимаем эффект, чтобы четыре секунды не складывались, а обновлялись.
     if victim:buff_count(rust) > 0 then victim:buff_remove(rust) end
     victim:buff_apply(rust, RUST_DURATION, 1)
 end)
@@ -213,7 +215,7 @@ pcall(function()
 
         local victim = Instance.wrap(raw_victim)
         if not exists(victim) then return end
-        -- Р Р°СЃС‡С‘С‚ СѓСЂРѕРЅР° РїСЂРёС…РѕРґРёС‚ Рё РґР»СЏ СЏС‰РёРєРѕРІ, РѕР±СЉРµРєС‚РѕРІ РєР°СЂС‚С‹ Рё РїСЂРѕС‡РёС… РЅРµ-Р°РєС‚С‘СЂРѕРІ.
+        -- Расчёт урона приходит и для ящиков, объектов карты и прочих не-актёров.
         if gm.object_is_ancestor(victim.object_index, gm.constants.pActor) ~= 1.0 then return end
         if victim:buff_count(rust) <= 0 then return end
 
@@ -246,7 +248,7 @@ Callback.add(Callback.POST_STEP, function()
     local frame = Global._current_frame or 0
     for _, actor in ipairs(Instance.find_all(gm.constants.pActor)) do
         if is_rusted(actor) then
-            local data = actor:get_data("Rusted", GUID)
+            local data = Instance.get_data(actor, "Rusted", GUID)
             local next_cast = data.next_cast or frame
             if frame >= next_cast then
                 local casted = false
@@ -278,6 +280,6 @@ Callback.add(Callback.ON_DRAW, function()
             local strike_age = spike.age - TELEGRAPH_FRAMES
             frame = 4 + math.min(14, math.floor(strike_age * ATTACK_ANIMATION_SPEED))
         end
-        gm.draw_sprite(spike_sprite, math.min(18, frame), spike.x, spike.y)
+        gm.draw_sprite(spike_sprite.value, math.min(18, frame), spike.x, spike.y)
     end
 end)

@@ -1,10 +1,10 @@
--- DeerItems-SoulJar / В«РЈСЂРЅР° РґСѓС€В» / "Soul Jar"
--- РђРєС‚РёРІРєР° (РїРµСЂРµСЂР°Р±РѕС‚РєР° Goobo Jr РёР· RoR2): РїСЂРёР·С‹РІР°РµС‚ С‚РµРЅРµРІРѕРіРѕ РљР›РћРќРђ-С‚РµР»РµРїРѕСЂС‚С‘СЂР°.
--- Р¦РёРєР», РїРѕРєР° Р¶РёРІ: РЅРµРІРёРґРёРј -> РјРёРіР°РµС‚ Рє Р±Р»РёР¶Р°Р№С€РµРјСѓ РІСЂР°РіСѓ, РїРѕСЏРІР»СЏРµС‚СЃСЏ С‡С‘СЂРЅРѕР№ РєРѕРїРёРµР№ РёРіСЂРѕРєР°
--- Рё Р±СЊС‘С‚ РІР·СЂС‹РІРѕРј РЅР° 133% СѓСЂРѕРЅР° -> С‚СѓС‚ Р¶Рµ СѓС…РѕРґРёС‚ РІ РЅРµРІРёРґРёРјРѕСЃС‚СЊ -> РїРѕРІС‚РѕСЂСЏРµС‚. ~13СЃ, РЅРµСѓСЏР·РІРёРј.
--- РўР°Рє РЅРµС‚ РЅРё В«СЃС‚СЂР°РЅРЅРѕР№ С…РѕРґСЊР±С‹В», РЅРё РїСЂРѕС…РѕРґР° СЃРєРІРѕР·СЊ С‚РµРєСЃС‚СѓСЂС‹ вЂ” РєР»РѕРЅ С‚РѕР»СЊРєРѕ РјРёРіР°РµС‚ (С‚РµР»РµРїРѕСЂС‚).
+-- DeerItems-SoulJar / «Урна душ» / "Soul Jar"
+-- Активка (переработка Goobo Jr из RoR2): призывает теневого КЛОНА-телепортёра.
+-- Цикл, пока жив: невидим -> мигает к ближайшему врагу, появляется чёрной копией игрока
+-- и бьёт взрывом на 133% урона -> тут же уходит в невидимость -> повторяет. ~13с, неуязвим.
+-- Так нет ни «странной ходьбы», ни прохода сквозь текстуры — клон только мигает (телепорт).
 
--- РђСЃСЃРµС‚С‹ (Р·Р°РіР»СѓС€РєРё-С€Р°Р±Р»РѕРЅС‹ вЂ” Р·Р°РјРµРЅРё С‚РµРєСЃС‚СѓСЂС‹/Р·РІСѓРє РїРѕ СЌС‚РёРј РїСѓС‚СЏРј)
+-- Ассеты (заглушки-шаблоны — замени текстуры/звук по этим путям)
 local sprite      = Sprite.new("equipment/SoulJar", PATH.."assets/sprites/items/sEquipments/SoulJar.png", 1, 18, 18)
 local cloneSprite = Sprite.new("object/SoulJarClone", PATH.."assets/sprites/particle/SoulJarClone.png", 1, 8, 8)
 local sndSummon   = Sound.new("SoulJar/summon", PATH.."assets/sounds/SoulJarSummon.ogg")
@@ -15,32 +15,32 @@ local GUID  = _ENV["!guid"]
 local oP    = gm.constants.oP
 local BLACK = Color(0x000000)
 
--- РќР°СЃС‚СЂРѕР№РєРё Р±Р°Р»Р°РЅСЃР°
-local LIFETIME    = 800       -- РІСЂРµРјСЏ Р¶РёР·РЅРё РєР»РѕРЅР°, РєР°РґСЂС‹ (~13.3 СЃРµРє; Р±С‹Р»Рѕ 20 СЃРµРє, СѓРјРµРЅСЊС€РµРЅРѕ РІ 1.5 СЂР°Р·Р°)
-local COOLDOWN    = 100       -- РєСѓР»РґР°СѓРЅ, СЃРµРєСѓРЅРґС‹ (set_cooldown СЃР°Рј СѓРјРЅРѕР¶Р°РµС‚ РЅР° 60 вЂ” РїРµСЂРµРґР°С‘Рј 100)
-local DMG_COEF    = 2.33      -- СѓСЂРѕРЅ СѓРґР°СЂР° = 133% СѓСЂРѕРЅР° РёРіСЂРѕРєР° (Р±С‹Р»Рѕ 200%, СѓРјРµРЅСЊС€РµРЅРѕ РІ 1.5 СЂР°Р·Р°)
-local HUNT_RANGE  = 520       -- СЂР°РґРёСѓСЃ РїРѕРёСЃРєР° РІСЂР°РіР° Р’РћРљР РЈР“ РР“Р РћРљРђ, px
-local STRIKE_AOE  = 160       -- СЂР°РґРёСѓСЃ РІР·СЂС‹РІР° СѓРґР°СЂР°, px
-local SHOW_TIME   = 42        -- РєР°РґСЂРѕРІ РєР»РѕРЅ РІРёРґРµРЅ РІ С„Р°Р·Рµ СѓРґР°СЂР° (~0.7 СЃРµРє)
-local HIDE_TIME   = 30        -- РєР°РґСЂРѕРІ РЅРµРІРёРґРёРј РјРµР¶РґСѓ СѓРґР°СЂР°РјРё (~0.5 СЃРµРє)
-local RETRY_TIME  = 18        -- РєРѕСЂРѕС‚РєР°СЏ РїР°СѓР·Р°, РµСЃР»Рё РІСЂР°РіР° СЂСЏРґРѕРј РЅРµС‚
+-- Настройки баланса
+local LIFETIME    = 800       -- время жизни клона, кадры (~13.3 сек; было 20 сек, уменьшено в 1.5 раза)
+local COOLDOWN    = 100       -- кулдаун, секунды (set_cooldown сам умножает на 60 — передаём 100)
+local DMG_COEF    = 2.33      -- урон удара = 133% урона игрока (было 200%, уменьшено в 1.5 раза)
+local HUNT_RANGE  = 520       -- радиус поиска врага ВОКРУГ ИГРОКА, px
+local STRIKE_AOE  = 160       -- радиус взрыва удара, px
+local SHOW_TIME   = 42        -- кадров клон виден в фазе удара (~0.7 сек)
+local HIDE_TIME   = 30        -- кадров невидим между ударами (~0.5 сек)
+local RETRY_TIME  = 18        -- короткая пауза, если врага рядом нет
 
--- РћР±СЉРµРєС‚-РєР»РѕРЅ
+-- Объект-клон
 local obj = Object.new("SoulJarClone")
 obj:set_sprite(cloneSprite)
 obj:set_depth(1)
--- Р‘Р»РёР¶Р°Р№С€РёР№ РІСЂР°Рі РІРѕРєСЂСѓРі РР“Р РћРљРђ (Р° РЅРµ РєР»РѕРЅР°) вЂ” С‡С‚РѕР±С‹ РѕС…РѕС‚РёС‚СЊСЃСЏ РїРѕ РІСЃРµРјСѓ РїРѕР»СЋ Р±РѕСЏ.
+-- Ближайший враг вокруг ИГРОКА (а не клона) — чтобы охотиться по всему полю боя.
 local function nearest_enemy(self, parent)
     local enemy_team = parent.team == 1 and 2 or 1
     local found = List.wrap(self:find_characters_circle(parent.x, parent.y, HUNT_RANGE, true, enemy_team, true))
     return found[1]
 end
 
--- Р’СЃРїС‹С€РєР° РїРѕСЏРІР»РµРЅРёСЏ/РёСЃС‡РµР·РЅРѕРІРµРЅРёСЏ
+-- Вспышка появления/исчезновения
 local function puff(self, blend)
     local fx = gm.instance_create(self.x, self.y, gm.constants.oEfExplosion)
     if fx then
-        fx.sprite_index = burst
+        fx.sprite_index = burst.value
         if blend then fx.image_blend = blend end
     end
 end
@@ -49,19 +49,19 @@ Callback.add(obj.on_create, function(self)
     self.parent      = -4
     self.team        = 1
     self.life        = LIFETIME
-    self.state       = 0          -- 0 = СЃРєСЂС‹С‚, 1 = РІРёРґРµРЅ (СѓРґР°СЂ)
-    self.show        = 0          -- СЂРµРїР»РёС†РёСЂСѓРµРјС‹Р№ С„Р»Р°Рі РІРёРґРёРјРѕСЃС‚Рё РґР»СЏ РєР»РёРµРЅС‚РѕРІ
-    self.phase       = HIDE_TIME  -- СЃС‡С‘С‚С‡РёРє РєР°РґСЂРѕРІ РґРѕ СЃРјРµРЅС‹ СЃРѕСЃС‚РѕСЏРЅРёСЏ
-    self.image_alpha = 0          -- СЃС‚Р°СЂС‚ РЅРµРІРёРґРёРјС‹Рј
+    self.state       = 0          -- 0 = скрыт, 1 = виден (удар)
+    self.show        = 0          -- реплицируемый флаг видимости для клиентов
+    self.phase       = HIDE_TIME  -- счётчик кадров до смены состояния
+    self.image_alpha = 0          -- старт невидимым
     self.image_blend = BLACK
-    self.image_speed = 0          -- Р·Р°СЃС‚С‹РІС€Р°СЏ В«С‚РµРЅРµРІР°СЏВ» РїРѕР·Р°, Р±РµР· Р°РЅРёРјР°С†РёРё С…РѕРґСЊР±С‹
+    self.image_speed = 0          -- застывшая «теневая» поза, без анимации ходьбы
     self:projectile_sync(10)
 end)
 
 Callback.add(obj.on_step, function(self)
-    -- РќР° РєР»РёРµРЅС‚Рµ С‚РѕР»СЊРєРѕ Р РРЎРЈР•Рњ: РїРѕР·РёС†РёСЏ РїСЂРёС…РѕРґРёС‚ РёР· projectile_sync, РІРёРґРёРјРѕСЃС‚СЊ/РѕР±Р»РёРє вЂ” РёР·
-    -- onDeserialize (self.show / self.parent). РњР°С€РёРЅСѓ СЃРѕСЃС‚РѕСЏРЅРёР№ РќР• РєСЂСѓС‚РёРј: РёРЅР°С‡Рµ РєР»РёРµРЅС‚ СЃР°Рј
-    -- РІС‹Р±РёСЂР°РµС‚ РґСЂСѓРіСѓСЋ С†РµР»СЊ Рё РґРµСЂС‘С‚СЃСЏ СЃ СЃРёРЅРєРѕРј РїРѕР·РёС†РёРё (РјРёРіР°РЅРёРµ СѓС…РѕРґРёС‚ РЅРµ С‚СѓРґР°, FX РґСѓР±Р»РёСЂСѓСЋС‚СЃСЏ).
+    -- На клиенте только РИСУЕМ: позиция приходит из projectile_sync, видимость/облик — из
+    -- onDeserialize (self.show / self.parent). Машину состояний НЕ крутим: иначе клиент сам
+    -- выбирает другую цель и дерётся с синком позиции (мигание уходит не туда, FX дублируются).
     if Net.client then
         local p = self.parent
         if Instance.exists(p) and p.sprite_idle then self.sprite_index = p.sprite_idle end
@@ -70,15 +70,15 @@ Callback.add(obj.on_step, function(self)
         return
     end
 
-    -- Р›РѕРіРёРєСѓ РІС‹РїРѕР»РЅСЏРµС‚ С‚РѕР»СЊРєРѕ С…РѕСЃС‚.
-    -- РЈС…РѕРґРёС‚ РІРјРµСЃС‚Рµ СЃ РІР»Р°РґРµР»СЊС†РµРј / РїРѕ С‚Р°Р№РјРµСЂСѓ
+    -- Логику выполняет только хост.
+    -- Уходит вместе с владельцем / по таймеру
     if not Instance.exists(self.parent) then self:destroy(); return end
     self.life = self.life - 1
     if self.life <= 0 then self:destroy(); return end
 
     local parent = self.parent
 
-    -- РћР±Р»РёРє С‡С‘СЂРЅРѕР№ РєРѕРїРёРё РёРіСЂРѕРєР° (СЃС‚РѕР№РєР°, Р±РµР· С…РѕРґСЊР±С‹)
+    -- Облик чёрной копии игрока (стойка, без ходьбы)
     if parent.sprite_idle and self.sprite_index ~= parent.sprite_idle then
         self.sprite_index = parent.sprite_idle
     end
@@ -87,18 +87,18 @@ Callback.add(obj.on_step, function(self)
     self.phase = self.phase - 1
 
     if self.state == 0 then
-        -- РЎРєСЂС‹С‚: РЅРµРІРёРґРёРј Рё РґРµСЂР¶РёС‚СЃСЏ Сѓ РёРіСЂРѕРєР°.
+        -- Скрыт: невидим и держится у игрока.
         self.image_alpha = 0
         self.show = 0
         self.x = parent.x
         self.y = parent.y - 6
         if self.phase > 0 then return end
 
-        -- РџРѕСЂР° Р±РёС‚СЊ: РёС‰РµРј РІСЂР°РіР°
+        -- Пора бить: ищем врага
         local target = nearest_enemy(self, parent)
         if not target then self.phase = RETRY_TIME; return end
 
-        -- РњРёРіР°РµРј РїСЂСЏРјРѕ РЅР° РІСЂР°РіР°, СЃС‚Р°РЅРѕРІРёРјСЃСЏ РІРёРґРёРјС‹
+        -- Мигаем прямо на врага, становимся видимы
         self.x = target.x
         self.y = target.y - 2
         self.image_xscale = (target.x < parent.x) and -1 or 1
@@ -110,7 +110,7 @@ Callback.add(obj.on_step, function(self)
         puff(self, nil)
         if Instance.exists(parent) then parent:sound_play(sndSummon, 0.7, 1.4 + math.random() * 0.3) end
 
-        -- РЈРґР°СЂ: РІР·СЂС‹РІ РЅР° С†РµР»Рё Р·Р° 200% СѓСЂРѕРЅР° РёРіСЂРѕРєР° (С…РѕСЃС‚ вЂ” РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ Р°РІС‚РѕСЂРёС‚РµС‚). proc=false.
+        -- Удар: взрыв на цели за 200% урона игрока (хост — единственный авторитет). proc=false.
         local atk = parent:fire_explosion(target.x, target.y, STRIKE_AOE, STRIKE_AOE, DMG_COEF, burst, nil, false)
         if atk and atk.attack_info then
             atk.attack_info.proc = false
@@ -118,11 +118,11 @@ Callback.add(obj.on_step, function(self)
         end
         if Instance.exists(parent) then parent:sound_play(sndHit, 0.6, 1.1 + math.random() * 0.3) end
     else
-        -- Р’РёРґРёРј РІРѕ РІСЂРµРјСЏ СѓРґР°СЂР°: СЃС‚РѕРёС‚ РЅР° РјРµСЃС‚Рµ.
+        -- Видим во время удара: стоит на месте.
         self.image_alpha = 1
         self.show = 1
         if self.phase > 0 then return end
-        -- РСЃС‡РµР·Р°РµРј
+        -- Исчезаем
         puff(self, BLACK)
         self.image_alpha = 0
         self.show = 0
@@ -137,7 +137,7 @@ Callback.add(obj.on_destroy, function(self)
     self:instance_destroy_sync()
 end)
 
--- РЎРµС‚СЊ: РїРµСЂРµРЅРѕСЃРёРј РІР»Р°РґРµР»СЊС†Р°
+-- Сеть: переносим владельца
 Object.add_serializers(obj, function(self, buffer)
     buffer:write_instance(self.parent)
     buffer:write_byte(self.show or 0)
@@ -147,7 +147,7 @@ end, function(self, buffer)
     if Instance.exists(self.parent) then self.team = self.parent.team end
 end)
 
--- РЎРЅР°СЂСЏР¶РµРЅРёРµ
+-- Снаряжение
 local equip = Equipment.new("SoulJar")
 equip:set_sprite(sprite)
 equip.loot_tags = Item.LootTag.CATEGORY_DAMAGE
@@ -155,6 +155,9 @@ equip.cooldown = COOLDOWN * 60
 
 Callback.add(equip.on_use, function(actor)
     actor:sound_play(sndSummon, 1.0, 0.8 + math.random() * 0.2)
+    -- on_use идёт на каждой машине (пакет actor_use_equipment); клон создаёт хост, клиентам
+    -- он приходит через projectile_sync. Клиентская копия не тратила бы life и жила до конца этапа.
+    if not Net.host then return end
     local c = obj:create(actor.x, actor.y - 6)
     c.parent      = actor
     c.team        = actor.team
@@ -164,14 +167,14 @@ Callback.add(equip.on_use, function(actor)
     c.image_alpha = 0
     if actor.sprite_idle then c.sprite_index = actor.sprite_idle end
     c:instance_resync()
-    actor:get_data("DeerItems", GUID).soul_jar_inst = c
+    Instance.get_data(actor, "DeerItems", GUID).soul_jar_inst = c
 end)
 
--- РќР° РЅРѕРІРѕР№ Р»РѕРєР°С†РёРё СѓР±РёСЂР°РµРј РѕСЃС‚Р°РІС€РёС…СЃСЏ РєР»РѕРЅРѕРІ (СЃС‚СЂР°С…РѕРІРєР° Рє С‚Р°Р№РјРµСЂСѓ Р¶РёР·РЅРё).
+-- На новой локации убираем оставшихся клонов (страховка к таймеру жизни).
 Callback.add(Callback.ON_STAGE_START, function(...)
     for _, p in ipairs(Instance.find_all(oP)) do
-        local d = p:get_data("DeerItems", GUID)
-        if d.soul_jar_inst and d.soul_jar_inst:exists() then
+        local d = Instance.get_data(p, "DeerItems", GUID)
+        if Instance.exists(d.soul_jar_inst) then
             d.soul_jar_inst:destroy()
             d.soul_jar_inst = nil
         end

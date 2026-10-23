@@ -36,7 +36,7 @@ local ANTI_DOUBLE = 12
 
 -- При получении предмета — наполняем пул зарядов и сбрасываем очередь восстановления
 DeerItemsCallbacks.item_acquired(item, function(actor, stack)
-    local data = actor:get_data("DeerItems", GUID)
+    local data = Instance.get_data(actor, "DeerItems", GUID)
     data.rc_charges = stack      -- доступные запасные заряды
     data.rc_max     = stack      -- потолок пула
     data.rc_timers  = {}         -- таймеры восстановления израсходованных зарядов (кадры)
@@ -44,7 +44,7 @@ end)
 
 -- Каждый кадр: независимая перезарядка запасных зарядов (кулдаун самой активки НЕ трогаем)
 DeerItemsCallbacks.item_post_step(item, function(actor, stack)
-    local data = actor:get_data("DeerItems", GUID)
+    local data = Instance.get_data(actor, "DeerItems", GUID)
     data.rc_max = stack
     if data.rc_charges == nil then data.rc_charges = stack end
     data.rc_timers = data.rc_timers or {}
@@ -61,16 +61,16 @@ end)
 
 -- При использовании активки: если в пуле есть заряд — расходуем его и быстро откатываем кулдаун
 DeerItemsCallbacks.item_equipment_use(item, function(actor, stack)
-    local data = actor:get_data("DeerItems", GUID)
+    local data = Instance.get_data(actor, "DeerItems", GUID)
     data.rc_timers = data.rc_timers or {}
     -- Движок только что выставил полный КД активки — это и есть «КД одного заряда»
-    local cd_full = actor:get_equipment_cooldown()
+    local cd_full = gm.player_get_equipment_cooldown(actor.value)
     if (data.rc_charges or 0) > 0 and cd_full and cd_full > 0 then
         data.rc_charges = data.rc_charges - 1
         table.insert(data.rc_timers, cd_full * CHARGE_CD_MULT)  -- заряд вернётся через 2× полного КД
         -- быстрый, но НЕ мгновенный откат активки, иначе одно нажатие сработает дважды
         if cd_full > ANTI_DOUBLE then
-            actor:reduce_equipment_cooldown(cd_full - ANTI_DOUBLE)
+            gm.player_grant_equipment_cooldown_reduction(actor.value, cd_full - ANTI_DOUBLE)
         end
     end
 end)
@@ -103,11 +103,11 @@ end)
 
 gm.post_script_hook(gm.constants.draw_hud, function()
     if g_bar.frame ~= (Global._current_frame or 0) then return end   -- базу поймали в этом кадре
-    local p = Player.get_client()
+    local p = Player.get_local()
     if not p or not Instance.exists(p) then return end
     if (p:item_count(item) or 0) <= 0 then return end
 
-    local n = math.floor((p:get_data("DeerItems", GUID).rc_charges) or 0)
+    local n = math.floor((Instance.get_data(p, "DeerItems", GUID).rc_charges) or 0)
 
     gm.draw_set_colour(TEXT_COLOR)
     gm.draw_text(g_bar.x + EQUIP_DX - 3, g_bar.y + EQUIP_DY, string.format("%d", n))

@@ -1,4 +1,4 @@
--- РђСЂС‚РµС„Р°РєС‚ С‚РµС…РЅРёРєР°: РґРѕР±Р°РІР»СЏРµС‚ РІ РґРёСЂРµРєС‚РѕСЂР° СЌС‚Р°РїР° РїРѕРєСѓРїР°РµРјС‹Рµ СЃР»РѕРјР°РЅРЅС‹Рµ РґСЂРѕРЅС‹.
+-- Артефакт техника: добавляет в директора этапа покупаемые сломанные дроны.
 
 local sprite = Sprite.new("artifact/Technician",
     PATH.."assets/sprites/artifacts/ArtifactOfTechnician.png",
@@ -19,17 +19,22 @@ artifact.token_name = "artifact.Technician.name"
 artifact.token_pickup_name = "artifact.Technician.pickup"
 artifact.token_description = "artifact.Technician.description"
 
+-- Карта дрона с наименьшим id, как в RoMT, который шёл по массиву карт по порядку.
+-- Object.find_all обходится через pairs и меняет выбор от запуска к запуску, а
+-- find_all(…, Property) теряет последнюю карту.
 local function find_drone_spawn_data()
-    for _, card in ipairs(Class.INTERACTABLE_CARD) do
-        local object_id = card:get(4)
-        if object_id == DRONE_INTERACTABLE
-        or gm.object_is_ancestor(object_id, DRONE_INTERACTABLE) == 1.0
+    local best
+    for _, card in ipairs(InteractableCard.find_all()) do
+        local object_id = card.object_id
+        if (object_id == DRONE_INTERACTABLE or gm.object_is_ancestor(object_id, DRONE_INTERACTABLE) == 1.0)
+        and (not best or card.value < best.value)
         then
-            return object_id, card:get(5)
+            best = card
         end
     end
 
-    return nil, nil
+    if not best then return nil, nil end
+    return best.object_id, best.required_tile_space
 end
 
 Callback.add(Callback.ON_STAGE_START, function()
