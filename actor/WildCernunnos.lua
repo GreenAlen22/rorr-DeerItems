@@ -1,6 +1,7 @@
 -- DeerItems-WildCernunnos
--- Босс телепорта: дикий Цернуннос на ванильном ИИ, вплотную бьёт когтями.
+-- Босс телепорта: дикий Цернуннос на ванильном ИИ, вплотную бьёт когтями, издали бросается рывком.
 
+local GUID = _ENV["!guid"]
 local SPRITE_PATH = PATH.."assets/sprites/actor/sWildCernunnos/"
 
 -- Тот же идентификатор, что у союзника: Sprite.new отдаст уже загруженную маску, а
@@ -16,9 +17,12 @@ local sprite_fall      = Sprite.new("actor/WildCernunnosFall", SPRITE_PATH.."fal
 -- Лежащее тело шире 128: кадр 160, origin — тот же центр под ногами.
 local sprite_death     = Sprite.new("actor/WildCernunnosDeath", SPRITE_PATH.."death.png", 9, 80, 128)
 local sprite_shoot1    = Sprite.new("actor/WildCernunnosShoot1", SPRITE_PATH.."shoot1.png", 7, 64, 128)
+-- Рога вперёд и вытянутый бег шире 128, как и лежащее тело.
+local sprite_charge    = Sprite.new("actor/WildCernunnosCharge", SPRITE_PATH.."charge.png", 12, 80, 128)
 
--- Sprite.new скорость не берёт; 0.5 — как у союзника, ленты те же.
-for _, s in ipairs({sprite_spawn, sprite_idle, sprite_walk, sprite_death, sprite_shoot1}) do
+-- Sprite.new скорость не берёт; 0.5 — как у союзника, ленты те же. Рывок туда же:
+-- скорости в состояниях босса считаются от одной базы.
+for _, s in ipairs({sprite_spawn, sprite_idle, sprite_walk, sprite_death, sprite_shoot1, sprite_charge}) do
     s:set_speed(0.5)
 end
 
@@ -35,6 +39,31 @@ local CLAWS_FRAME = 3
 local CLAWS_W = 256
 local CLAWS_H = 128
 local CLAWS_CENTER_Y = -48
+
+local CHARGE_RANGE = 520
+local CHARGE_STEP = 7
+local CHARGE_FRAMES = 45
+local CHARGE_WINDUP_ANIM = 0.2
+local CHARGE_RUN_FIRST = 5
+local CHARGE_RUN_COUNT = 4
+-- Кадров ленты за игровой кадр: бег привязан к шагу 7 px, а не к скорости атаки,
+-- поэтому цикл ведётся по счётчику кадров бега, а не image_speed.
+local CHARGE_RUN_ANIM = 0.25
+local CHARGE_BRAKE_FIRST = 9
+local CHARGE_BRAKE_ANIM = 0.2
+local CHARGE_AHEAD = 40
+local CHARGE_GROUND_PROBE_Y = 8
+local CHARGE_HIT_Y = -48
+local CHARGE_HIT_R = 48
+local CHARGE_BLAST = 96
+local CHARGE_KNOCK_FRAMES = 20
+local CHARGE_KNOCK_FORCE = 6
+-- Пол под ногами касается низа bbox; без отступа он читался бы стеной.
+local CHARGE_WALL_FLOOR_GAP = 2
+
+local PHASE_WINDUP = 0
+local PHASE_RUN = 1
+local PHASE_BRAKE = 2
 
 -- -4 и INVALID отсекаются до Instance.exists: INVALID разворачивается в Lua-таблицу,
 -- а -4 для exists опасен (knowledge/mechanics.md, «Агро»).
@@ -59,6 +88,12 @@ claws.damage = 1.6
 
 local state_claws = ActorState.new("WildCernunnosClaws")
 
+local charge = Skill.new("WildCernunnosCharge")
+charge.cooldown = 360
+charge.damage = 2.5
+
+local state_charge = ActorState.new("WildCernunnosCharge")
+
 Callback.add(wild.on_create, function(actor)
     actor.sprite_palette = sprite_palette
     actor.sprite_spawn = sprite_spawn
@@ -80,6 +115,8 @@ Callback.add(wild.on_create, function(actor)
     actor.pHmax_base = SPEED
     actor.z_range = CLAWS_RANGE
     actor:set_default_skill(Skill.Slot.PRIMARY, claws)
+    actor.x_range = CHARGE_RANGE
+    actor:set_default_skill(Skill.Slot.SECONDARY, charge)
 
     actor:init_actor_late()
 end)
@@ -111,6 +148,134 @@ Callback.add(state_claws.on_step, function(actor, data)
     end
 
     actor:skill_util_exit_state_on_anim_end()
+end)
+
+-- Флаг остановки по пакету живёт в данных инстанса: структуру состояния
+-- десериализатор не видит.
+local function charge_data(actor)
+    return Instance.get_data(actor, "WildCernunnosCharge", GUID)
+end
+
+-- collision_* отдают инстанс или noone (-4); инстанс — не число, -4 может прийти
+-- не Lua-числом, отсюда tonumber.
+local function found_block(result)
+    return result ~= nil and tonumber(result) ~= -4
+end
+
+local function wall_ahead(actor, side)
+    local step = side * CHARGE_STEP
+    return found_block(gm.collision_rectangle(
+        tonumber(actor.bbox_left) + step, tonumber(actor.bbox_top),
+        tonumber(actor.bbox_right) + step, tonumber(actor.bbox_bottom) - CHARGE_WALL_FLOOR_GAP,
+        gm.constants.pBlock, false, true))
+end
+
+local function ground_ahead(actor, side)
+    return found_block(gm.collision_point(
+        tonumber(actor.x) + side * CHARGE_AHEAD, tonumber(actor.y) + CHARGE_GROUND_PROBE_Y,
+        gm.constants.pBlock, false, true))
+end
+
+local function charge_brake(actor, data)
+    data.phase = PHASE_BRAKE
+    actor.image_index = CHARGE_BRAKE_FIRST
+end
+
+local packet_charge_stop = Packet.new("WildCernunnos-charge_stop")
+packet_charge_stop:set_serializers(function(buffer, actor, x)
+    buffer:write_instance(actor)
+    buffer:write_float(x)
+end, function(buffer)
+    local actor = buffer:read_instance()
+    local x = buffer:read_float()
+    if not Net.client then return end
+    if not exists(actor) then return end
+
+    -- Позиция хоста при ударе: клиент мог убежать дальше, пока шёл пакет.
+    actor.x = x
+    charge_data(actor).stop = true
+    actor:sound_play(snd_hit, 1.0, 1.0)
+end)
+
+-- Хост: первый враг перед рогами получает один удар, и рывок кончается.
+local function charge_try_hit(actor, data, side)
+    local enemy_team = tonumber(actor.team) == 1 and 2 or 1
+    local hit_x = tonumber(actor.x) + side * CHARGE_AHEAD
+    local hit_y = tonumber(actor.y) + CHARGE_HIT_Y
+    local found = List.wrap(actor:find_characters_circle(hit_x, hit_y, CHARGE_HIT_R, false, enemy_team, true))
+
+    for _, victim in ipairs(found) do
+        if exists(victim) then
+            local attack = actor:fire_explosion(hit_x, hit_y, CHARGE_BLAST, CHARGE_BLAST, skill_damage(charge))
+            -- Игроков отбрасывание может и не сдвинуть (порог стана 1e+25): тогда только урон.
+            attack.attack_info:set_knockback(side, CHARGE_KNOCK_FRAMES, CHARGE_KNOCK_FORCE)
+            actor:sound_play(snd_hit, 1.0, 1.0)
+            charge_brake(actor, data)
+            packet_charge_stop:send_to_all(actor, actor.x)
+            return
+        end
+    end
+end
+
+local function charge_run(actor, data)
+    local frames = tonumber(data.run_frames)
+    local side = tonumber(data.side)
+
+    -- image_speed 0: кадр бега ставится по счётчику, иначе движок дошёл бы до торможения сам.
+    actor:actor_animation_set(sprite_charge, 0)
+    actor.image_index = CHARGE_RUN_FIRST + math.floor(frames * CHARGE_RUN_ANIM) % CHARGE_RUN_COUNT
+
+    -- Стену, обрыв и время каждая машина видит одинаково: пакет нужен только удару.
+    if frames >= CHARGE_FRAMES or wall_ahead(actor, side) or not ground_ahead(actor, side) then
+        charge_brake(actor, data)
+        return
+    end
+
+    actor.x = tonumber(actor.x) + side * CHARGE_STEP
+    data.run_frames = frames + 1
+
+    if Net.host then
+        charge_try_hit(actor, data, side)
+    end
+end
+
+-- Состояние, как у когтей, идёт на каждой машине; движение тоже, как у Bison.
+Callback.add(charge.on_activate, function(actor, skill, slot)
+    actor:set_state(state_charge)
+end)
+
+Callback.add(state_charge.on_enter, function(actor, data)
+    actor.image_index = 0
+    data.phase = PHASE_WINDUP
+    data.run_frames = 0
+    data.side = tonumber(actor.image_xscale) < 0 and -1 or 1
+    charge_data(actor).stop = false
+    actor:sound_play(snd_hit, 1.0, 1.0)
+end)
+
+Callback.add(state_charge.on_step, function(actor, data)
+    -- Без гашения pHspeed движок добавил бы к шагу рывка свой ход.
+    actor:skill_util_fix_hspeed()
+
+    if tonumber(data.phase) ~= PHASE_BRAKE and charge_data(actor).stop then
+        charge_brake(actor, data)
+    end
+
+    if tonumber(data.phase) == PHASE_WINDUP then
+        actor:actor_animation_set(sprite_charge, CHARGE_WINDUP_ANIM)
+        if tonumber(actor.image_index) >= CHARGE_RUN_FIRST then
+            data.phase = PHASE_RUN
+        end
+    end
+
+    if tonumber(data.phase) == PHASE_RUN then
+        charge_run(actor, data)
+    end
+
+    if tonumber(data.phase) == PHASE_BRAKE then
+        actor:actor_animation_set(sprite_charge, CHARGE_BRAKE_ANIM)
+        actor:skill_util_exit_state_on_anim_end()
+    end
 end)
 
 local card = MonsterCard.new("WildCernunnos")
