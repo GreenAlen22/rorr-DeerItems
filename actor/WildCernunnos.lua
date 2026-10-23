@@ -97,7 +97,8 @@ end)
 
 Callback.add(state_claws.on_step, function(actor, data)
     actor:skill_util_fix_hspeed()
-    actor:actor_animation_set(sprite_shoot1, 0.22 * actor.attack_speed)
+    -- attack_speed умножает сам actor_animation_set (scale_animspeed по умолчанию true).
+    actor:actor_animation_set(sprite_shoot1, 0.22)
 
     -- Util.bool: в структуре состояния булево может вернуться числом, а 0 в Lua истинно.
     if not Util.bool(data.struck) and actor.image_index >= CLAWS_FRAME then
