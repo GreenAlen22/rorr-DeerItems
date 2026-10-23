@@ -22,6 +22,8 @@ local sprite_charge    = Sprite.new("actor/WildCernunnosCharge", SPRITE_PATH.."c
 local sprite_roar      = Sprite.new("actor/WildCernunnosRoar", SPRITE_PATH.."roar.png", 10, 64, 128)
 -- Кадр корней хелпер шипов выбирает сам по возрасту шипа: скорость ленты ему не нужна.
 local sprite_roots     = Sprite.new("actor/WildCernunnosRoots", SPRITE_PATH.."roots.png", 19, 32, 64)
+-- Заглушка портрета журнала: кадр 0 idle ×2 на тёмном фоне, пока нет иллюстрации (A12).
+local sprite_portrait  = Sprite.new("actor/WildCernunnosPortrait", SPRITE_PATH.."portrait.png", 1, 0, 0)
 
 -- Sprite.new скорость не берёт; 0.5 — как у союзника, ленты те же. Рывок и рёв туда же:
 -- скорости в состояниях босса считаются от одной базы.
@@ -43,6 +45,9 @@ local snare = Buff.find("snare", "ror")
 -- log.error бросает: без баффа корни молча били бы без замедления.
 if not snare then log.error("DeerItems: buff ror-snare not found, WildCernunnos roots would not snare") end
 
+-- Статы общие у тела и журнала: журнал показывает их сам, с актором не сверяет.
+local DAMAGE = 20
+local HP = 1400
 local SPEED = 2.4
 local CLAWS_RANGE = 120
 local CLAWS_FRAME = 3
@@ -99,6 +104,49 @@ local wild = Object.new("WildCernunnos", Object.Parent.BOSS_CLASSIC)
 wild:set_sprite(sprite_idle)
 wild:set_depth(11)
 
+-- 1 = книга босса: sBookDropBoss игра выбирает по log_backdrop_index один раз, при
+-- создании записи, и вешает на объект книги; поздняя смена индекса книгу не меняет.
+local BOSS_BACKDROP = 1
+
+-- Игра дописывает запись в конец списка журнала. Если до нас чей-то мод дописал туда
+-- обычных врагов, босс встал бы за ними, отдельно от раздела боссов: ставим его сразу
+-- за последним боссом.
+local function place_in_boss_section(log_id)
+    local order = List.wrap(gm.variable_global_get("monster_log_display_list"))
+    local own = order:find(log_id)
+    if not own then log.error("WildCernunnos: monster log "..tostring(log_id).." is not in monster_log_display_list") end
+    order:delete(own)
+
+    local after = nil
+    for i, id in ipairs(order) do
+        if tonumber(MonsterLog.wrap(id).log_backdrop_index) == BOSS_BACKDROP then after = i end
+    end
+    -- i из ipairs считается с 1, insert — с 0: индекс i и есть место сразу за записью.
+    order:insert(after or order:size(), log_id)
+end
+
+-- Повторная загрузка мода находит запись, созданную в первый раз: иначе журнал получил бы дубль.
+local mlog = MonsterLog.find("WildCernunnos", "DeerItems")
+if not mlog then
+    local count_before = gm.variable_global_get("count_monster_log")
+    -- log_id = nil: номер выдаёт игра (count_monster_log++). Портрет обязателен: без него
+    -- игра по ошибке затирает sprite_id портретом по умолчанию, а не portrait_id.
+    local log_id = gm.monster_log_create("DeerItems", "WildCernunnos", nil,
+        sprite_idle.value, sprite_portrait.value, 0, HP, DAMAGE, SPEED, BOSS_BACKDROP, wild.value)
+    -- Если nil не стал undefined, игра не выдала номер, а запись легла в чужой слот.
+    if type(log_id) ~= "number" or log_id ~= count_before
+        or gm.variable_global_get("count_monster_log") ~= count_before + 1 then
+        log.error("WildCernunnos: monster_log_create did not allocate an id (got "..tostring(log_id)
+            ..", count_monster_log was "..tostring(count_before).."); fallback: pass count_monster_log as log_id and increment it")
+    end
+    mlog = MonsterLog.wrap(log_id)
+    place_in_boss_section(log_id)
+    -- зонд: убрать после прогона
+    log.info("WildCernunnos monster log: id="..tostring(log_id)
+        ..", log_backdrop_index="..tostring(mlog.log_backdrop_index)
+        ..", object_id="..tostring(mlog.object_id))
+end
+
 local claws = Skill.new("WildCernunnosClaws")
 claws.cooldown = 90
 claws.damage = 1.6
@@ -131,9 +179,11 @@ Callback.add(wild.on_create, function(actor)
     actor.sound_spawn = snd_spawn
     actor.sound_hit = snd_hit
     actor.sound_death = snd_death
+    -- Книгу журнала роняет смерть актора, пока запись не открыта (scr_actor_death).
+    actor.monster_log_drop_id = mlog.value
 
     -- Урон, HP, порог стана, опыт — уровень боссов первого этапа (Colossus, Vagrant).
-    actor:enemy_stats_init(20, 1400, 100, 50)
+    actor:enemy_stats_init(DAMAGE, HP, 100, 50)
     actor.pHmax_base = SPEED
     actor.z_range = CLAWS_RANGE
     actor:set_default_skill(Skill.Slot.PRIMARY, claws)

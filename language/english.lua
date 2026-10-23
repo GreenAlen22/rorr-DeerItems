@@ -705,6 +705,12 @@ return {
             text = "Lord of the Thicket"
         }
     },
+    monster = {
+        WildCernunnos = {
+            name = "Wild Cernunnos",
+            story = "Day 41. East ridge.\n\nThe tracks run in a straight line. Through the brush, through a fallen trunk thicker than I am tall. It doesn't go around things; it goes through them. Before it goes it paws at the ground, and you can hear that from the ridge.\n\nThat makes two I've seen. The one that followed the idol-carrier walked behind him like a dog and never made a sound. This one is loud. When it calls, the ground answers, and for a few seconds you can't lift your feet. Hiller lost a boot like that. Then he lost the rest.\n\nThe antlers aren't bone. I cut a tine off the dead one by the lake. Overnight it put a root through the bottom of my pack.\n\nI've moved the pack outside the tent."
+        }
+    },
     ui = {
         options = {
             DeerItems = {
