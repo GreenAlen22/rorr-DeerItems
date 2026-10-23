@@ -9,17 +9,6 @@ local MAX_TARGET_DISTANCE = 40 * METERS_TO_PIXELS
 
 local SPIKE_COOLDOWN_MIN = 10 * 60
 local SPIKE_COOLDOWN_MAX_BONUS = 5 * 60
-local TELEGRAPH_FRAMES = 30
-local VERTICAL_FRAMES = 10
-local HORIZONTAL_FRAMES = 5
-local ATTACK_ANIMATION_SPEED = 0.8 -- 25% slower visual frames; gameplay timing remains unchanged.
-local LAST_FRAME_HOLD = 30
-local STRIKE_ANIMATION_DURATION = math.ceil((VERTICAL_FRAMES + HORIZONTAL_FRAMES) / ATTACK_ANIMATION_SPEED)
-local SPIKE_VISUAL_LIFETIME = TELEGRAPH_FRAMES + STRIKE_ANIMATION_DURATION + LAST_FRAME_HOLD
-local VERTICAL_WIDTH = 24
-local VERTICAL_HEIGHT = 96
-local HORIZONTAL_WIDTH = 96
-local HORIZONTAL_HEIGHT = 24
 
 local HEALTH_MULTIPLIER = 4.5
 local DAMAGE_MULTIPLIER = 4
@@ -160,49 +149,12 @@ Callback.add(rusted.on_apply, function(actor)
     end
 end)
 
-local spikes = {}
-local spike_packet = Packet.new("Rusted-spike_packet")
-
-local function add_spike(x, y, owner)
-    spikes[#spikes + 1] = { x = x, y = y, owner = owner, age = 0 }
-end
-
-spike_packet:set_serializers(function(buffer, owner, x, y)
-    buffer:write_instance(owner)
-    buffer:write_float(x)
-    buffer:write_float(y)
-end, function(buffer)
-    if not Net.client then return end
-    local owner = buffer:read_instance()
-    local x = buffer:read_float()
-    local y = buffer:read_float()
-    add_spike(x, y, owner)
-end)
-
-local function spawn_spike(owner, x, y)
-    add_spike(x, y, owner)
-
-    if Net.host then
-        spike_packet:send_to_all(owner, x, y)
-    end
-end
-
-local function play_spike_emerge_sound(spike)
-    if exists(spike.owner) then
-        spike.owner:sound_play(spike_emerge_sound, 0.9, 1.0)
-    end
-end
-
-local function fire_spike_attack(spike, width, height)
-    local owner = spike.owner
-    if not is_rusted(owner) then return end
-
-    local attack = owner:fire_explosion(spike.x, spike.y, width, height, 1, nil, nil, false)
-    if attack and attack.attack_info then
-        attack.attack_info.proc = false
-        attack.attack_info:set_critical(false)
-    end
-end
+local spike_kind = DeerItemsGroundSpikes.kind("Rusted", {
+    sprite = spike_sprite,
+    sound = spike_emerge_sound,
+    damage = 1,
+    can_fire = is_rusted,
+})
 
 Callback.add(Callback.ON_ATTACK_HIT, function(hit_info)
     local actor = hit_info.inflictor
@@ -232,25 +184,6 @@ pcall(function()
 end)
 
 Callback.add(Callback.POST_STEP, function()
-    for index = #spikes, 1, -1 do
-        local spike = spikes[index]
-        spike.age = spike.age + 1
-
-        if Net.host then
-            if spike.age == TELEGRAPH_FRAMES then
-                fire_spike_attack(spike, VERTICAL_WIDTH, VERTICAL_HEIGHT)
-            elseif spike.age == TELEGRAPH_FRAMES + VERTICAL_FRAMES then
-                fire_spike_attack(spike, HORIZONTAL_WIDTH, HORIZONTAL_HEIGHT)
-            end
-        end
-
-        if spike.age == TELEGRAPH_FRAMES then play_spike_emerge_sound(spike) end
-
-        if spike.age >= SPIKE_VISUAL_LIFETIME then
-            table.remove(spikes, index)
-        end
-    end
-
     if not Net.host then return end
 
     local frame = Global._current_frame or 0
@@ -266,7 +199,7 @@ Callback.add(Callback.POST_STEP, function()
                     local distance_sq = dx * dx + dy * dy
                     if distance_sq >= MIN_TARGET_DISTANCE * MIN_TARGET_DISTANCE
                         and distance_sq <= MAX_TARGET_DISTANCE * MAX_TARGET_DISTANCE then
-                        spawn_spike(actor, player.x, player.bbox_bottom or player.y)
+                        spike_kind:spawn(actor, player.x, player.bbox_bottom or player.y)
                         casted = true
                     end
                 end
@@ -276,18 +209,5 @@ Callback.add(Callback.POST_STEP, function()
                 end
             end
         end
-    end
-end)
-
-Callback.add(Callback.ON_DRAW, function()
-    for _, spike in ipairs(spikes) do
-        local frame
-        if spike.age < TELEGRAPH_FRAMES then
-            frame = math.min(3, math.floor(spike.age * 4 / TELEGRAPH_FRAMES))
-        else
-            local strike_age = spike.age - TELEGRAPH_FRAMES
-            frame = 4 + math.min(14, math.floor(strike_age * ATTACK_ANIMATION_SPEED))
-        end
-        gm.draw_sprite(spike_sprite.value, math.min(18, frame), spike.x, spike.y)
     end
 end)
