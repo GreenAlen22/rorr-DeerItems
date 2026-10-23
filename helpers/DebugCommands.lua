@@ -1,5 +1,6 @@
 -- Отладочные команды прогона: выдать предмет или снаряжение мода, чтобы не искать его в забеге,
--- вызвать зверя Ingrown Idol и напечатать статы игрока, чтобы бонус предмета был виден числом.
+-- вызвать зверя Ingrown Idol или босса Wild Cernunnos и напечатать статы игрока, чтобы бонус
+-- предмета был виден числом.
 -- Консоль: Shift + ` (на русской раскладке Shift + Ё), не на паузе.
 
 -- Спутники *Deactivate тоже выдаются: их состояние иначе получить долго.
@@ -115,6 +116,24 @@ local function beast(args)
     Console.print("deer_beast: "..(inst and "beast x"..stack.." for "..tostring(player.user_name) or "not spawned"))
 end
 
+-- Босса иначе ждать до телепорта на двух этапах. Спавн врага — хостовый: клиенту
+-- инстанс приезжает с хоста.
+local function wild()
+    if not Net.host then
+        Console.print("deer_wild: host or single player only.", Color.Console.RED)
+        return
+    end
+
+    local player = Player.get_local()
+    if player == Instance.INVALID or not Instance.exists(player) then
+        Console.print("deer_wild: no local player, start a run first.", Color.Console.RED)
+        return
+    end
+
+    DeerItemsWildCernunnos.object:create(player.x + 200, player.y - 16)
+    Console.print("deer_wild: Wild Cernunnos next to "..tostring(player.user_name))
+end
+
 Console.new{
     "deer_beast [stack]",
     {
@@ -124,6 +143,17 @@ Console.new{
     function(args)
         local ok, err = pcall(beast, args)
         if not ok then Console.print("deer_beast failed: "..tostring(err), Color.Console.RED) end
+    end
+}
+
+Console.new{
+    "deer_wild",
+    {
+        "Spawn the Wild Cernunnos boss next to the local player (host or single player).",
+    },
+    function()
+        local ok, err = pcall(wild)
+        if not ok then Console.print("deer_wild failed: "..tostring(err), Color.Console.RED) end
     end
 }
 

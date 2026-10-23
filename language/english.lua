@@ -699,6 +699,12 @@ return {
             description = "Lightning strikes near the players. Lightning strikes take away 5% of your maximum health. Items enhance the storm."
         }
     },
+    actor = {
+        WildCernunnos = {
+            name = "Wild Cernunnos",
+            text = "Lord of the Thicket"
+        }
+    },
     ui = {
         options = {
             DeerItems = {
