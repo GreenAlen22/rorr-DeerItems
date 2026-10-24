@@ -63,7 +63,6 @@ Initialize.add(function()
     import_local("helpers/GroundSpikes")
     import_local("Interactables/StandingRequisitionChest")
     import_local("actor/Cernunnos")
-    import_local("actor/WildCernunnos")
     import_local("elite/Bramble")
     import_local("elite/Rusted")
     import_local("helpers/ArtifactPlayerDeath")
@@ -81,5 +80,8 @@ Initialize.add(function()
 
     log.info("DeerItems registered all items; enabled "..enabled_count.." configured drops; disabled "..disabled_count..".")
 
+    -- After the items: a failed fail-fast check in the boss file aborts the rest of
+    -- this body, and items must not be lost to it. Needs helpers/GroundSpikes above.
+    import_local("actor/WildCernunnos")
     import_local("helpers/DebugCommands")
 end)

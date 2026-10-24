@@ -93,8 +93,9 @@ local CHARGE_HIT_R = 48
 local CHARGE_BLAST = 96
 local CHARGE_KNOCK_FRAMES = 20
 local CHARGE_KNOCK_FORCE = 6
--- Пол под ногами касается низа bbox; без отступа он читался бы стеной.
-local CHARGE_WALL_FLOOR_GAP = 2
+-- Пол под ногами касается низа bbox, потолок над головой — верха; без отступа
+-- они читались бы стеной.
+local CHARGE_WALL_INSET = 2
 
 local ROAR_RANGE = 900
 local ROAR_FRAME = 4
@@ -102,6 +103,8 @@ local ROAR_ANIM = 0.2
 local ROAR_SHAKE = 4
 local ROOTS_DAMAGE = 1.2
 local SNARE_FRAMES = 90
+-- Глубже пол под игроком не ищется: с такой высоты корни до него уже не достанут.
+local ROOTS_GROUND_SEARCH = 200
 
 local PHASE_WINDUP = 0
 local PHASE_RUN = 1
@@ -154,8 +157,8 @@ if not mlog then
     local log_id = gm.monster_log_create("DeerItems", "WildCernunnos", nil,
         sprite_idle.value, sprite_portrait.value, 0, HP, DAMAGE, SPEED, BOSS_BACKDROP, wild.value)
     -- Если nil не стал undefined, игра не выдала номер, а запись легла в чужой слот.
-    -- Индекс фона проверяется отдельно: обрежь вызов nil хвост аргументов, запись
-    -- получила бы номер, но не книгу босса, и после снятия зонда этого никто бы не увидел.
+    -- Индекс фона проверяется отдельно: если nil посреди вызова обрежет хвост аргументов,
+    -- запись получит номер, но не книгу босса, и после снятия зонда этого никто не увидит.
     if type(log_id) ~= "number" or log_id ~= count_before
         or gm.variable_global_get("count_monster_log") ~= count_before + 1
         or tonumber(MonsterLog.wrap(log_id).log_backdrop_index) ~= BOSS_BACKDROP then
@@ -200,9 +203,8 @@ Callback.add(wild.on_create, function(actor)
     actor.can_jump = true
     actor.mask_index = sprite_mask
     actor.sprite_ping = sprite_ping
-    -- Эти звуки играет движок из полей актора, по одному на поле: вариант выбирается на
-    -- инстанс. sound_hit движок читает на каждом ударе (actor_on_damage_raw), так что у
-    -- одного босса звук попадания один на весь бой, у следующего может быть другой.
+    -- Эти звуки играет движок из полей актора, по одному на поле: появление и смерть
+    -- звучат раз, им хватает выбора на инстанс. sound_hit перевыбирает on_step.
     actor.sound_spawn = pick(snd_spawn)
     actor.sound_hit = pick(snd_hit)
     actor.sound_death = pick(snd_death)
@@ -220,6 +222,12 @@ Callback.add(wild.on_create, function(actor)
     actor:set_default_skill(Skill.Slot.UTILITY, roar)
 
     actor:init_actor_late()
+end)
+
+-- sound_hit движок читает на каждом ударе (actor_on_damage_raw): выбор каждый кадр даёт
+-- подряд идущим попаданиям разные варианты. Звук локален, каждая машина выбирает себе.
+Callback.add(wild.on_step, function(actor)
+    actor.sound_hit = pick(snd_hit)
 end)
 
 -- activate_skill приходит на каждую машину, поэтому состояние идёт везде;
@@ -266,8 +274,8 @@ end
 local function wall_ahead(actor, side)
     local step = side * CHARGE_STEP
     return found_block(gm.collision_rectangle(
-        tonumber(actor.bbox_left) + step, tonumber(actor.bbox_top),
-        tonumber(actor.bbox_right) + step, tonumber(actor.bbox_bottom) - CHARGE_WALL_FLOOR_GAP,
+        tonumber(actor.bbox_left) + step, tonumber(actor.bbox_top) + CHARGE_WALL_INSET,
+        tonumber(actor.bbox_right) + step, tonumber(actor.bbox_bottom) - CHARGE_WALL_INSET,
         gm.constants.pBlock, false, true))
 end
 
@@ -420,12 +428,43 @@ local function roar_data(actor)
     return Instance.get_data(actor, "WildCernunnosRoar", GUID)
 end
 
+-- Первая строка pBlock под ногами игрока: в прыжке или на верёвке низ bbox висит в
+-- воздухе, и корни поднялись бы из пустоты. nil — пола нет в пределах поиска.
+local function ground_below(player)
+    local x = tonumber(player.x)
+    local bottom = tonumber(player.bbox_bottom)
+    for dy = 0, ROOTS_GROUND_SEARCH do
+        if found_block(gm.collision_point(x, bottom + dy, gm.constants.pBlock, false, true)) then
+            return bottom + dy
+        end
+    end
+    return nil
+end
+
+-- Горизонтальный удар корня стоит по центру на игроке и задевает соседей: корень под
+-- каждым из стоящих рядом бил бы каждого из них по разу на корень.
+local function roots_overlap(placed, x, y)
+    local half_width = DeerItemsGroundSpikes.HORIZONTAL_WIDTH / 2
+    local height = DeerItemsGroundSpikes.HORIZONTAL_HEIGHT
+    for _, root in ipairs(placed) do
+        if math.abs(x - root.x) <= half_width and math.abs(y - root.y) <= height then return true end
+    end
+    return false
+end
+
 -- Хост: корни под каждым живым игроком в радиусе, клиентам их донесёт пакет хелпера.
+-- Игрока у уже поставленного корня этот корень и накроет, второй ему не нужен.
 local function roar_spawn_roots(actor)
+    local placed = {}
     for _, player in ipairs(Instance.find_all(gm.constants.oP)) do
         if player_alive(player)
             and gm.point_distance(actor.x, actor.y, player.x, player.y) <= ROAR_RANGE then
-            roots:spawn(actor, player.x, player.bbox_bottom)
+            local x = tonumber(player.x)
+            local y = ground_below(player)
+            if y and not roots_overlap(placed, x, y) then
+                placed[#placed + 1] = { x = x, y = y }
+                roots:spawn(actor, x, y)
+            end
         end
     end
 end
@@ -467,7 +506,8 @@ card.can_be_blighted = false
 
 for _, id in ipairs({ "desolateForest", "skyMeadow" }) do
     local stage = Stage.find(id, "ror")
-    -- Без этапа босс молча пропал бы из игры: log.error бросает и останавливает загрузку файла.
+    -- Без этапа босс молча пропал бы из игры. log.error бросает и обрывает всё тело
+    -- Initialize.add в main.lua, а не только этот файл: поэтому босс грузится после предметов.
     if not stage then log.error("DeerItems: stage ror-"..id.." not found, WildCernunnos card not added") end
     stage:add_monster(card)
 end

@@ -15,6 +15,11 @@ local VERTICAL_HEIGHT = 96
 local HORIZONTAL_WIDTH = 96
 local HORIZONTAL_HEIGHT = 24
 
+-- Размер горизонтального удара нужен виду, который ставит несколько шипов сразу:
+-- по нему он разводит шипы, чтобы соседние не били одну цель дважды.
+M.HORIZONTAL_WIDTH = HORIZONTAL_WIDTH
+M.HORIZONTAL_HEIGHT = HORIZONTAL_HEIGHT
+
 -- Метка на attack_info: ключ с префиксом неймспейса, чужие моды пишут в тот же struct.
 -- По сети она не едет, поэтому читается только у хоста, где удар и создан.
 local ATTACK_TAG = "DeerItems_spike"
@@ -113,20 +118,31 @@ Callback.add(Callback.POST_STEP, function()
         local spike = spikes[index]
         spike.age = spike.age + 1
 
-        if Net.host then
-            if spike.age == TELEGRAPH_FRAMES then
-                fire_spike_attack(spike, VERTICAL_WIDTH, VERTICAL_HEIGHT)
-            elseif spike.age == TELEGRAPH_FRAMES + VERTICAL_FRAMES then
-                fire_spike_attack(spike, HORIZONTAL_WIDTH, HORIZONTAL_HEIGHT)
+        -- Владелец умер за телеграф: удара не будет, и шип не поднимается и не звучит.
+        -- Проверка на каждой машине — иначе клиент показал бы безвредный удар.
+        if spike.age == TELEGRAPH_FRAMES and not spike.kind.can_fire(spike.owner) then
+            table.remove(spikes, index)
+        else
+            if Net.host then
+                if spike.age == TELEGRAPH_FRAMES then
+                    fire_spike_attack(spike, VERTICAL_WIDTH, VERTICAL_HEIGHT)
+                elseif spike.age == TELEGRAPH_FRAMES + VERTICAL_FRAMES then
+                    fire_spike_attack(spike, HORIZONTAL_WIDTH, HORIZONTAL_HEIGHT)
+                end
+            end
+
+            if spike.age == TELEGRAPH_FRAMES then play_spike_emerge_sound(spike) end
+
+            if spike.age >= SPIKE_VISUAL_LIFETIME then
+                table.remove(spikes, index)
             end
         end
-
-        if spike.age == TELEGRAPH_FRAMES then play_spike_emerge_sound(spike) end
-
-        if spike.age >= SPIKE_VISUAL_LIFETIME then
-            table.remove(spikes, index)
-        end
     end
+end)
+
+-- Шипы — локальная картинка каждой машины: со старым этапом они не переезжают.
+Callback.add(Callback.ON_STAGE_START, function()
+    spikes = {}
 end)
 
 Callback.add(Callback.ON_DRAW, function()
