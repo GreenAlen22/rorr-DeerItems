@@ -11,6 +11,8 @@ All notable DeerItems changes.
 - Gold Standard (red): gold you collect also grants experience toward your next level; the gold is kept.
 - Katana (equipment): a 1-second parry that deflects the first attack and slashes enemies around you for double the damage.
 - Glyph Paper (equipment): draws a random fire, ice, light or plant glyph above you.
+- Wild Cernunnos, a new teleporter boss on Desolate Forest and Sky Meadow: it claws, charges on two legs, and roars to raise roots that hold you in place. It has its own monster log entry.
+- `deer_wild` console command: summons Wild Cernunnos next to you (host or single player).
 - `deer_give` console command: gives you any DeerItems item or equipment (host or single player); a player number as the third argument gives it to another player. Type it without arguments to list the ids.
 - `deer_stats` console command: prints your stats and skill cooldowns.
 - `deer_beast` console command: summons Ingrown Idol's beast next to you (host or single player).
