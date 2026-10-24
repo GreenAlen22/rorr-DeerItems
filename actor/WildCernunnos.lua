@@ -21,9 +21,12 @@ local sprite_shoot1    = Sprite.new("actor/WildCernunnosShoot1", SPRITE_PATH.."s
 local sprite_charge    = Sprite.new("actor/WildCernunnosCharge", SPRITE_PATH.."charge.png", 12, 80, 128)
 local sprite_roar      = Sprite.new("actor/WildCernunnosRoar", SPRITE_PATH.."roar.png", 10, 64, 128)
 -- Кадр корней хелпер шипов выбирает сам по возрасту шипа: скорость ленты ему не нужна.
-local sprite_roots     = Sprite.new("actor/WildCernunnosRoots", SPRITE_PATH.."roots.png", 19, 32, 64)
+-- Кадр 96 px: корни в стороны шире шипа Rusted; origin — центр низа, у точки удара.
+local sprite_roots     = Sprite.new("actor/WildCernunnosRoots", SPRITE_PATH.."roots.png", 19, 48, 64)
 -- Заглушка портрета журнала: кадр 0 idle ×2 на тёмном фоне, пока нет иллюстрации (A12).
 local sprite_portrait  = Sprite.new("actor/WildCernunnosPortrait", SPRITE_PATH.."portrait.png", 1, 0, 0)
+-- Метка босса за краем экрана; origin в центре, как у ванильных пингов.
+local sprite_ping      = Sprite.new("actor/WildCernunnosPing", SPRITE_PATH.."ping.png", 1, 32, 32)
 
 -- Sprite.new скорость не берёт; 0.5 — как у союзника, ленты те же. Рывок и рёв туда же:
 -- скорости в состояниях босса считаются от одной базы.
@@ -34,11 +37,28 @@ end
 -- Без сгенерированных палитр элиты не перекрашивают босса.
 gm.elite_generate_palettes(sprite_palette.value)
 
-local snd_spawn = Sound.new("WildCernunnos/spawn", PATH.."assets/sounds/CernunnosSpawn.ogg")
-local snd_hit   = Sound.new("WildCernunnos/hit", PATH.."assets/sounds/CernunnosHit.ogg")
-local snd_death = Sound.new("WildCernunnos/death", PATH.."assets/sounds/CernunnosDeath.ogg")
--- Рёв союзника, пока у босса нет своего.
-local snd_roar  = Sound.new("WildCernunnos/roar", PATH.."assets/sounds/IngrownIdol.ogg")
+local function load_sound(name, file)
+    return Sound.new("WildCernunnos/"..name, PATH.."assets/sounds/"..file..".ogg")
+end
+
+-- По два варианта на событие: один и тот же звук на каждом ударе быстро приедается.
+local snd_spawn         = { load_sound("spawn", "CernunnosSpawn"), load_sound("spawn2", "CernunnosSpawn2") }
+local snd_hit           = { load_sound("hit", "CernunnosHit"), load_sound("hit2", "CernunnosHit2") }
+local snd_death         = { load_sound("death", "CernunnosDeath"), load_sound("death2", "CernunnosDeath2") }
+-- Первый вариант рёва — звук союзника из Ingrown Idol.
+local snd_roar          = { load_sound("roar", "IngrownIdol"), load_sound("roar2", "WildCernunnosRoar2") }
+local snd_charge_windup = { load_sound("chargeWindup1", "WildCernunnosChargeWindup1"), load_sound("chargeWindup2", "WildCernunnosChargeWindup2") }
+local snd_charge_impact = { load_sound("chargeImpact1", "WildCernunnosChargeImpact1"), load_sound("chargeImpact2", "WildCernunnosChargeImpact2") }
+local snd_roots         = { load_sound("roots1", "WildCernunnosRoots1"), load_sound("roots2", "WildCernunnosRoots2") }
+
+local function pick(list)
+    return list[math.random(#list)]
+end
+
+-- Вариант каждая машина выбирает себе: звук локален, совпадать у всех ему незачем.
+local function play_random(actor, list, volume, pitch)
+    actor:sound_play(pick(list), volume, pitch)
+end
 
 -- Тот же замедлитель, что даёт Taser: минус скорость, без своего баффа.
 local snare = Buff.find("snare", "ror")
@@ -109,20 +129,20 @@ wild:set_depth(11)
 local BOSS_BACKDROP = 1
 
 -- Игра дописывает запись в конец списка журнала. Если до нас чей-то мод дописал туда
--- обычных врагов, босс встал бы за ними, отдельно от раздела боссов: ставим его сразу
--- за последним боссом.
+-- обычных врагов, босс встал бы за ними, отдельно от раздела боссов: ставим его перед
+-- последним боссом (Providence), туда же, куда боссов ставят другие моды (Starstorm).
 local function place_in_boss_section(log_id)
     local order = List.wrap(gm.variable_global_get("monster_log_display_list"))
     local own = order:find(log_id)
     if not own then log.error("WildCernunnos: monster log "..tostring(log_id).." is not in monster_log_display_list") end
     order:delete(own)
 
-    local after = nil
+    local last_boss = nil
     for i, id in ipairs(order) do
-        if tonumber(MonsterLog.wrap(id).log_backdrop_index) == BOSS_BACKDROP then after = i end
+        if tonumber(MonsterLog.wrap(id).log_backdrop_index) == BOSS_BACKDROP then last_boss = i end
     end
-    -- i из ipairs считается с 1, insert — с 0: индекс i и есть место сразу за записью.
-    order:insert(after or order:size(), log_id)
+    -- i из ipairs считается с 1, insert — с 0: индекс i - 1 и есть место перед записью.
+    order:insert(last_boss and last_boss - 1 or order:size(), log_id)
 end
 
 -- Повторная загрузка мода находит запись, созданную в первый раз: иначе журнал получил бы дубль.
@@ -134,9 +154,12 @@ if not mlog then
     local log_id = gm.monster_log_create("DeerItems", "WildCernunnos", nil,
         sprite_idle.value, sprite_portrait.value, 0, HP, DAMAGE, SPEED, BOSS_BACKDROP, wild.value)
     -- Если nil не стал undefined, игра не выдала номер, а запись легла в чужой слот.
+    -- Индекс фона проверяется отдельно: обрежь вызов nil хвост аргументов, запись
+    -- получила бы номер, но не книгу босса, и после снятия зонда этого никто бы не увидел.
     if type(log_id) ~= "number" or log_id ~= count_before
-        or gm.variable_global_get("count_monster_log") ~= count_before + 1 then
-        log.error("WildCernunnos: monster_log_create did not allocate an id (got "..tostring(log_id)
+        or gm.variable_global_get("count_monster_log") ~= count_before + 1
+        or tonumber(MonsterLog.wrap(log_id).log_backdrop_index) ~= BOSS_BACKDROP then
+        log.error("WildCernunnos: monster_log_create did not allocate an id with the boss backdrop (got "..tostring(log_id)
             ..", count_monster_log was "..tostring(count_before).."); fallback: pass count_monster_log as log_id and increment it")
     end
     mlog = MonsterLog.wrap(log_id)
@@ -176,9 +199,13 @@ Callback.add(wild.on_create, function(actor)
 
     actor.can_jump = true
     actor.mask_index = sprite_mask
-    actor.sound_spawn = snd_spawn
-    actor.sound_hit = snd_hit
-    actor.sound_death = snd_death
+    actor.sprite_ping = sprite_ping
+    -- Эти звуки играет движок из полей актора, по одному на поле: вариант выбирается на
+    -- инстанс. sound_hit движок читает на каждом ударе (actor_on_damage_raw), так что у
+    -- одного босса звук попадания один на весь бой, у следующего может быть другой.
+    actor.sound_spawn = pick(snd_spawn)
+    actor.sound_hit = pick(snd_hit)
+    actor.sound_death = pick(snd_death)
     -- Книгу журнала роняет смерть актора, пока запись не открыта (scr_actor_death).
     actor.monster_log_drop_id = mlog.value
 
@@ -215,7 +242,7 @@ Callback.add(state_claws.on_step, function(actor, data)
     if not Util.bool(data.struck) and actor.image_index >= CLAWS_FRAME then
         data.struck = true
         -- Звук каждая машина играет себе: пакета ждать незачем.
-        actor:sound_play(snd_hit, 1.0, 1.0)
+        play_random(actor, snd_hit, 1.0, 1.0)
         if Net.host then
             actor:fire_explosion(actor.x, actor.y + CLAWS_CENTER_Y, CLAWS_W, CLAWS_H, skill_damage(claws))
         end
@@ -268,7 +295,7 @@ end, function(buffer)
     -- Позиция хоста при ударе: клиент мог убежать дальше, пока шёл пакет.
     actor.x = x
     charge_data(actor).stop = true
-    actor:sound_play(snd_hit, 1.0, 1.0)
+    play_random(actor, snd_charge_impact, 1.0, 1.0)
 end)
 
 -- Хост: первый враг перед рогами получает один удар, и рывок кончается.
@@ -283,7 +310,7 @@ local function charge_try_hit(actor, data, side)
             local attack = actor:fire_explosion(hit_x, hit_y, CHARGE_BLAST, CHARGE_BLAST, skill_damage(charge))
             -- Игроков отбрасывание может и не сдвинуть (порог стана 1e+25): тогда только урон.
             attack.attack_info:set_knockback(side, CHARGE_KNOCK_FRAMES, CHARGE_KNOCK_FORCE)
-            actor:sound_play(snd_hit, 1.0, 1.0)
+            play_random(actor, snd_charge_impact, 1.0, 1.0)
             charge_brake(actor, data)
             packet_charge_stop:send_to_all(actor, actor.x)
             return
@@ -309,6 +336,9 @@ local function charge_run(actor, data)
     data.run_frames = frames + 1
 
     if Net.host then
+        -- Как у Bison: свежая отметка не даёт плановой синхронизации позиции дёрнуть
+        -- клиента назад, к позиции хоста, которая на шаг отстаёт от его рывка.
+        actor.net_last_position_update = Global._current_frame
         charge_try_hit(actor, data, side)
     end
 end
@@ -324,11 +354,12 @@ Callback.add(state_charge.on_enter, function(actor, data)
     data.run_frames = 0
     data.side = tonumber(actor.image_xscale) < 0 and -1 or 1
     charge_data(actor).stop = false
-    actor:sound_play(snd_hit, 1.0, 1.0)
+    play_random(actor, snd_charge_windup, 1.0, 1.0)
 end)
 
 Callback.add(state_charge.on_step, function(actor, data)
-    -- Без гашения pHspeed движок добавил бы к шагу рывка свой ход.
+    -- skill_util_fix_hspeed гасит pHspeed постепенно, а не обнуляет: без него движок
+    -- добавил бы к шагу рывка остаток хода, с которым босс вошёл в рывок.
     actor:skill_util_fix_hspeed()
 
     if tonumber(data.phase) ~= PHASE_BRAKE and charge_data(actor).stop then
@@ -364,7 +395,8 @@ end
 
 local roots = DeerItemsGroundSpikes.kind("WildCernunnosRoots", {
     sprite = sprite_roots,
-    sound = snd_hit,
+    -- Список: вариант хелпер выбирает на каждый шип.
+    sound = snd_roots,
     damage = ROOTS_DAMAGE,
     -- Корни переживают босса: убитый или исчезнувший больше не бьёт.
     -- object_index инстанса — объект-носитель, свой объект отдаёт get_object_index.
@@ -415,7 +447,7 @@ Callback.add(state_roar.on_step, function(actor, data)
     if not roar_state.fired and tonumber(actor.image_index) >= ROAR_FRAME then
         roar_state.fired = true
         -- Звук и тряска локальны, каждая машина делает их себе.
-        actor:sound_play(snd_roar, 1.0, 1.0)
+        play_random(actor, snd_roar, 1.0, 1.0)
         actor:screen_shake(ROAR_SHAKE)
         -- kind:spawn и сам откажет клиенту; проверка здесь — чтобы роль была видна.
         if Net.host then

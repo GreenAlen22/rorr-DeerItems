@@ -42,15 +42,20 @@ function Kind:spawn(owner, x, y)
 end
 
 -- opts.can_fire(owner) обязан сам обрабатывать мёртвого или уничтоженного владельца: шип его пережить может.
+-- opts.sound — Sound или список Sound: из списка каждый шип берёт случайный.
 function M.kind(id, opts)
     if kinds[id] then error("DeerItemsGroundSpikes: kind '"..tostring(id).."' already registered") end
     assert(opts and opts.sprite and opts.sound and opts.damage and opts.can_fire,
         "DeerItemsGroundSpikes: sprite, sound, damage and can_fire are required")
 
+    -- У обёртки RAPI есть поле RAPI, у простого списка его нет.
+    local sounds = opts.sound.RAPI and { opts.sound } or opts.sound
+    assert(#sounds > 0, "DeerItemsGroundSpikes: sound list is empty")
+
     local kind = setmetatable({
         id = id,
         sprite = opts.sprite,
-        sound = opts.sound,
+        sounds = sounds,
         damage = opts.damage,
         can_fire = opts.can_fire,
         on_hit = opts.on_hit,
@@ -88,7 +93,8 @@ end
 
 local function play_spike_emerge_sound(spike)
     if exists(spike.owner) then
-        spike.owner:sound_play(spike.kind.sound, 0.9, 1.0)
+        local sounds = spike.kind.sounds
+        spike.owner:sound_play(sounds[math.random(#sounds)], 0.9, 1.0)
     end
 end
 
