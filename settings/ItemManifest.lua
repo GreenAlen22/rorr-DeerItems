@@ -31,6 +31,8 @@ M.categories = {
             { id = "Tankbuster" },
             { id = "ThinWings" },
             { id = "UnfocusPrisma" },
+            { id = "TipJar" },
+            { id = "Thermos" },
         },
     },
     {
@@ -80,6 +82,7 @@ M.categories = {
             { id = "RustMite" },
             { id = "ShineOSun" },
             { id = "VioletFrenzy" },
+            { id = "GoldStandard" },
         },
     },
     {
@@ -91,6 +94,8 @@ M.categories = {
             { id = "SoulJar" },
             { id = "OneArmyMan" },
             { id = "TacticalVisor" },
+            { id = "Katana" },
+            { id = "GlyphPaper" },
         },
     },
 }

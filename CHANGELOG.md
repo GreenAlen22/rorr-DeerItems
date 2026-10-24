@@ -6,6 +6,11 @@ All notable DeerItems changes.
 
 ### Added
 
+- Tip Jar (white): you gain 15% more gold from all sources.
+- Thermos (white): your positive effects from items, equipment and skills last longer.
+- Gold Standard (red): gold you collect also grants experience toward your next level; the gold is kept.
+- Katana (equipment): a 1-second parry that deflects the first attack and slashes enemies around you for double the damage.
+- Glyph Paper (equipment): draws a random fire, ice, light or plant glyph above you.
 - `deer_give` console command: gives you any DeerItems item or equipment (host or single player); a player number as the third argument gives it to another player. Type it without arguments to list the ids.
 - `deer_stats` console command: prints your stats and skill cooldowns.
 - `deer_beast` console command: summons Ingrown Idol's beast next to you (host or single player).

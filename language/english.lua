@@ -625,6 +625,51 @@ return {
             date = "31.10.2057",
             story = "\"Nature nourishes the body. Resolve nourishes the mind. Imagination nourishes the soul.\" The later disciples of N'kuhana found this line incomplete.\n\nThey added a fourth principle: death feeds on excess.\n\nIf death is the great equalizer, then healing is a debt taken from it without permission. The resulting surplus cannot be considered a blessing.\n\nNot every debt should be repaid at once. Some debts must be grown. Strengthened. Multiplied. Until life itself becomes heavy enough for matter to be chipped from it.",
             priority = "<r>High Priority</c>"
+        },
+        GoldStandard = {
+            name = "Gold Standard",
+            pickup = "Gold you collect also grants experience.",
+            description = "Every <y>$25</c> of gold you collect grants <y>6%</c> <c_stack>(+3% per stack)</c> <y>of the experience needed for the next level</c>. The gold is not spent. Scales with time.",
+            destination = "Vault 9,\nProvidence Mutual,\nMars",
+            date = "14.02.2058",
+            story = "PROVIDENCE MUTUAL - STANDARD CERTIFICATE\n\nCongratulations! Your savings now work as hard as you do!\n\nUnder the new Gold Standard, every credit you deposit is matched by our Personal Growth Program. Watch your balance grow. Watch YOURSELF grow. Clients report faster reflexes, steadier hands and a renewed sense of purpose within days!\n\nNo fees. No forms. No waiting.\n\n* Growth is non-transferable and cannot be withdrawn. Providence Mutual is not responsible for what the client grows into.",
+            priority = "<r>High Priority</c>"
+        },
+        TipJar = {
+            name = "Tip Jar",
+            pickup = "Gain more gold.",
+            description = "Gain <y>15%</c> <c_stack>(+15% per stack)</c> <y>more gold</c> from all sources.",
+            destination = "Rosie's Diner,\nRoute 9,\nEarth",
+            date = "03.07.2056",
+            story = "TIPS!! for the band\n(we are saving for a van)\n(the van is for leaving)\n(THANK YOU)",
+            priority = "Standard"
+        },
+        Thermos = {
+            name = "Thermos",
+            pickup = "Your positive effects last longer.",
+            description = "Your <y>positive effects</c> last <y>25%</c> <c_stack>(+25% per stack)</c> <y>longer</c>. Works on boosts from items, equipment and skills.",
+            destination = "Apartment 4B,\nNew Hollis,\nEarth",
+            date = "19.11.2056",
+            story = "Took this to every shift for 31 years and it never once let me down. Tea hot at dawn, still hot at midnight. Your grandad swore it was cheating.\n\nYou drink your coffee cold, I KNOW you do, you leave it on the console and forget about it. Not anymore.\n\nWrap a sock around it if the lid squeaks.\n\nCome home before it cools down.\nGran",
+            priority = "Standard/Fragile"
+        },
+        Katana = {
+            name = "Katana",
+            pickup = "Parry the next attack and strike back.",
+            description = "Enter a <b>parry stance</c> for <b>1 second</c>. The first attack that hits you is <b>deflected</c>, and you slash enemies around you for <y>200% of the damage you would have taken</c>. If no enemy is close, the slash hits the nearest enemy within <y>20m</c>. A successful parry reduces the remaining cooldown by <y>75%</c>.",
+            destination = "Kurogane Forge,\nOld Quarter,\nEarth",
+            date = "08.08.2057",
+            story = "My father said the blade does nothing. The waiting does everything.\n\nHe waited forty years for the right moment and died in his sleep.\n\nI'm not waiting.",
+            priority = "<y>Unstable</c>"
+        },
+        GlyphPaper = {
+            name = "Glyph Paper",
+            pickup = "Draw a random glyph of fire, ice, light or plants.",
+            description = "Draw a random <b>glyph</c> above you. <r>Fire</c> explodes in front of you for <y>600% base damage</c> and burns enemies for <y>5×80% base damage</c>. <b>Ice</c> deals <y>300% base damage</c> to enemies within <y>8m</c> and <b>freezes</c> them for <y>2 seconds</c>. <y>Light</c> <b>blinds</c> enemies within <y>10m</c> for <y>6 seconds</c> and <g>heals</c> allies for <g>20% of their maximum health</c>. <g>Plants</c> <b>root</c> enemies within <y>8m</c> for <y>4 seconds</c> and deal <y>5×80% base damage</c>.",
+            destination = "Camila N.,\nGravesfield, Connecticut,\nEarth",
+            date = "31.10.2057",
+            story = "Hi Mom! Camp is GREAT. Really. Food is fine, the counselor is strict but nice, she has an owl on her front door and she steals stuff. Jokes! She jokes.\n\nI learned something new. You draw a circle, put a sign inside and TAP it. Light, ice, fire, plants. Nobody taught me the signs, I found them myself, the whole island is made of them if you look. Don't tap it indoors. I tapped it indoors. The door said hoot and won't talk to me now.\n\nlove, L.\n\nP.S. It's definitely a camp. Don't worry.",
+            priority = "<y>Unstable</c>"
         }
     },
     artifact = {
@@ -689,7 +734,9 @@ return {
                 SporeOBloom = "Spore Flower",
                 Tankbuster = "Tankbuster",
                 ThinWings = "Thin Wings",
-                UnfocusPrisma = "Defocus Prism"
+                UnfocusPrisma = "Defocus Prism",
+                TipJar = "Tip Jar",
+                Thermos = "Thermos"
             },
             green = {
                 header = "Green Items",
@@ -734,7 +781,8 @@ return {
                 RiftBeacon = "Rift Beacon",
                 RustMite = "Rust Mite",
                 ShineOSun = "Sun's Radiance",
-                VioletFrenzy = "Violet Frenzy"
+                VioletFrenzy = "Violet Frenzy",
+                GoldStandard = "Gold Standard"
             },
             equipment = {
                 header = "Equipment",
@@ -742,7 +790,9 @@ return {
                 Hunger = "Hunger",
                 SoulJar = "Soul Jar",
                 OneArmyMan = "One Army Man",
-                TacticalVisor = "Tactical Visor"
+                TacticalVisor = "Tactical Visor",
+                Katana = "Katana",
+                GlyphPaper = "Glyph Paper"
             }
                 }
             }
