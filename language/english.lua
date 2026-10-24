@@ -73,7 +73,7 @@ return {
         BountyContract = {
             name = "Bounty Contract",
             pickup = "<r>Execute elites</c> and earn <y>gold</c>.",
-            description = "Instantly <r>kills an elite monster</c> below <y>12%</c> <c_stack>(+12% per stack)</c> health. Does not execute <r>bosses</c>. Every <r>elite monster kill</c> grants <y>$15</c> <c_stack>(+$15 per stack)</c>. <y>Scales with time</c>.",
+            description = "Instantly <r>kills an elite monster</c> below <y>12%</c> <c_stack>(+12% per stack)</c> health. Does not execute <r>bosses</c>. Every <r>elite monster kill</c> grants <y>$15</c> <c_stack>(+$15 per stack)</c>. Scales with time.",
             destination = "Contracts Desk,\nReclamation Office,\nPrimas V",
             date = "14.07.2057",
             story = "Notice issued by the Provisional Government of Primas V:\n\nThe guillotine remains intended for enemies of the people whose deaths must be public.\n\nFor those who fled, concealed their status, bought silence, or hid behind foreign documents, official contracts may now be concluded. Payment will be made after confirmation that the specified target has been eliminated.\n\nUse red ink only. Do not replace it with black ink. Do not cross out a name once it has been written.\n\nIf the reward amount exceeds the stated sum, report the discrepancy to the Land Reclamation Office.",
@@ -223,7 +223,7 @@ return {
         BloodyDividends = {
             name = "Bloody Dividends",
             pickup = "<y>Gold</c> for <r>pain</c>. More pain, more gold.",
-            description = "On taking <r>damage</c> from an enemy, gain <y>$6</c> <c_stack>(+$6 per stack)</c>. If the hit removes more than <b>25%</c> of your maximum health, gain twice as much. <y>Scales with time</c>.",
+            description = "On taking <r>damage</c> from an enemy, gain <y>$6</c> <c_stack>(+$6 per stack)</c>. If the hit removes more than <b>25%</c> of your maximum health, gain twice as much. Scales with time.",
             destination = "Collections Floor,\nDebt Office,\nTitan",
             date = "01.04.2057",
             story = "The last Lemurian fell into the dust, and for a moment the battlefield was quiet.\n\nJohnson looked around, but no one from his team got back up. Only smoke, blood, and the distant howls of creatures beyond the rocks.\n\nWith difficulty, he rose, readjusted his weapon, and smiled through the pain.\n\n— I hope they pay overtime too.",
@@ -259,7 +259,7 @@ return {
         BountyTag = {
             name = "Bounty Tag",
             pickup = "Play a <g>no-hit run</c> for <y>money</c>.",
-            description = "Earn <y>$2</c> <c_stack>(+$2 per stack)</c> per <r>kill</c>, plus <y>$1</c> for each consecutive kill without taking damage, up to <y>+$10</c>. Taking damage <r>resets the streak</c>. <y>Scales with time</c>.",
+            description = "Earn <y>$2</c> <c_stack>(+$2 per stack)</c> per <r>kill</c>, plus <y>$1</c> for each consecutive kill without taking damage, up to <y>+$10</c>. Taking damage <r>resets the streak</c>. Scales with time.",
             destination = "Contracts Desk,\nBounty Office,\nEdge Frontiers",
             date = "15.08.2058",
             story = "The front of the tag bore a laughing horned man. On the reverse were the target's name and an amount.\n\nAfter a kill, the name vanished and the amount grew.\n\nSometimes the next target appeared.\n\nSometimes the target was very close.\n\nOnce, the owner's own name appeared on the reverse.\n\nThe bounty was a record amount.",
@@ -304,7 +304,7 @@ return {
         GoldenSneakers = {
             name = "Golden Sneakers",
             pickup = "Grants <b>movement speed</c> based on your current <y>gold</c>.",
-            description = "Grants up to <b>50% movement speed</c> based on your current <y>gold</c>. Reaches the cap at <y>700</c> <c_stack>(-50% per stack)</c> <y>gold</c>. <y>Scales with time</c>.",
+            description = "Grants up to <b>50% movement speed</c> based on your current <y>gold</c>. Reaches the cap at <y>700</c> <c_stack>(-50% per stack)</c> <y>gold</c>. Scales with time.",
             destination = "Sprint Foundry,\nCourier Outfitters,\nNeo-Olympia",
             date = "11.05.2057",
             story = "Gold is rarely chosen for convenience.\n\nIt is too heavy for shoes, too soft for soles, and too conspicuous for anyone trying to run away.\n\nYet this pair of sneakers weighs almost nothing while its owner has something jingling in their pockets. The more gold they carry, the lighter each step becomes — as though the metal itself pulls their feet forward, eager to be somewhere else.\n\nSpend the last of it, and the shoes grow heavy again. Not like gold. Like regret.",
@@ -457,7 +457,7 @@ return {
         GoldBar = {
             name = "Gold Bar",
             pickup = "Grants <y>gold</c> at the start of a stage.",
-            description = "At the start of each stage, gain <y>$33</c> <c_stack>(+$22 per stack)</c>. <y>Scales with time</c>.",
+            description = "At the start of each stage, gain <y>$33</c> <c_stack>(+$22 per stack)</c>. Scales with time.",
             destination = "Mint 'Orbita',\nSmelting Section,\nEarth",
             date = "05.03.2057",
             story = "Pulled from an old safe during the dig at the estate of some long-vanished rich men. To look at it, an ordinary gold bar. But marks are etched along its edge, like figures. The jewelers agreed to a man: it's no stamp and no hallmark - the metal seems to have always borne them.\n\nThe figures won't hold still. The cashier who held the bar swore the number crept slowly upward, right there in his hand, and the longer you held it the heavier it pressed on your palm. He set it down when he understood - that isn't a price climbing. That's a debt.\n\nTake it into safekeeping. Paper burns, accounts reset to zero, but gold stays gold. I only rest easier when this bar is lying in someone else's hands.",
