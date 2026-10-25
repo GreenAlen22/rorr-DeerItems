@@ -52,7 +52,8 @@ end
 local function counter(actor, damage)
     if not Instance.exists(actor) then return end
 
-    actor:sound_play(gm.constants.wMercenary_Parry_SuccessfulSlash, 1, 1)
+    -- counter идёт только у машины с правом на игрока: звук остальным — через сеть.
+    DeerItemsSound.play_at(Sound.wrap(gm.constants.wMercenary_Parry_SuccessfulSlash), actor.x, actor.y, 1, 1)
 
     local coef = COUNTER_MULT * damage / math.max(actor.damage, 1)
     -- Спрайт разреза — ванильный sEfSlash2 Mercenary; через fire_explosion он виден всем машинам.
