@@ -52,6 +52,9 @@ local function ensure_drone(actor)
     -- Привязываем дрона к ВЛАДЕЛЬЦУ. owner — реальное поле дронов (его читает voidCore.lua);
     -- кладём именно raw-CInstance (actor.value), а не тулкит-обёртку, иначе GML получит мусор.
     inst.owner = actor.value
+    -- -1 — «не перерабатывается», как у init_drone. Иначе переработчик дронов
+    -- (oDroneRecycler_Step_2) брал бесплатного дрона, а мы ставили нового: бесконечный лут.
+    inst.recycle_tier = -1
     data.inst  = inst
 end
 

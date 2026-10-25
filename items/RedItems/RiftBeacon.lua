@@ -20,6 +20,7 @@ local LIFE_MAX     = 16 * 60     -- потолок продления убийс
 local RADIUS       = 250
 local TP_TICK      = 60          -- выброс раз в 1с
 local TP_DIST      = 250
+local NET_ACTOR_TELEPORT = 47    -- ids.tsv: net 47 actor_teleport
 
 local RADIUS_SPRITE_SIZE = 128
 local RADIUS_SPRITE_SCALE = (RADIUS * 1.2) / RADIUS_SPRITE_SIZE
@@ -58,6 +59,9 @@ local function displace_from_rift(actor, x, y)
     actor.pVspeed = 0
     actor.ghost_x = actor.x
     actor.ghost_y = actor.y
+    -- teleport_nearby двигает только у хоста; ваниль после него шлёт actor_teleport
+    -- (scr_skills_enemy_imp.gml), иначе у клиента враг так и стоит в разломе.
+    actor:net_send_instance_message(NET_ACTOR_TELEPORT)
 end
 
 local function radius_frame_for(self)

@@ -33,6 +33,12 @@ All notable DeerItems changes.
 - Multiplayer: Ingrown Idol's indicator now fills up for clients.
 - Totemetry's attack speed bonus now starts when the totem appears and ends on time, and works for clients.
 - Multiplayer: Concentration's ready marker on clients now goes out after the empowered hit.
+- Multiplayer: clients now see Artifact of Storm's lightning and Newton's Mechanism's pulse.
+- Drones with Shield Generator's shield no longer replay the shield sound every few seconds.
+- Laughing Fungus's mushrooms no longer fall through the floor.
+- Violet Frenzy's purple screen tint no longer flickers.
+- Army Surplus's drone can no longer be scrapped at a Drone Recycler for free items.
+- Multiplayer: Rift Beacon now throws enemies out of the rift on clients' screens too.
 
 ## [3.0.14]
 

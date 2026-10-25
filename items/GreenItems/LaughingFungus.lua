@@ -137,10 +137,11 @@ Callback.add(objMushroom.on_step, function(self)
     end
     if not Instance.exists(self.zone) then self:destroy(); return end
 
+    -- pBlock — родитель всех видов пола. oB — лишь один из них: на oBNoSpawn и
+    -- oBFloorNoSpawn гриб пола не видел и падал под карту до MUSHROOM_FALL_FUSE.
     local hit_ground = false
     if (self.vspeed or 0) >= 0 then
-        local ok, res = pcall(function() return self:is_colliding(gm.constants.oB, self.x, self.y + 2) end)
-        hit_ground = ok and res
+        hit_ground = self:is_colliding(gm.constants.pBlock, self.x, self.y + 2)
     end
 
     if hit_ground or self.life >= MUSHROOM_FALL_FUSE then

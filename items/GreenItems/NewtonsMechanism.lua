@@ -40,6 +40,29 @@ DeerItemsCallbacks.item_stat_recalc(item, function(actor, stack, api)
     end
 end)
 
+-- Один спрайт молнии: высота = радиус, ширина = 0.8×высоты (пропорция арта). Спрайт 64×112 px.
+local function pulse_visual(actor, radius)
+    local ef = gm.instance_create(actor.x, actor.y, gm.constants.oEfExplosion)
+    ef.sprite_index = voltOverload.value
+    ef.image_yscale = radius / 112
+    ef.image_xscale = (radius * 0.8) / 64
+
+    actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.2)
+    actor:screen_shake(3)
+end
+
+-- Пульс выпускает хост; oEfExplosion локальный, поэтому молнию и звук клиентам шлём пакетом.
+local packet_pulse = Packet.new("NewtonsMechanism-packet_pulse")
+packet_pulse:set_serializers(function(buffer, actor, radius)
+    buffer:write_instance(actor)
+    buffer:write_float(radius)
+end, function(buffer)
+    local actor = buffer:read_instance()
+    local radius = buffer:read_float()
+    if not Net.client or not Instance.exists(actor) then return end
+    pulse_visual(actor, radius)
+end)
+
 -- Оглушающий пульс при пробитии щита: 150%(+75%/стак) базового урона + 100%(+50%/стак) от макс. щита.
 local function release_pulse(actor, stack)
     local radius = RADIUS_BASE + RADIUS_STACK * (stack - 1)
@@ -62,14 +85,8 @@ local function release_pulse(actor, stack)
         attack.attack_info.stun = STUN_SECONDS / 1.5  -- stun считается в единицах по 1,5 с
     end
 
-    -- Один спрайт молнии: высота = радиус, ширина = 0.8×высоты (пропорция арта). Спрайт 64×112 px.
-    local ef = gm.instance_create(actor.x, actor.y, gm.constants.oEfExplosion)
-    ef.sprite_index = voltOverload.value
-    ef.image_yscale = radius / 112
-    ef.image_xscale = (radius * 0.8) / 64
-
-    actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.2)
-    actor:screen_shake(3)
+    pulse_visual(actor, radius)
+    packet_pulse:send_to_all(actor, radius)
 end
 
 -- Каждый кадр: ловим пробитие щита и держим бонус брони актуальным.

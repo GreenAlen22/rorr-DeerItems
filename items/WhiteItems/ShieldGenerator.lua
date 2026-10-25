@@ -98,28 +98,17 @@ Callback.add(Callback.ON_STEP, function()
     end
 end)
 
--- Ванильные дроны не вызывают item:onStatRecalc владельца, поэтому применяем
--- щит на их собственном пересчёте — тот же путь, что у HeavyLungs.
-gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result, args)
-    if not is_drone(self) then return end
+-- Ванильные дроны не вызывают item:onStatRecalc владельца, поэтому щит вешаем
+-- на их собственный пересчёт. Только через api: post-хук дописывал maxshield после
+-- того, как ваниль уже обрезала shield до maxshield без бонуса (recalculate_stats.gml:107),
+-- и щит дрона каждые COUNT_PERIOD кадров обнулялся и перезаливался со звуком wShield.
+-- Прирост щита при подборе ваниль выдаёт сама той же строкой.
+RecalculateStats.add(function(actor, api)
+    if not is_drone(actor) then return end
 
     refresh_team_stacks()
-    local stack = team_stacks[self.team] or 0
-    local data = Instance.get_data(Instance.wrap(self), "ShieldGenerator", GUID)
-    if stack <= 0 then
-        data.sg_bonus = nil
-        self.shield = math.min(self.shield or 0, self.maxshield or 0)
-        return
-    end
+    local stack = team_stacks[actor.team] or 0
+    if stack <= 0 then return end
 
-    local bonus = self.maxhp * DRONE_SHIELD_PER_STACK * stack
-    self.maxshield = self.maxshield + bonus
-
-    -- Выдаём только прирост нового бонуса: щит появляется сразу при подборе, но не
-    -- восстанавливается полностью на каждом последующем пересчёте характеристик.
-    local gained_bonus = math.max(0, bonus - (data.sg_bonus or 0))
-    if gained_bonus > 0 then
-        self.shield = math.min(self.maxshield, (self.shield or 0) + gained_bonus)
-    end
-    data.sg_bonus = bonus
+    api.maxshield_add(actor.maxhp * DRONE_SHIELD_PER_STACK * stack)
 end)

@@ -6,9 +6,6 @@
 -- Загружаем спрайт предмета (плейсхолдер — копия Community.png; замени на финальный арт по этому пути)
 local sprite = Sprite.new("item/VioletFrenzy", PATH.."assets/sprites/items/sRedItems/VioletFrenzy.png", 1, 18, 17)
 
--- guid мода: ускоряет get_data (без обхода debug-стека на каждом кадре)
-local GUID = _ENV["!guid"]
-
 -- Настройки баланса
 local BASE_SECONDS = 8
 local STACK_SECONDS = 6
@@ -52,18 +49,19 @@ end
 -- При убийстве элиты — входим (или продлеваем) берсерк.
 -- Таймер ОБНОВЛЯЕТСЯ до полной длительности (не суммируется), как в RoR2:
 -- чтобы держать берсерк, нужно убивать элиту не реже, чем раз в длительность. Это естественный кэп аптайма.
+-- Длительность несёт сам бафф: ваниль ставит таймер max(старый, новый)
+-- (apply_buff_internal.gml:23), снимает бафф по истечении и синкает клиентам.
+-- Раньше бафф на 2 кадра переподвешивался каждый кадр, и подсветка экрана мигала.
 DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
     if Net.client then return end
 
     if not is_elite_or_boss(victim) then return end
     stack = stack or 1
-    local data = Instance.get_data(actor, nil, GUID)
-    local full = (BASE_SECONDS + STACK_SECONDS * (stack - 1)) * 60
-    data.berserk = math.max(data.berserk or 0, full)
+    actor:buff_apply(buff, (BASE_SECONDS + STACK_SECONDS * (stack - 1)) * 60)
 end)
 
 local function is_berserk(actor)
-    return actor:buff_count(buff) > 0 or (Instance.get_data(actor, nil, GUID).berserk or 0) > 0
+    return actor:buff_count(buff) > 0
 end
 
 local function reduce_slot_cooldown(actor, slot)
@@ -99,28 +97,6 @@ local function reduce_other_skills(actor, used_slot)
         end
     end
 end
-
--- Каждый кадр у держателя: пока берсерк активен, поддерживаем таймер и визуальный бафф.
--- Сокращение кулдаунов происходит только в onSecondaryUse/onUtilityUse/onSpecialUse.
-DeerItemsCallbacks.item_post_step(item, function(actor, stack)
-    if Net.client then return end
-
-    local data = Instance.get_data(actor, nil, GUID)
-    local t = data.berserk or 0
-    if t <= 0 then return end
-
-    -- Поддерживаем визуальный бафф, пока идёт берсерк
-    if actor:buff_count(buff) <= 0 then
-        actor:buff_apply(buff, 2)
-    end
-
-    data.berserk = t - 1
-    if data.berserk <= 0 then
-        data.berserk = 0
-        local n = actor:buff_count(buff)
-        if n > 0 then actor:buff_remove(buff, n) end
-    end
-end)
 
 DeerItemsCallbacks.item_secondary_use(item, function(actor, stack, active_skill)
     reduce_other_skills(actor, Skill.Slot.SECONDARY)

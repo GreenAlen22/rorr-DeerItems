@@ -48,6 +48,9 @@ artifact.token_description = "artifact.Storm.description"
 
 local storm_timer = 0
 local pending_strikes = {}
+-- Волны и урон считает хост. Эффекты oEfExplosion локальные, поэтому хост
+-- рассылает точку удара, а клиент сам ведёт предупреждение и вспышку.
+local packet_strike = Packet.new("ArtifactOfStorm-packet_strike")
 
 Callback.add(Callback.ON_GAME_START, function()
     storm_timer = 0
@@ -119,13 +122,7 @@ local function clear_pending_strikes()
     pending_strikes = {}
 end
 
-local function queue_strike(players)
-    local target = players[math.random(#players)]
-    local distance = math.random() * STRIKE_RANGE
-    local angle = math.random() * math.pi * 2
-    local x = target.x + math.cos(angle) * distance
-    local y = target.y + math.sin(angle) * distance
-
+local function add_pending_strike(x, y)
     table.insert(pending_strikes, {
         x = x,
         y = y,
@@ -134,20 +131,43 @@ local function queue_strike(players)
     })
 end
 
+packet_strike:set_serializers(function(buffer, x, y)
+    buffer:write_float(x)
+    buffer:write_float(y)
+end, function(buffer)
+    local x = buffer:read_float()
+    local y = buffer:read_float()
+    if not Net.client or not artifact.active then return end
+    add_pending_strike(x, y)
+end)
+
+local function queue_strike(players)
+    local target = players[math.random(#players)]
+    local distance = math.random() * STRIKE_RANGE
+    local angle = math.random() * math.pi * 2
+    local x = target.x + math.cos(angle) * distance
+    local y = target.y + math.sin(angle) * distance
+
+    add_pending_strike(x, y)
+    packet_strike:send_to_all(x, y)
+end
+
 Callback.add(Callback.POST_STEP, function()
-    if Net.client or not artifact.active then
+    if not artifact.active then
         storm_timer = 0
         clear_pending_strikes()
         return
     end
 
+    -- У клиента список игроков пуст: урон по ним наносит хост.
     local players = {}
-    for _, player in ipairs(Instance.find_all(gm.constants.oP)) do
-        if is_alive(player) then
-            table.insert(players, player)
+    if not Net.client then
+        for _, player in ipairs(Instance.find_all(gm.constants.oP)) do
+            if is_alive(player) then
+                table.insert(players, player)
+            end
         end
     end
-    if #players == 0 then return end
 
     local struck = false
     for index = #pending_strikes, 1, -1 do
@@ -160,9 +180,12 @@ Callback.add(Callback.POST_STEP, function()
             struck = true
         end
     end
-    if struck then
-        players[1]:sound_play(volt_overload_sound, 1.5, 0.9 + math.random() * 0.2)
+    local listener = Player.get_local()
+    if struck and listener and Instance.exists(listener) then
+        listener:sound_play(volt_overload_sound, 1.5, 0.9 + math.random() * 0.2)
     end
+
+    if Net.client or #players == 0 then return end
 
     local item_weight = total_player_item_weight(players)
     storm_timer = storm_timer + 1
