@@ -9,8 +9,10 @@ local sndDraw     = Sound.new("GlyphPaper/draw", PATH.."assets/sounds/GlyphPaper
 local sndBurn     = Sound.new("GlyphPaper/burn", PATH.."assets/sounds/GlyphPaperBurn.ogg")
 
 local COOLDOWN   = 45
-local DRAW_TIME  = 36     -- кадры, за которые рисуется круг с символом
-local CAST_AT    = 45     -- кадр срабатывания
+-- Рисование растянуто, а срабатывание стоит после паузы за его концом: по прогону
+-- 25.10.2026 в мультиплеере анимацию не успевали разглядеть.
+local DRAW_TIME  = 60     -- кадры, за которые рисуется круг с символом
+local CAST_AT    = 75     -- кадр срабатывания: 15 кадров готовый глиф висит целиком
 local BURN_SPEED = 0.35   -- кадров ленты за кадр игры при сгорании
 local BURN_FIRST = 1
 local BURN_LAST  = 8
