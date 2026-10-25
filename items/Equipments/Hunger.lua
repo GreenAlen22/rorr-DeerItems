@@ -80,11 +80,14 @@ Callback.add(obj.on_step, function(self)
     self.image_index = visual_frame_for(self.age)
     self.age = (self.age or 0) + 1
 
-    -- Притяжение считает хост (авторитет по позициям врагов); клиентам прилетает синк
-    if Net.client then return end
+    -- Жизнь дыры ведёт хост, клиентская копия уходит по instance_destroy_sync.
+    if not Net.client then
+        self.life = self.life - 1
+        if self.life <= 0 then self:destroy(); return end
+    end
 
-    self.life = self.life - 1
-    if self.life <= 0 then self:destroy(); return end
+    -- Притяжение — на каждой машине: дыра у клиента своя копия (projectile_sync), а позицию
+    -- врага хост досылает лишь раз в 90 кадров (oServer_Alarm_1), и враги дёргались рывками.
 
     -- Враги = противоположная команда владельца (как в Totemetry/DeepcoreGK2)
     local enemy_team = self.team == 1 and 2 or 1

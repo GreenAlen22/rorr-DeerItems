@@ -92,7 +92,9 @@ Callback.add(oSkull.on_step, function(self)
                 -- поэтому фиксируем итог через raw damage, чтобы энергия души не умножалась на actor.damage.
                 -- proc=false обязателен: иначе урон черепа
                 -- мог бы прокать другие предметы и сам себя.
-                local atk = self.parent:fire_explosion(self.x, self.y, 48, 48, self.dmg, burstSprite, nil, false)
+                -- Без спрайта: вспышку импакта рисует on_destroy на каждой машине, со спрайтом
+                -- здесь она выходила дважды.
+                local atk = self.parent:fire_explosion(self.x, self.y, 48, 48, self.dmg, nil, nil, false)
                 if atk and atk.attack_info then
                     atk.attack_info:use_raw_damage()
                     atk.attack_info:set_damage(self.dmg)
@@ -215,7 +217,7 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     local threshold = maxhp * THRESHOLD_FRAC
     if threshold > 0 and data.soul >= threshold and (data.dw_cd or 0) <= 0 then
         if Net.host then
-            actor:sound_play(sndLaunch, 0.9, 1.1 + math.random() * 0.3)
+            DeerItemsSound.play_at(sndLaunch, actor.x, actor.y, 0.9, 1.1 + math.random() * 0.3)
             local s = oSkull:create(actor.x, actor.y - 24)
             s.parent    = actor
             s.team      = actor.team

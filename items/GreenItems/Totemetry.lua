@@ -95,7 +95,7 @@ DeerItemsCallbacks.item_pre_step(item, function(actor, stack)
 
     if now >= next_frame then
         -- Воспроизводим звук
-        actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
+        DeerItemsSound.play_at(sound, actor.x, actor.y, 2.0, 0.9 + math.random() * 0.5)
 
         -- Спавним тотем
         local inst = objTotem:create(actor.x, actor.y)

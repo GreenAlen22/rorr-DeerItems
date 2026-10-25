@@ -17,6 +17,27 @@ local SUN_Y_OFFSET = 6 * 32
 local SUN_SPAWN_COOLDOWN = 5 * 60
 -- Цвет отрисовки зоны действия солнца — создаётся один раз, а не каждый кадр
 local SUN_COLOR = Color(0xffcc33)
+local SUN_LIFE = 5 * 60
+
+-- Солнца заводит хост (ON_KILL_PROC идёт только у него), а контур зоны рисует каждая
+-- машина по своему data.suns. Клиенту солнце приходит пакетом, урон остаётся у хоста.
+local packet_sun = Packet.new("ShineOSun-packet_sun")
+packet_sun:set_serializers(function(buffer, actor, x, y, radius)
+    buffer:write_instance(actor)
+    buffer:write_float(x)
+    buffer:write_float(y)
+    buffer:write_float(radius)
+end, function(buffer)
+    local actor = buffer:read_instance()
+    local x = buffer:read_float()
+    local y = buffer:read_float()
+    local radius = buffer:read_float()
+    if not Net.client or not Instance.exists(actor) then return end
+
+    local data = Instance.get_data(actor, nil, GUID)
+    data.suns = data.suns or {}
+    table.insert(data.suns, { x = x, y = y, w = radius, h = radius, t = SUN_LIFE })
+end)
 
 -- Создание предмета ShineOSun
 -- Привязка спрайта к предмету
@@ -43,7 +64,7 @@ DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
         -- Ограничение: не больше MAX_SUNS солнц на карте одновременно
         if #data.suns >= MAX_SUNS then return end
 
-        actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
+        DeerItemsSound.play_at(sound, actor.x, actor.y, 2.0, 0.9 + math.random() * 0.5)
 
         -- Урон за удар: 5% от максимального HP убитого — сырое число, а не коэффициент к урону игрока
         local dmg = victim.maxhp * 0.05
@@ -59,18 +80,29 @@ DeerItemsCallbacks.item_kill_proc(item, function(actor, victim, stack)
             -- всё равно достаёт до земли под ним.
             w = radius,                  -- полуширина зоны
             h = radius,                  -- полувысота зоны
-            t = 5 * 60,                  -- общее время жизни (5 секунд)
+            t = SUN_LIFE,                -- общее время жизни (5 секунд)
             tick = 12                    -- интервал урона: 12 кадров
         })
+        packet_sun:send_to_all(actor, victim.x, victim.y - SUN_Y_OFFSET, radius)
         data.sun_spawn_cooldown = SUN_SPAWN_COOLDOWN
     end
 end)
 
 -- Обработка каждого активного солнца: урон по области каждые 12 кадров
 DeerItemsCallbacks.item_post_step(item, function(actor, stack)
-    if not Net.host then return end
-
     local data = Instance.get_data(actor, nil, GUID)
+
+    -- У клиента солнца только для контура: ведём их срок, урона нет.
+    if Net.client then
+        if not data.suns then return end
+        for i = #data.suns, 1, -1 do
+            local s = data.suns[i]
+            s.t = s.t - 1
+            if s.t <= 0 then table.remove(data.suns, i) end
+        end
+        return
+    end
+
     if (data.sun_spawn_cooldown or 0) > 0 then
         data.sun_spawn_cooldown = data.sun_spawn_cooldown - 1
     end

@@ -22,9 +22,10 @@ item.loot_tags = Item.LootTag.CATEGORY_UTILITY
 
 -- В начале этапа даёт временный бафф
 DeerItemsCallbacks.item_stage_start(item, function(actor, stack)
+    -- Начало этапа идёт на каждой машине: звук у всех, бафф ставит хост.
+    actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
     if Net.client then return end
 
-    actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
     -- Длительность: 20 + 10 сек за стак
     actor:buff_apply(buff, 60 * (20 + 10 * stack), stack)
 end)

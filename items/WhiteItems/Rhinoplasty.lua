@@ -57,7 +57,7 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
             table.remove(timers, i)
             actor:buff_remove(buff, 1)
             actor:heal(heal_per_skin(actor))
-            actor:sound_play_at(gm.constants.wUse, 1.0, 0.7, actor.x, actor.y)
+            DeerItemsSound.play_at(Sound.wrap(gm.constants.wUse), actor.x, actor.y, 1.0, 0.7)
         end
     end
 

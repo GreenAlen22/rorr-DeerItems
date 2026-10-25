@@ -72,7 +72,7 @@ end
 
 local function play_ignite_sound(victim)
     if math.random() <= IGNITE_SOUND_CHANCE then
-        victim:sound_play(sound, 1.0, 0.9 + math.random() * 0.2)
+        DeerItemsSound.play_at(sound, victim.x, victim.y, 1.0, 0.9 + math.random() * 0.2)
     end
 end
 

@@ -54,17 +54,12 @@ Callback.add(arrow.on_step, function(self)
             data.hit_targets[target.id] = true
             data.pierce_count = data.pierce_count + 1
 
-            local hit = self.parent:fire_direct(target, self.dmg_coef, self.direction, self.x, self.y)
+            -- Искры — спрайтом попадания атаки: его движок показывает всем. Свой oEfSparks
+            -- (pVFX, без синхронизации) видел только хост, стрела у клиента не бьёт.
+            local hit = self.parent:fire_direct(target, self.dmg_coef, self.direction, self.x, self.y, gm.constants.sSparks1)
             if hit and hit.attack_info then
                 hit.attack_info.proc = false
                 hit.attack_info.damage_color = BLEND
-            end
-
-            local efSparks = Object.find("EfSparks", "ror")
-            if efSparks then
-                local sp = efSparks:create(target.x, target.y)
-                sp.sprite_index = gm.constants.sSparks1
-                sp.image_blend = BLEND
             end
 
             if data.pierce_count >= PIERCE_TARGETS then
@@ -128,7 +123,8 @@ DeerItemsCallbacks.item_primary_use(item, function(actor, stack, active_skill)
 
     data.charges = data.charges - 1
 
-    actor:sound_play(MagicMissileLaunch, 1.0, 0.9 + math.random() * 0.4)
+    -- Заряды тратит только хост, поэтому и звук выстрела решает он.
+    DeerItemsSound.play_at(MagicMissileLaunch, actor.x, actor.y, 1.0, 0.9 + math.random() * 0.4)
     local dir = aim_direction(actor)
     local missile = arrow:create(actor.x + gm.lengthdir_x(10, dir), actor.y - 12 + gm.lengthdir_y(10, dir))
     missile.parent = actor

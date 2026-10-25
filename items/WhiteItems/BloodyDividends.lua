@@ -15,6 +15,17 @@ local SOUND_CHANCE   = 0.15  -- шанс звука при начислении
 local SOUND_COOLDOWN = 60    -- минимум кадров между звуками (анти-спам, 1 сек)
 
 -- Создание предмета: белый тир, тег «утилита»
+local function play_coin(actor)
+    actor:sound_play(coinSound, 1.0, 0.95 + math.random() * 0.1)
+end
+
+local packet_coin = Packet.new("BloodyDividends-packet_coin")
+packet_coin:set_serializers(function(buffer) end, function(buffer)
+    if not Net.client then return end
+    local player = Player.get_local()
+    if player and Instance.exists(player) then play_coin(player) end
+end)
+
 local item = Item.new("BloodyDividends")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.COMMON)
@@ -31,13 +42,16 @@ DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_
     -- ON_DAMAGED_PROC зовёт только хост: держателю-клиенту золото уходит пакетом
     DeerItemsGold.pay(actor, money)
 
-    -- Звук — только когда держатель сидит за этой машиной
-    if actor ~= Player.get_local() then return end
     -- Звук с редким шансом и анти-спамом
     local data = Instance.get_data(actor, "BloodyDividends", GUID)
     local now = Global._current_frame
     if (now - (data.pt_last_sound or -SOUND_COOLDOWN)) >= SOUND_COOLDOWN and math.random() < SOUND_CHANCE then
-        actor:sound_play(coinSound, 1.0, 0.95 + math.random() * 0.1)
         data.pt_last_sound = now
+        -- Звон слышит только сам держатель: у хоста он свой, клиенту — личным пакетом.
+        if not Net.online or actor == Player.get_local() then
+            play_coin(actor)
+        elseif actor.object_index == gm.constants.oP then
+            packet_coin:send_direct(actor)
+        end
     end
 end)

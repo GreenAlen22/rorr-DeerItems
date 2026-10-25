@@ -37,6 +37,45 @@ for _, n in ipairs({ "oSpiderBulletNoSync", "oGuardBulletNoSync", "oBugBulletNoS
     if c then NOSYNC[c] = true end
 end
 
+-- Визуал как у Боско: трассер от игрока + искры на снаряде.
+local function zap_visual(actor, x, y)
+    local efLineTracer = Object.find("EfLineTracer", "ror")
+    if efLineTracer then
+        local tr = efLineTracer:create(actor.x, actor.y - 8)
+        tr.xend = x; tr.yend = y
+        tr.bm = 1; tr.rate = 0.1; tr.width = 1.5
+        tr.image_blend = BLEND
+    end
+    local efSparks = Object.find("EfSparks", "ror")
+    if efSparks then
+        local sp = efSparks:create(x, y)
+        sp.sprite_index = gm.constants.sSparks1
+        sp.image_blend  = BLEND
+    end
+end
+
+-- Синхронные снаряды сбивает только хост, а трассер и искры (pVFX) локальные:
+-- клиенту точки сбитых снарядов идут пакетом. NoSync клиент сбивает и рисует сам.
+local packet_zap = Packet.new("MosquitoNet-packet_zap")
+packet_zap:set_serializers(function(buffer, actor, points)
+    buffer:write_instance(actor)
+    buffer:write_byte(#points)
+    for _, pt in ipairs(points) do
+        buffer:write_float(pt[1])
+        buffer:write_float(pt[2])
+    end
+end, function(buffer)
+    local actor = buffer:read_instance()
+    local points = {}
+    for i = 1, buffer:read_byte() do
+        points[i] = { buffer:read_float(), buffer:read_float() }
+    end
+    if not Net.client or not Instance.exists(actor) then return end
+
+    for _, pt in ipairs(points) do zap_visual(actor, pt[1], pt[2]) end
+    actor:sound_play(sound, 0.7, 1.2 + math.random() * 0.3)
+end)
+
 local item = Item.new("MosquitoNet")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.RARE)
@@ -75,30 +114,19 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if not inrange[1] then return end
     if inrange[2] then table.sort(inrange, function(a, b) return a.d < b.d end) end
 
-    local host         = Net.host
-    local efLineTracer = Object.find("EfLineTracer", "ror")
-    local efSparks     = Object.find("EfSparks", "ror")
+    local host = Net.host
 
     local n    = math.min(INTERCEPT_BASE + INTERCEPT_STACK * stack, MAX_PER_TICK)   -- 2 (+2 за стак)
     local shot = 0
+    local synced = {}
     for i = 1, #inrange do
         if shot >= n then break end
         local p = inrange[i].p
         if Instance.exists(p) then
             -- NoSync — локально на любом клиенте; синхронные — только хост.
             if NOSYNC[p.object_index] or host then
-                -- Визуал как у Боско: трассер от игрока + искры на снаряде.
-                if efLineTracer then
-                    local tr = efLineTracer:create(actor.x, actor.y - 8)
-                    tr.xend = p.x; tr.yend = p.y
-                    tr.bm = 1; tr.rate = 0.1; tr.width = 1.5
-                    tr.image_blend = BLEND
-                end
-                if efSparks then
-                    local sp = efSparks:create(p.x, p.y)
-                    sp.sprite_index = gm.constants.sSparks1
-                    sp.image_blend  = BLEND
-                end
+                zap_visual(actor, p.x, p.y)
+                if not NOSYNC[p.object_index] then synced[#synced + 1] = { p.x, p.y } end
                 p:destroy()
                 shot = shot + 1
             end
@@ -108,6 +136,7 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if shot > 0 then
         actor:sound_play(sound, 0.7, 1.2 + math.random() * 0.3)
     end
+    if synced[1] then packet_zap:send_to_all(actor, synced) end
 end)
 
 -- Периодический блок: до расчёта урона по игроку с предметом, если блок готов — гасим удар в 0.

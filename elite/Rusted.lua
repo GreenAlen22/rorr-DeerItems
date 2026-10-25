@@ -131,6 +131,15 @@ end
 
 Callback.add(Callback.ON_DIRECTOR_POPULATE_SPAWN_ARRAYS, update_card_availability)
 
+-- HP и урон — через api на каждом пересчёте и на каждой машине. Прямая запись в
+-- maxhp/damage жила до первого пересчёта, а его запускает любой бафф на враге
+-- (apply_buff_internal → actor_queue_dirty): элита теряла множители, HP обрезалось.
+RecalculateStats.add(function(actor, api)
+    if not is_rusted(actor) then return end
+    api.maxhp_mult(HEALTH_MULTIPLIER)
+    api.damage_mult(DAMAGE_MULTIPLIER)
+end)
+
 Callback.add(rusted.on_apply, function(actor)
     if not Net.host then return end
     if not is_rusted(actor) then return end
@@ -139,9 +148,8 @@ Callback.add(rusted.on_apply, function(actor)
     if data.stats_applied then return end
     data.stats_applied = true
 
-    actor.maxhp = actor.maxhp * HEALTH_MULTIPLIER
+    actor:recalculate_stats()
     actor.hp = actor.maxhp
-    actor.damage = actor.damage * DAMAGE_MULTIPLIER
     if actor.gold then actor.gold = actor.gold * GOLD_MULTIPLIER end
 
     for slot = 0, 3 do

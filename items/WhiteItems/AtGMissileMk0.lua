@@ -122,7 +122,7 @@ DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     if not Net.host then return end
     -- Шанс 7% за стак
     if math.random() <= (0.07 * stack) then
-        actor:sound_play(launch, 1.0, 0.9 + math.random() * 0.4)
+        DeerItemsSound.play_at(launch, actor.x, actor.y, 1.0, 0.9 + math.random() * 0.4)
         -- Создание ракеты рядом с актёром
         local s = oMissile:create(actor.x + actor.image_xscale * 10, actor.y - 15)
         s.direction = 90 - actor.image_xscale * 45

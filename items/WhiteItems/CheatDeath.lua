@@ -117,8 +117,13 @@ end, function(buffer)
 
     local actor = buffer:read_instance()
     local amount = buffer:read_float()
-    if not Instance.exists(actor) or actor ~= Player.get_local() then return end
-    deal_internal_damage(actor, amount)
+    if not Instance.exists(actor) then return end
+    -- Урон наносит только владелец HP, цифры видят все.
+    if actor == Player.get_local() then
+        deal_internal_damage(actor, amount)
+    else
+        spawn_damage_text(actor, amount)
+    end
 end)
 
 local function send_restore(actor)
@@ -174,8 +179,10 @@ Callback.add(Callback.POST_STEP, function()
                     if actor == Player.get_local() then
                         deal_internal_damage(actor, tick.damage)
                     else
-                        send_tick(actor, tick.damage)
+                        spawn_damage_text(actor, tick.damage)
                     end
+                    -- Тик уходит всем: владелец HP наносит урон, остальные рисуют цифры.
+                    send_tick(actor, tick.damage)
                     tick.ticks = tick.ticks - 1
                     if tick.ticks <= 0 then
                         table.remove(ticks, i)

@@ -39,6 +39,12 @@ All notable DeerItems changes.
 - Violet Frenzy's purple screen tint no longer flickers.
 - Army Surplus's drone can no longer be scrapped at a Drone Recycler for free items.
 - Multiplayer: Rift Beacon now throws enemies out of the rift on clients' screens too.
+- Rusted elites keep their extra health and damage after being slowed or debuffed, and clients see their full health bar.
+- Multiplayer: Hunger pulls enemies in smoothly on clients' screens.
+- Multiplayer: clients now see Shine, O Sun's zone, Magic Missile's hit sparks, Soul Jar's vanish flash, Mosquito Net's zaps and Leaking Capacitor's pulse.
+- Multiplayer: clients now hear Annihilator, AtG Missile Mk. 0, Bloody Dividends, Faceted Jade, Fear Eyes, Ice Mixture, Ingrown Idol's beast, Leaking Capacitor, Magic Missile, Magma Fragment, Rhinoplasty, Shadow Shield, Shine, O Sun, Soul Jar, Totemetry and Twisted Opinion.
+- Multiplayer: everyone sees Cheat Death's delayed damage numbers.
+- Twisted Opinion's skull impact flash no longer plays twice.
 
 ## [3.0.14]
 

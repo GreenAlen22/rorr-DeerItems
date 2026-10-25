@@ -66,7 +66,23 @@ Callback.add(obj.on_step, function(self)
         local p = self.parent
         if Instance.exists(p) and p.sprite_idle then self.sprite_index = p.sprite_idle end
         self.image_blend = BLACK
-        self.image_alpha = (self.show == 1) and 1 or 0
+        local shown = self.show == 1
+        self.image_alpha = shown and 1 or 0
+
+        -- Звуки удара и вспышку ухода хост играет у себя в машине состояний. Клиент
+        -- узнаёт о них по смене show из instance_resync и играет сам, без пакета.
+        local data = Instance.get_data(self, "SoulJar", GUID)
+        if shown ~= (data.shown or false) then
+            data.shown = shown
+            if shown then
+                if Instance.exists(p) then
+                    p:sound_play(sndSummon, 0.7, 1.4 + math.random() * 0.3)
+                    p:sound_play(sndHit, 0.6, 1.1 + math.random() * 0.3)
+                end
+            else
+                puff(self, BLACK)
+            end
+        end
         return
     end
 

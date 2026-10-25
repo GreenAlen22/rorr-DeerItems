@@ -42,7 +42,7 @@ DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_
         local normal = actor:item_count(item, Item.StackKind.NORMAL)
         if normal > 0 then
             actor:item_take(item, normal)
-            actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
+            DeerItemsSound.play_at(sound, actor.x, actor.y, 2.0, 0.9 + math.random() * 0.5)
             actor:item_give(item_used, normal)
         end
 
@@ -50,7 +50,7 @@ DeerItemsCallbacks.item_damaged_proc(item, function(actor, attacker, stack, hit_
         local temp = actor:item_count(item, Item.StackKind.TEMPORARY_BLUE)
         if temp > 0 then
             actor:item_take(item, temp, Item.StackKind.TEMPORARY_BLUE)
-            actor:sound_play(sound, 2.0, 0.9 + math.random() * 0.5)
+            DeerItemsSound.play_at(sound, actor.x, actor.y, 2.0, 0.9 + math.random() * 0.5)
             actor:item_give(item_used, temp, Item.StackKind.TEMPORARY_BLUE)
         end
     end

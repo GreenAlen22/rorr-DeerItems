@@ -27,7 +27,7 @@ DeerItemsCallbacks.item_hit_proc(item, function(actor, victim, stack, hit_info)
     -- Шанс 7% (2+5) и + 5% за стак
 	if math.random() <= 0.02 + (0.05 * stack) then
         -- Звук на цели при наложении: всегда случайные громкость и интонация
-        victim:sound_play(sound, 0.8 + math.random() * 0.6, 0.7 + math.random() * 0.6)
+        DeerItemsSound.play_at(sound, victim.x, victim.y, 0.8 + math.random() * 0.6, 0.7 + math.random() * 0.6)
         -- Применение дебаффа
         iceBuff = iceBuff or Buff.find("IceMixture", "DeerItems")
         victim:buff_apply(iceBuff, 1)

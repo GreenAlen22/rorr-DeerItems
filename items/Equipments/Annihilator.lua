@@ -118,11 +118,11 @@ equip.loot_tags = Item.LootTag.CATEGORY_DAMAGE
 equip.cooldown = COOLDOWN * 60
 
 Callback.add(equip.on_use, function(actor)
-    -- Коллбек снаряжения вызывается у всех. Создаём заряд только на хосте, чтобы
-    -- синхронизированный projectile_sync был единственной копией, видимой клиентам.
+    -- Коллбек снаряжения вызывается у всех: звук каждый играет у себя. Заряд создаём
+    -- только на хосте, чтобы синхронизированный projectile_sync был единственной копией.
+    actor:sound_play(sndLaunch, 1.0, 0.9 + math.random() * 0.2)
     if not Net.host then return end
 
-    actor:sound_play(sndLaunch, 1.0, 0.9 + math.random() * 0.2)
     local c = oCharge:create(actor.x + actor.image_xscale * 16, actor.y - 16)
     c.parent = actor
     c.team   = actor.team

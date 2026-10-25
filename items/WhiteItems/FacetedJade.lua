@@ -122,7 +122,7 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
     if active ~= data.fj_was_active then
         actor:recalculate_stats()
         if safe then
-            actor:sound_play(restoreSound, 1.0, 0.95 + math.random() * 0.1)
+            DeerItemsSound.play_at(restoreSound, actor.x, actor.y, 1.0, 0.95 + math.random() * 0.1)
         end
         data.fj_was_active = active
     end

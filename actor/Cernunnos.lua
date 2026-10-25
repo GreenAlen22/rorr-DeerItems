@@ -431,7 +431,7 @@ Callback.add(statePrimary.on_step, function(actor, data)
     if not data.fired and actor.image_index >= ATTACK_FRAME then
         data.fired = true
         actor:fire_explosion(actor.x, actor.y + CENTER_Y, ATTACK_W, ATTACK_H, 1, nil, nil, true)
-        play_sound(actor, CernunnosSound.hit, 1.0, 1.0)
+        DeerItemsSound.play_at(cernunnos_sounds[CernunnosSound.hit], actor.x, actor.y, 1.0, 1.0)
     end
 
     actor:skill_util_exit_state_on_anim_end()
@@ -522,7 +522,7 @@ local function spawn(owner, stack)
             if alive(inst) then sync_network_state(inst) end
         end)
     end
-    owner:sound_play(snd, 1.0, 0.8)
+    DeerItemsSound.play_at(snd, owner.x, owner.y, 1.0, 0.8)
     return inst
 end
 

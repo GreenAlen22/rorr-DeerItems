@@ -51,6 +51,23 @@ local function recalc_drones(actor)
     end
 end
 
+-- Обратная связь: звук + вспышка-кольцо у игрока.
+local function pulse_visual(actor)
+    actor:sound_play(sound, 0.9, 0.95 + math.random() * 0.2)
+    local fx = gm.instance_create(actor.x, actor.y, gm.constants.oEfSparks)
+    if fx then fx.sprite_index = pulseSprite.value end
+end
+
+-- Волну по таймеру запускает хост; oEfSparks локальный, поэтому клиентам — пакет.
+local packet_pulse = Packet.new("LeackedCapacitor-packet_pulse")
+packet_pulse:set_serializers(function(buffer, actor)
+    buffer:write_instance(actor)
+end, function(buffer)
+    local actor = buffer:read_instance()
+    if not Net.client or not Instance.exists(actor) then return end
+    pulse_visual(actor)
+end)
+
 local item = Item.new("LeackedCapacitor")
 item:set_sprite(sprite)
 item:set_tier(ItemTier.RARE)
@@ -96,10 +113,8 @@ DeerItemsCallbacks.item_post_step(item, function(actor, stack)
         ally:buff_apply(energize, DURATION, 1)
     end
 
-    -- Обратная связь: звук + вспышка-кольцо у игрока.
-    actor:sound_play(sound, 0.9, 0.95 + math.random() * 0.2)
-    local fx = gm.instance_create(actor.x, actor.y, gm.constants.oEfSparks)
-    if fx then fx.sprite_index = pulseSprite.value end
+    pulse_visual(actor)
+    packet_pulse:send_to_all(actor)
 end)
 
 -- Глобальный хук пересчёта статов: усиливает урон каждого дрона на ЕГО пересчёте.
